@@ -30,7 +30,7 @@ $flickr_table = $wpdb->prefix . "flickr";
 $flickr_db_version = "1.0";
 $flickr_directory = dirname(__FILE__);
 
-add_action('activate_flickr/flickr-manager-plugin.php', 'flickr_install');
+add_action('activate_wordpress-flickr-manager/flickr-manager-plugin.php', 'flickr_install');
 
 function flickr_install() {
 	global $wpdb, $flickr_db_version, $flickr_table;

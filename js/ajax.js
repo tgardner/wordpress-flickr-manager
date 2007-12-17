@@ -82,7 +82,7 @@ function prepareLinks() {
 	for (var i=0; i < links.length; i++) {
 		links[i].onclick = function() {
 			var query = this.getAttribute("href").split("?")[1];
-			var url = "/wp-content/plugins/flickr/flickr-ajax.php?"+query;
+			var url = "/wp-content/plugins/wordpress-flickr-manager/flickr-ajax.php?"+query;
 			return !getData(url);
 		};
 	}
@@ -92,13 +92,13 @@ function performFilter() {
 	var filter = document.getElementById("flickr-filter").value;
 	var size = document.getElementById("flickr-size");
 	var query = "action=" + document.getElementById("flickr-action").value + "&photoSize=" + size.options[size.selectedIndex].value + "&filter=" + filter;
-	var url = "/wp-content/plugins/flickr/flickr-ajax.php?"+query;
+	var url = "/wp-content/plugins/wordpress-flickr-manager/flickr-ajax.php?"+query;
 	return !getData(url);
 }
 
 function executeLink(link) {
 	var query = link.getAttribute("href").split("?")[1];
-	var url = "/wp-content/plugins/flickr/flickr-ajax.php?"+query;
+	var url = "/wp-content/plugins/wordpress-flickr-manager/flickr-ajax.php?"+query;
 	return !getData(url);
 }
 

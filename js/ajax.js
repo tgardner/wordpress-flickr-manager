@@ -15,7 +15,7 @@ function parseResponse(request) {
 function displayLoading(element) {
 	var image = document.createElement("img");
 	image.setAttribute("alt","loading...");
-	image.setAttribute("src","/wp-content/plugins/flickr/images/loading.gif");
+	image.setAttribute("src","/wp-content/plugins/wordpress-flickr-manager/images/loading.gif");
 	image.className = "loading";
 	element.innerHTML = "";
 	element.appendChild(image);

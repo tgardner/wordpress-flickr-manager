@@ -44,3 +44,4 @@ Through the 'Options->Flickr' menu, click Authenticate, log into Flickr and then
 Through the 'Manage->Images' menu, and follow the on screen instructions.
 *CHANGE: From version 1.1 onwards you can upload images directly to Flickr by clicking 'Upload Photo' on the Flickr Manager panel (located beneath the tinyMCE editor) on the edit page.*
 
+== Screenshots ==1. The Flickr Manager Panel that appears on the post insertion screen.

@@ -4,7 +4,7 @@ Donate link: http://tgardner.net/
 Tags: flickr, images
 Requires at least: 2.1
 Tested up to: 2.3.1
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 
 Handles uploading, modifying images on Flickr, and insertion into posts.
 
@@ -41,9 +41,11 @@ Sizes Available:
 Through the 'Options->Flickr' menu, click Authenticate, log into Flickr and then click finish.
 
 3. How do I upload / edit my pictures?
-Through the 'Manage->Images' menu, and follow the on screen instructions.
+Through the 'Manage->Flickr' menu, and follow the on screen instructions.
 *CHANGE: From version 1.1 onwards you can upload images directly to Flickr by clicking 'Upload Photo' on the Flickr Manager panel (located beneath the tinyMCE editor) on the edit page.*
 
-== Screenshots ==1. The Flickr Manager Panel that appears on the post insertion screen.
-2. The upload panel available from the image insertion panel under the WYSIWYG.
-3. The Flickr management page under the 'Manage' menu.
+== Screenshots ==
+
+1. The Flickr Manager Panel that appears on the post insertion screen
+2. The upload panel available from the image insertion panel under the WYSIWYG
+3. The Flickr management page under the 'Manage' menu

@@ -53,8 +53,8 @@
 			
 				<?php if($page > 1) :?>
 				
-				<a href="#?action=<?php echo $_REQUEST['action']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=1" title="&laquo; First Page" onclick="executeLink(this)">&laquo;</a>&nbsp;
-				<a href="#?action=<?php echo $_REQUEST['action']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=<?php echo $page - 1; ?>" title="&lsaquo; Previous Page" onclick="executeLink(this)">&lsaquo;</a>&nbsp;
+				<a href="#?action=<?php echo $_REQUEST['action']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=1" title="&laquo; First Page" onclick="return executeLink(this,'flickr-ajax')">&laquo;</a>&nbsp;
+				<a href="#?action=<?php echo $_REQUEST['action']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=<?php echo $page - 1; ?>" title="&lsaquo; Previous Page" onclick="return executeLink(this,'flickr-ajax')">&lsaquo;</a>&nbsp;
 				
 				<?php endif; ?>
 				
@@ -62,12 +62,12 @@
 				<input type="text" name="filter" id="flickr-filter" value="<?php echo $_REQUEST['filter']; ?>" />
 				</label>
 				<input type="hidden" name="action" id="flickr-action" value="<?php echo $_REQUEST['action']; ?>" />
-				<input type="submit" name="button" value="Filter" onclick="performFilter()" />
+				<input type="submit" name="button" value="Filter" onclick="performFilter('flickr-ajax')" />
 				
 				<?php if($page < $pages) :?>
 				
-				&nbsp;<a href="#?action=<?php echo $_REQUEST['action']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=<?php echo $page + 1; ?>" title="Next Page &rsaquo;" onclick="executeLink(this)">&rsaquo;</a>
-				&nbsp;<a href="#?action=<?php echo $_REQUEST['action']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=<?php echo $pages; ?>" title="Last Page &raquo;" onclick="executeLink(this)">&raquo;</a>
+				&nbsp;<a href="#?action=<?php echo $_REQUEST['action']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=<?php echo $page + 1; ?>" title="Next Page &rsaquo;" onclick="return executeLink(this,'flickr-ajax')">&rsaquo;</a>
+				&nbsp;<a href="#?action=<?php echo $_REQUEST['action']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=<?php echo $pages; ?>" title="Last Page &raquo;" onclick="return executeLink(this,'flickr-ajax')">&raquo;</a>
 				
 				<?php endif; ?>
 				<br>

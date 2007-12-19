@@ -93,7 +93,7 @@
 	
 	function displayUpload() {
 
-		echo '<iframe id="flickr-uploader" name="flickr-uploader" src="/wp-content/plugins/wordpress-flickr-manager/upload.php"></iframe>';
+		echo '<iframe id="flickr-uploader" name="flickr-uploader" src="'.get_option('home').'/wp-content/plugins/wordpress-flickr-manager/upload.php"></iframe>';
 	
 	}
 	

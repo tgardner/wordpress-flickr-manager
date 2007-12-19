@@ -2,6 +2,8 @@
 ini_set('display_errors', 1);
 require_once("../../../../wp-config.php");
 header('Content-Type: text/javascript');
+header('Cache-Control: no-cache');
+header('Pragma: no-cache');
 ?>
 
 /*global document, window, Ajax */

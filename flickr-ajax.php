@@ -7,7 +7,7 @@
 	
 	$flickr_table = $wpdb->prefix . "flickr";
 
-	$action = $_REQUEST['action'];
+	$action = $_REQUEST['faction'];
 	
 	switch($action) {
 		case 'browse':
@@ -23,6 +23,20 @@
 	
 	function displayBrowse() {
 		global $wpdb, $flickr_table;
+		$token = $wpdb->get_var("SELECT value FROM $flickr_table WHERE name='token'");
+		
+		if(!empty($token)) {
+			$params = array('auth_token' => $token);
+			$auth_status = flickr_call('flickr.auth.checkToken',$params, true); 
+			$auth_status = $auth_status['stat'];
+			if($auth_status != 'ok') {
+				echo '<h3>Error: Please authenticate through Options->Flickr</h3>';
+				return;
+			}
+		} else {
+			echo '<h3>Error: Please authenticate through Options->Flickr</h3>';
+			return;
+		}
 		
 		$page = (isset($_REQUEST['fpage'])) ? $_REQUEST['fpage'] : '1';
 		$per_page = (isset($_REQUEST['fper_page'])) ? $_REQUEST['fper_page'] : '5';
@@ -37,7 +51,7 @@
 	?>
 		
 		<div id="flickr-browse">
-		
+			
 			<?php foreach ($photos['photos']['photo'] as $photo) : ?>
 	
 			<div class="flickr-img" id="flickr-<?php echo $photo['id']; ?>">
@@ -53,26 +67,26 @@
 			
 				<?php if($page > 1) :?>
 				
-				<a href="#?action=<?php echo $_REQUEST['action']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=1" title="&laquo; First Page" onclick="return executeLink(this,'flickr-ajax')">&laquo;</a>&nbsp;
-				<a href="#?action=<?php echo $_REQUEST['action']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=<?php echo $page - 1; ?>" title="&lsaquo; Previous Page" onclick="return executeLink(this,'flickr-ajax')">&lsaquo;</a>&nbsp;
+				<a href="#?faction=<?php echo $_REQUEST['faction']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=1" title="&laquo; First Page" onclick="return executeLink(this,'flickr-ajax')">&laquo;</a>&nbsp;
+				<a href="#?faction=<?php echo $_REQUEST['faction']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=<?php echo $page - 1; ?>" title="&lsaquo; Previous Page" onclick="return executeLink(this,'flickr-ajax')">&lsaquo;</a>&nbsp;
 				
 				<?php endif; ?>
 				
 				<label>Filter: 
 				<input type="text" name="filter" id="flickr-filter" value="<?php echo $_REQUEST['filter']; ?>" />
 				</label>
-				<input type="hidden" name="action" id="flickr-action" value="<?php echo $_REQUEST['action']; ?>" />
-				<input type="submit" name="button" value="Filter" onclick="performFilter('flickr-ajax')" />
+				<input type="hidden" name="faction" id="flickr-action" value="<?php echo $_REQUEST['faction']; ?>" />
+				<input type="submit" name="button" value="Filter" onclick="return performFilter('flickr-ajax')" />
 				
 				<?php if($page < $pages) :?>
 				
-				&nbsp;<a href="#?action=<?php echo $_REQUEST['action']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=<?php echo $page + 1; ?>" title="Next Page &rsaquo;" onclick="return executeLink(this,'flickr-ajax')">&rsaquo;</a>
-				&nbsp;<a href="#?action=<?php echo $_REQUEST['action']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=<?php echo $pages; ?>" title="Last Page &raquo;" onclick="return executeLink(this,'flickr-ajax')">&raquo;</a>
+				&nbsp;<a href="#?faction=<?php echo $_REQUEST['faction']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=<?php echo $page + 1; ?>" title="Next Page &rsaquo;" onclick="return executeLink(this,'flickr-ajax')">&rsaquo;</a>
+				&nbsp;<a href="#?faction=<?php echo $_REQUEST['faction']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=<?php echo $pages; ?>" title="Last Page &raquo;" onclick="return executeLink(this,'flickr-ajax')">&raquo;</a>
 				
 				<?php endif; ?>
 				<br>
 				<?php $sizes = array("square", 'thumbnail', 'small', 'medium', 'original'); ?>
-				<select name="photoSize" id="flickr-size">
+				<select name="photoSize" id="flickr-size" onchange="return performFilter('flickr-ajax')">
 				
 					<?php 
 					foreach ($sizes as $v) {
@@ -92,6 +106,21 @@
 	
 	
 	function displayUpload() {
+		global $wpdb, $flickr_table;
+		$token = $wpdb->get_var("SELECT value FROM $flickr_table WHERE name='token'");
+		
+		if(!empty($token)) {
+			$params = array('auth_token' => $token);
+			$auth_status = flickr_call('flickr.auth.checkToken',$params, true); 
+			$auth_status = $auth_status['stat'];
+			if($auth_status != 'ok') {
+				echo '<h3>Error: Please authenticate through Options->Flickr</h3>';
+				return;
+			}
+		} else {
+			echo '<h3>Error: Please authenticate through Options->Flickr</h3>';
+			return;
+		}
 
 		echo '<iframe id="flickr-uploader" name="flickr-uploader" src="'.get_option('home').'/wp-content/plugins/wordpress-flickr-manager/upload.php"></iframe>';
 	

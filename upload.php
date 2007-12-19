@@ -64,7 +64,7 @@ if(isset($_FILES['uploadPhoto'])) {
 			</table>
 			<p class="submit" style="text-align: right;">
 				<input type="submit" name="Submit" value="<?php _e('Upload &raquo;') ?>" />
-				<input type="hidden" name="action" id="flickr-action" value="<?php echo $_REQUEST['action']; ?>" />
+				<input type="hidden" name="faction" id="flickr-action" value="<?php echo $_REQUEST['faction']; ?>" />
 			</p>
 			
 		</form>

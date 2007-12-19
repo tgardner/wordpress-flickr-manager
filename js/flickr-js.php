@@ -1,6 +1,7 @@
 <?php
 ini_set('display_errors', 1);
 require_once("../../../../wp-config.php");
+header('Content-Type: text/javascript');
 ?>
 
 /*global document, window, Ajax */
@@ -29,20 +30,21 @@ function returnError(destId) {
 }
 
 function executeLink(link, destId) {
-	var query = link.getAttribute("href").split("?")[1];
+	var query_array = link.getAttribute("href").split("?");
+	var query = query_array[query_array.length - 1];
 	var url = plugin_dir + "flickr-ajax.php";
 	displayLoading(destId);
-	var ajax = new Ajax.Updater({success: destId}, url,	{method: 'get', parameters: query, onFailure: function(){ returnError(destId); }});
+	var flickr_ajax = new Ajax.Updater({success: destId}, url,	{method: 'get', parameters: query, onFailure: function(){ returnError(destId); }});
 	return false;
 }
 
 function performFilter(destId) {
 	var filter = document.getElementById("flickr-filter").value;
 	var size = document.getElementById("flickr-size");
-	var query = "action=" + document.getElementById("flickr-action").value + "&photoSize=" + size.options[size.selectedIndex].value + "&filter=" + filter;
+	var query = "faction=" + document.getElementById("flickr-action").value + "&photoSize=" + size.options[size.selectedIndex].value + "&filter=" + filter;
 	var url = plugin_dir + "flickr-ajax.php";
 	displayLoading(destId);
-	var ajax = new Ajax.Updater({success: destId}, url,	{method: 'get', parameters: query, onFailure: function(){ returnError(destId); }});
+	var flickr_ajax = new Ajax.Updater({success: destId}, url,	{method: 'get', parameters: query, onFailure: function(){ returnError(destId); }});
 	return false;
 }
 
@@ -57,15 +59,28 @@ function prepareLinks(containId, destId) {
 	var links = list.getElementsByTagName("a");
 	for (var i=0; i < links.length; i++) {
 		links[i].onclick = function() {
-			var query = this.getAttribute("href").split("?")[1];
+			var query_array = this.getAttribute("href").split("?");
+			var query = query_array[query_array.length - 1];
 			var url = plugin_dir + "flickr-ajax.php";
 			displayLoading(destId);
-			var ajax = new Ajax.Updater({success: destId}, url,	{method: 'get', parameters: query, onFailure: function(){ returnError(destId); }});
+			var flickr_ajax = new Ajax.Updater({success: destId}, url,	{method: 'get', parameters: query, onFailure: function(){ returnError(destId); }});
 			return false;
 		};
 	}
 }
 
-window.onload = function() {
-	prepareLinks('flickr-insert-widget','flickr-ajax');
-};
+function addLoadEvent(func) {
+	var oldonload = window.onload;
+	if (typeof window.onload != 'function') {
+		window.onload = func;
+	} else {
+		window.onload = function() {
+			oldonload();
+			func();
+		};
+	}
+}
+
+addLoadEvent(function () {
+	prepareLinks('flickr-content','flickr-ajax');
+});

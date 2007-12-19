@@ -24,8 +24,8 @@ function add_insert_widget() {
 		<div id="flickr-content" class="dbx-content">
 		
 			<div id="flickr-menu">
-				<a href="#?action=upload" title="Upload Photo">Upload Photo</a>
-				<a href="#?action=browse" title="Browse Photos">Browse Photos</a>
+				<a href="#?faction=upload" title="Upload Photo">Upload Photo</a>
+				<a href="#?faction=browse" title="Browse Photos">Browse Photos</a>
 				<div style="clear: both; height: 1%;"></div>
 			</div>
 			<div id="flickr-ajax"></div>

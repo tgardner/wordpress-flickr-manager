@@ -4,7 +4,7 @@ Donate link: http://tgardner.net/
 Tags: flickr, images
 Requires at least: 2.1
 Tested up to: 2.3.1
-Stable tag: 1.1.2
+Stable tag: 1.2.0
 
 Handles uploading, modifying images on Flickr, and insertion into posts.
 
@@ -21,7 +21,8 @@ Inserting images into posts could never have been easier. You can now drag and d
 == Installation ==
 
 1. Upload the folder `wordpress-flickr-manager` to the `/wp-content/plugins/` directory
-2. Activate the plugin through the 'Plugins' menu in WordPress
+2. Activate the plugin through the `Plugins` menu in WordPress
+3. Authenticate with Flickr through `Options->Flickr`
 
 
 == Frequently Asked Questions ==

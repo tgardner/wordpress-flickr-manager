@@ -1,9 +1,11 @@
 <?php
-
 ini_set('display_errors',1);
 require_once(dirname(__FILE__) . "/flickr-operations.php");
 require_once("../../../wp-config.php");
 require_once("../../../wp-includes/wp-db.php");
+
+$curr_user = wp_get_current_user();
+if($curr_user->user_level <= 4) die("Unauthorized Access");
 
 $flickr_table = $wpdb->prefix . "flickr";
 

@@ -5,6 +5,9 @@
 	require_once("../../../wp-config.php");
 	require_once("../../../wp-includes/wp-db.php");
 	
+	$curr_user = wp_get_current_user();
+	if($curr_user->user_level <= 4) die("Unauthorized Access");
+	
 	$flickr_table = $wpdb->prefix . "flickr";
 
 	$action = $_REQUEST['faction'];
@@ -55,7 +58,9 @@
 			<?php foreach ($photos['photos']['photo'] as $photo) : ?>
 	
 			<div class="flickr-img" id="flickr-<?php echo $photo['id']; ?>">
-				<img src="<?php echo flickr_photo_url($photo,$size); ?>" alt="<?php echo $photo['title']; ?>" />
+				<!-- <a href="http://www.flickr.com/photos/<?php echo "{$photo['owner']}/{$photo['id']}/"; ?>" title="<?php echo $photo['title']; ?>"> -->
+					<img src="<?php echo flickr_photo_url($photo,$size); ?>" alt="<?php echo $photo['title']; ?>" />
+				<!-- </a> -->
 			</div>
 	
 			<?php endforeach; ?>

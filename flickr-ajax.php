@@ -6,7 +6,7 @@
 	require_once("../../../wp-includes/wp-db.php");
 	
 	$curr_user = wp_get_current_user();
-	if($curr_user->user_level <= 4) die("Unauthorized Access");
+	if($curr_user->user_level <= 2) die("Unauthorized Access");
 	
 	$flickr_table = $wpdb->prefix . "flickr";
 
@@ -59,7 +59,9 @@
 	
 			<div class="flickr-img" id="flickr-<?php echo $photo['id']; ?>">
 				<!-- <a href="http://www.flickr.com/photos/<?php echo "{$photo['owner']}/{$photo['id']}/"; ?>" title="<?php echo $photo['title']; ?>"> -->
-					<img src="<?php echo flickr_photo_url($photo,$size); ?>" alt="<?php echo $photo['title']; ?>" />
+				
+					<img src="<?php echo flickr_photo_url($photo,$size); ?>" alt="<?php echo $photo['title']; ?>" onclick="return insertImage(this,'<?php echo $photo['owner']; ?>','<?php echo $photo['id']; ?>')" />
+					
 				<!-- </a> -->
 			</div>
 	
@@ -72,8 +74,8 @@
 			
 				<?php if($page > 1) :?>
 				
-				<a href="#?faction=<?php echo $_REQUEST['faction']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=1" title="&laquo; First Page" onclick="return executeLink(this,'flickr-ajax')">&laquo;</a>&nbsp;
-				<a href="#?faction=<?php echo $_REQUEST['faction']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=<?php echo $page - 1; ?>" title="&lsaquo; Previous Page" onclick="return executeLink(this,'flickr-ajax')">&lsaquo;</a>&nbsp;
+				<a href="#?faction=<?php echo $_REQUEST['faction']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=1&amp;photoSize=<?php echo $_REQUEST['photoSize']; ?>" title="&laquo; First Page" onclick="return executeLink(this,'flickr-ajax')">&laquo;</a>&nbsp;
+				<a href="#?faction=<?php echo $_REQUEST['faction']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=<?php echo $page - 1; ?>&amp;photoSize=<?php echo $_REQUEST['photoSize']; ?>" title="&lsaquo; Previous Page" onclick="return executeLink(this,'flickr-ajax')">&lsaquo;</a>&nbsp;
 				
 				<?php endif; ?>
 				
@@ -81,12 +83,13 @@
 				<input type="text" name="filter" id="flickr-filter" value="<?php echo $_REQUEST['filter']; ?>" />
 				</label>
 				<input type="hidden" name="faction" id="flickr-action" value="<?php echo $_REQUEST['faction']; ?>" />
+				<input type="hidden" name="fpage" id="flickr-page" value="<?php echo $_REQUEST['fpage']; ?>" />
 				<input type="submit" name="button" value="Filter" onclick="return performFilter('flickr-ajax')" />
 				
 				<?php if($page < $pages) :?>
 				
-				&nbsp;<a href="#?faction=<?php echo $_REQUEST['faction']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=<?php echo $page + 1; ?>" title="Next Page &rsaquo;" onclick="return executeLink(this,'flickr-ajax')">&rsaquo;</a>
-				&nbsp;<a href="#?faction=<?php echo $_REQUEST['faction']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=<?php echo $pages; ?>" title="Last Page &raquo;" onclick="return executeLink(this,'flickr-ajax')">&raquo;</a>
+				&nbsp;<a href="#?faction=<?php echo $_REQUEST['faction']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=<?php echo $page + 1; ?>&amp;photoSize=<?php echo $_REQUEST['photoSize']; ?>" title="Next Page &rsaquo;" onclick="return executeLink(this,'flickr-ajax')">&rsaquo;</a>
+				&nbsp;<a href="#?faction=<?php echo $_REQUEST['faction']; ?>&amp;filter=<?php echo $_REQUEST['filter']; ?>&amp;fpage=<?php echo $pages; ?>&amp;photoSize=<?php echo $_REQUEST['photoSize']; ?>" title="Last Page &raquo;" onclick="return executeLink(this,'flickr-ajax')">&raquo;</a>
 				
 				<?php endif; ?>
 				<br>

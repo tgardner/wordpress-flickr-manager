@@ -3,7 +3,7 @@
 Plugin Name: Flickr Manager
 Plugin URI: http://tgardner.net/
 Description: Handles uploading, modifying images on Flickr, and insertion into posts.
-Version: 1.2.0
+Version: 1.2.1
 Author: Trent Gardner
 Author URI: http://tgardner.net/
 

@@ -4,7 +4,7 @@ Donate link: http://tgardner.net/
 Tags: flickr, images
 Requires at least: 2.1
 Tested up to: 2.3.1
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 
 Handles uploading, modifying images on Flickr, and insertion into posts.
 
@@ -15,7 +15,7 @@ Project home is [tgardner.net](http://tgardner.net/ "WordPress Flickr Manager").
 
 Handles uploading, modifying images on Flickr, and insertion into posts.
 
-Inserting images into posts could never have been easier. You can now drag and drop photos into your posts from the added *'Flickr Manager'* panel added to the edit page.
+Inserting images into posts could never have been easier. Simply click on an image from the added *'Flickr Manager'* panel on the edit page and it will automatically be inserted into your post.
 
 
 == Installation ==

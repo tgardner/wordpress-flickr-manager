@@ -26,6 +26,10 @@ function add_insert_widget() {
 			<div id="flickr-menu">
 				<a href="#?faction=upload" title="Upload Photo">Upload Photo</a>
 				<a href="#?faction=browse" title="Browse Photos">Browse Photos</a>
+				<div id="scope-block">
+				<label><input type="radio" name="fscope" id="flickr-personal" value="Personal" checked="checked" /> Personal</label>
+				<label><input type="radio" name="fscope" id="flickr-public" value="Public" /> Public</label>
+				</div>
 				<div style="clear: both; height: 1%;"></div>
 			</div>
 			<div id="flickr-ajax"></div>

@@ -4,6 +4,8 @@
 	require_once(dirname(__FILE__) . "/flickr-operations.php");
 	require_once("../../../wp-config.php");
 	require_once("../../../wp-includes/wp-db.php");
+	header('Cache-Control: no-cache');
+	header('Pragma: no-cache');
 	
 	$curr_user = wp_get_current_user();
 	if($curr_user->user_level <= 2) die("Unauthorized Access");
@@ -44,12 +46,30 @@
 		$page = (isset($_REQUEST['fpage'])) ? $_REQUEST['fpage'] : '1';
 		$per_page = (isset($_REQUEST['fper_page'])) ? $_REQUEST['fper_page'] : '5';
 		$nsid = $wpdb->get_var("SELECT value FROM $flickr_table WHERE name='nsid'");
-		$params = array('user_id' => $nsid, 'per_page' => $per_page, 'page' => $page, 'auth_token' => $token, 'extras' => 'original_format');
+		$fscope = $_REQUEST['fscope'];
+		$params = array('per_page' => $per_page, 'page' => $page, 'auth_token' => $token, 'extras' => 'license,owner_name,original_format');
+		if($fscope == "Personal") {
+			$params = array_merge($params, array('user_id' => $nsid));
+		} else {
+			$licences = flickr_call('flickr.photos.licenses.getInfo',array());
+			$temp = array();
+			for($i = 1; $i < count($licences['licenses']['license']); $i++) {
+				array_push($temp,$i);
+			}
+			$licence_search = implode(',',$temp);
+		}
 		$size = (isset($_REQUEST['photoSize']) && !empty($_REQUEST['photoSize'])) ? $_REQUEST['photoSize'] : "thumbnail";
+		$flickr_function = 'flickr.photos.search';
 		if(isset($_REQUEST['filter']) && !empty($_REQUEST['filter'])) {
 			$params = array_merge($params,array('tags' => $_REQUEST['filter'],'tag_mode' => 'all'));
+		} elseif($fscope == "Public") {
+			//$flickr_function = 'flickr.photos.getRecent';
+			$params = array_merge($params,array('text' => " "));
 		}
-		$photos = flickr_call('flickr.photos.search', $params, true);
+		if($fscope == "Public" && $flickr_function == 'flickr.photos.search') {
+			$params = array_merge($params, array('license' => $licence_search));
+		}
+		$photos = flickr_call($flickr_function, $params, true);
 		$pages = $photos['photos']['pages'];
 	?>
 		
@@ -60,7 +80,18 @@
 			<div class="flickr-img" id="flickr-<?php echo $photo['id']; ?>">
 				<!-- <a href="http://www.flickr.com/photos/<?php echo "{$photo['owner']}/{$photo['id']}/"; ?>" title="<?php echo $photo['title']; ?>"> -->
 				
-					<img src="<?php echo flickr_photo_url($photo,$size); ?>" alt="<?php echo $photo['title']; ?>" onclick="return insertImage(this,'<?php echo $photo['owner']; ?>','<?php echo $photo['id']; ?>')" />
+					<img src="<?php echo flickr_photo_url($photo,$size); ?>" alt="<?php echo $photo['title']; ?>" onclick="return insertImage(this,'<?php echo $photo['owner']; ?>','<?php echo $photo['id']; ?>','<?php echo str_replace("'","&lsquo;",$photo['ownername']); ?>')" />
+					
+					<?php 
+					if($fscope == "Public") {
+						foreach ($licences['licenses']['license'] as $licence) {
+							if($licence['id'] == $photo['license']) {
+								if($licence['url'] == '') $licence['url'] = "http://www.flickr.com/people/{$photo['owner']}/";
+								echo "<br /><small><a href='{$licence['url']}' title='{$licence['name']}' rel='license' id='license-{$photo['id']}' onclick='return false'><img src='".get_option('home')."/wp-content/plugins/wordpress-flickr-manager/images/creative_commons_bw.gif' alt='{$licence['name']}'/></a> by {$photo['ownername']}</small>";
+							}
+						}
+					}
+					?>
 					
 				<!-- </a> -->
 			</div>
@@ -84,6 +115,7 @@
 				</label>
 				<input type="hidden" name="faction" id="flickr-action" value="<?php echo $_REQUEST['faction']; ?>" />
 				<input type="hidden" name="fpage" id="flickr-page" value="<?php echo $_REQUEST['fpage']; ?>" />
+				<input type="hidden" name="fold_filter" id="flickr-old-filter" value="<?php echo $_REQUEST['filter']; ?>" />
 				<input type="submit" name="button" value="Filter" onclick="return performFilter('flickr-ajax')" />
 				
 				<?php if($page < $pages) :?>

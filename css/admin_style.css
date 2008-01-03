@@ -42,6 +42,20 @@
 	border-bottom: 0px !important;
 }
 
+#scope-block {
+	float: right;
+	margin: 2px 2px;
+}
+
+#scope-block input {
+	border: 0px;
+}
+
+div small a {
+	text-decoration: none;
+	border: none;
+}
+
 #flickr-menu {
 	height: 25px;
 }

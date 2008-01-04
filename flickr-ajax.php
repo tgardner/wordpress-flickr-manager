@@ -8,7 +8,7 @@
 	header('Pragma: no-cache');
 	
 	$curr_user = wp_get_current_user();
-	if($curr_user->user_level <= 2) die("Unauthorized Access");
+	if($curr_user->user_level < 2) die("Unauthorized Access");
 	
 	$flickr_table = $wpdb->prefix . "flickr";
 

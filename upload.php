@@ -37,8 +37,8 @@ if(isset($_FILES['uploadPhoto'])) {
 ?>
 <html>
 <head>
-<link rel='stylesheet' href='<?php echo get_option('home'); ?>/wp-admin/wp-admin.css' type='text/css' />
-<link rel="stylesheet" href="<?php echo get_option('home'); ?>/wp-content/plugins/wordpress-flickr-manager/css/admin_style.css" type="text/css" />
+<link rel='stylesheet' href='<?php echo get_option('siteurl'); ?>/wp-admin/wp-admin.css' type='text/css' />
+<link rel="stylesheet" href="<?php echo get_option('siteurl'); ?>/wp-content/plugins/wordpress-flickr-manager/css/admin_style.css" type="text/css" />
 </head>
 <body style="background-color: #f4f4f4;">
 	<div id="uploadContainer">

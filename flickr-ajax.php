@@ -84,7 +84,7 @@
 						foreach ($licences['licenses']['license'] as $licence) {
 							if($licence['id'] == $photo['license']) {
 								if($licence['url'] == '') $licence['url'] = "http://www.flickr.com/people/{$photo['owner']}/";
-								echo "<br /><small><a href='{$licence['url']}' title='{$licence['name']}' rel='license' id='license-{$photo['id']}' onclick='return false'><img src='".get_option('home')."/wp-content/plugins/wordpress-flickr-manager/images/creative_commons_bw.gif' alt='{$licence['name']}'/></a> by {$photo['ownername']}</small>";
+								echo "<br /><small><a href='{$licence['url']}' title='{$licence['name']}' rel='license' id='license-{$photo['id']}' onclick='return false'><img src='".get_option('siteurl')."/wp-content/plugins/wordpress-flickr-manager/images/creative_commons_bw.gif' alt='{$licence['name']}'/></a> by {$photo['ownername']}</small>";
 							}
 						}
 					}
@@ -159,7 +159,7 @@
 			return;
 		}
 
-		echo '<iframe id="flickr-uploader" name="flickr-uploader" src="'.get_option('home').'/wp-content/plugins/wordpress-flickr-manager/upload.php"></iframe>';
+		echo '<iframe id="flickr-uploader" name="flickr-uploader" src="'.get_option('siteurl').'/wp-content/plugins/wordpress-flickr-manager/upload.php"></iframe>';
 	
 	}
 	

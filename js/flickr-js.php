@@ -8,7 +8,7 @@ header('Pragma: no-cache');
 
 /*global document, window, Ajax, tinyMCE */
 
-var plugin_dir = "<?php echo get_option('home'); ?>/wp-content/plugins/wordpress-flickr-manager/";
+var plugin_dir = "<?php echo get_option('siteurl'); ?>/wp-content/plugins/wordpress-flickr-manager/";
 
 function displayLoading(destId) {
 	var element = document.getElementById(destId);

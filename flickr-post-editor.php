@@ -8,8 +8,8 @@ function add_flickr_styles() {
 	if(isset($_REQUEST['page'])) return;
 ?>
 	
-	<link rel="stylesheet" href="<?php echo get_option('home'); ?>/wp-content/plugins/wordpress-flickr-manager/css/admin_style.css" type="text/css" />
-	<script type="text/javascript" src="<?php echo get_option('home'); ?>/wp-content/plugins/wordpress-flickr-manager/js/flickr-js.php"></script>
+	<link rel="stylesheet" href="<?php echo get_option('siteurl'); ?>/wp-content/plugins/wordpress-flickr-manager/css/admin_style.css" type="text/css" />
+	<script type="text/javascript" src="<?php echo get_option('siteurl'); ?>/wp-content/plugins/wordpress-flickr-manager/js/flickr-js.php"></script>
 	
 <?php
 }

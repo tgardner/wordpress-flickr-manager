@@ -96,8 +96,14 @@ addLoadEvent(function () {
 
 function insertImage(image,owner,id,name) {
 	if ( typeof tinyMCE != 'undefined' ) {
-		var imgHTML = '<a href="http://www.flickr.com/photos/' + owner + "/" + id + '/" title="' + image.alt + '">';
-		imgHTML = imgHTML + '<img src="' + image.src + '" alt="' + image.alt + '" /></a>';
+		var imgHTML = "";
+		if(document.getElementById("flickr-lightbox").checked) {
+			imgHTML = '<a href="http://www.flickr.com/photos/' + owner + "/" + id + '/" rel="flickr-mgr">';
+			imgHTML = imgHTML + '<img src="' + image.src + '" alt="' + image.alt + '" /></a>';
+		} else {
+			imgHTML = '<a href="http://www.flickr.com/photos/' + owner + "/" + id + '/" title="' + image.alt + '">';
+			imgHTML = imgHTML + '<img src="' + image.src + '" alt="' + image.alt + '" /></a>';
+		}
 		var license = document.getElementById("license-" + id);
 		if(license) {
 			imgHTML = imgHTML + "<br /><small><a href='" + license.href + "' title='" + license.title + "' rel='license'>" + license.innerHTML + "</a> by <a href='http://www.flickr.com/people/"+owner+"/'>"+name+"</a></small>&nbsp;";

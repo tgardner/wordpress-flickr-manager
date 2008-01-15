@@ -3,7 +3,7 @@
 Plugin Name: Flickr Manager
 Plugin URI: http://tgardner.net/
 Description: Handles uploading, modifying images on Flickr, and insertion into posts.
-Version: 1.3.1
+Version: 1.4.0b
 Author: Trent Gardner
 Author URI: http://tgardner.net/
 
@@ -316,6 +316,8 @@ function flickr_manage_page() {
 function flickr_options_page() {
 	global $wpdb, $flickr_table;
 	
+	ini_set('display_errors',1);
+	
 	if(!empty($_REQUEST['action'])) {
 		switch (intval($_REQUEST['action'])) {
 			
@@ -487,5 +489,14 @@ function filter_callback($match) {
 				</a>
 			</div>";
 }
+
+add_action('wp_head', 'add_flickr_lightbox');
+
+function add_flickr_lightbox() {?>
+
+	<link rel="stylesheet" href="<?php echo get_option('siteurl'); ?>/wp-content/plugins/wordpress-flickr-manager/lightbox/lightbox.css" type="text/css" />
+	<script type="text/javascript" src="<?php echo get_option('siteurl'); ?>/wp-content/plugins/wordpress-flickr-manager/lightbox/lightbox.php"></script>
+	
+<?php }
 
 ?>

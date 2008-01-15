@@ -123,7 +123,7 @@
 				<?php endif; ?>
 				<br>
 				<?php $sizes = array("square", 'thumbnail', 'small', 'medium', 'original'); ?>
-				<select name="photoSize" id="flickr-size" onchange="return performFilter('flickr-ajax')">
+				<label>Size: <select name="photoSize" id="flickr-size" onchange="return performFilter('flickr-ajax')">
 				
 					<?php 
 					foreach ($sizes as $v) {
@@ -133,7 +133,8 @@
 					}
 					?>
 					
-				</select>
+				</select></label>
+				<label><input type="checkbox" id="flickr-lightbox" name="flickr-lightbox" value="1" /> Insert with lightbox support</label>
 		</div>
 		
 <?php

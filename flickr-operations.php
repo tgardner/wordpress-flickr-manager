@@ -17,15 +17,69 @@ function flickr_call($method, $params, $sign = false, $rsp_format = "php_serial"
 	
 	$url = "http://api.flickr.com/services/rest/?".flickr_encode($params);
 	
-	$session = curl_init($url);
-	curl_setopt($session, CURLOPT_HEADER, false);
-	curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
-	$response = curl_exec($session);
-	curl_close($session);
-	$rsp_obj = unserialize($response);
-    return $rsp_obj;
+    return perform_get_request($url);
     
-	
+}
+
+function perform_get_request($url) {
+	if(function_exists('curl_init')) {
+		$session = curl_init($url);
+		curl_setopt($session, CURLOPT_HEADER, false);
+		curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
+		$response = curl_exec($session);
+		curl_close($session);
+		$rsp_obj = unserialize($response);
+	} else {
+		$handle = fopen($url, "rb");
+		$contents = '';
+		while (!feof($handle)) {
+			$contents .= fread($handle, 8192);
+		}
+		fclose($handle);
+		$rsp_obj = unserialize($contents);
+	}
+	return $rsp_obj;
+}
+
+function perform_post_request($url, $params) {
+	if(function_exists('curl_init')) {
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_POST, true);
+		
+	    curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+	    
+	    curl_setopt($ch, CURLOPT_FAILONERROR, 1);
+	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
+	    curl_setopt($ch, CURLOPT_TIMEOUT,200);
+	    
+	    $result = curl_exec($ch);
+	    
+	    if (curl_errno($ch) == 0) {
+	    	curl_close($ch);
+	        return $result;
+	    }
+	    curl_close($ch);
+		return false;
+	} else {
+		// Perform fopen POST request
+		$request = array('http' => array(
+                 'method' => 'POST',
+                 'content' => flickr_encode($params)
+              ));
+              
+	    $ctx = stream_context_create($request);
+	    $fp = @fopen($url, 'rb', false, $ctx);
+	    if (!$fp) {
+	       return false;
+	    }
+	    $response = @stream_get_contents($fp);
+	    if ($response === false) {
+	       return false;
+	    }
+	    return $response;
+	}
 }
 
 function flickr_post($method, $params, $sign = false, $rsp_format = "php_serial") {
@@ -42,27 +96,8 @@ function flickr_post($method, $params, $sign = false, $rsp_format = "php_serial"
 	if($sign) $params = array_merge($params, array('api_sig' => flickr_sig($params)));
 	
 	$url = "http://api.flickr.com/services/rest/";
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL, $url);
-	curl_setopt($ch, CURLOPT_POST, true);
 	
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-    
-    curl_setopt($ch, CURLOPT_FAILONERROR, 1);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
-    curl_setopt($ch, CURLOPT_TIMEOUT,200);
-    
-    set_time_limit(20 + 200 + 5);
-    $result = curl_exec($ch);
-    
-    if (curl_errno($ch) == 0) {
-    	curl_close($ch);
-        return $result;
-    }
-    curl_close($ch);
-	return false;
-	
+	return perform_post_request($url, $params);
 }
 
 function flickr_upload($params) {
@@ -80,26 +115,8 @@ function flickr_upload($params) {
 	
 	$url = "http://api.flickr.com/services/upload/";
 	
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL, $url);
-	curl_setopt($ch, CURLOPT_POST, true);
+	return perform_post_request($url, $params);
 	
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-    
-    curl_setopt($ch, CURLOPT_FAILONERROR, 1);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
-    curl_setopt($ch, CURLOPT_TIMEOUT,200);
-    
-    set_time_limit(20 + 200 + 5);
-    $result = curl_exec($ch);
-    
-    if (curl_errno($ch) == 0) {
-    	curl_close($ch);
-        return $result;
-    }
-    curl_close($ch);
-	return false;
 }
 
 function flickr_encode($params) {

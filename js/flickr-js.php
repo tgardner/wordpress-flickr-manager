@@ -34,10 +34,14 @@ function returnError(destId) {
 function executeLink(link, destId) {
 	var query_array = link.getAttribute("href").split("?");
 	var scope = document.getElementById("flickr-public").value;
+	var lightbox = document.getElementById("flickr-lightbox");
 	if(document.getElementById("flickr-personal").checked === true) {
 		scope = document.getElementById("flickr-personal").value;
 	}
 	var query = query_array[query_array.length - 1] + "&fscope=" + scope;
+	if(lightbox) {
+		 query = query + "&flightbox=" + lightbox.checked;
+	}
 	var url = plugin_dir + "flickr-ajax.php";
 	displayLoading(destId);
 	var flickr_ajax = new Ajax.Updater({success: destId}, url, {method: 'get', parameters: query, onFailure: function(){ returnError(destId); }});
@@ -49,13 +53,14 @@ function performFilter(destId) {
 	var size = document.getElementById("flickr-size");
 	var scope = document.getElementById("flickr-public").value;
 	var page = document.getElementById("flickr-page").value;
+	var lightbox = document.getElementById("flickr-lightbox").checked;
 	if(filter != document.getElementById("flickr-old-filter").value) {
 		page = 1;
 	}
 	if(document.getElementById("flickr-personal").checked === true) {
 		scope = document.getElementById("flickr-personal").value;
 	}
-	var query = "faction=" + document.getElementById("flickr-action").value + "&photoSize=" + size.options[size.selectedIndex].value + "&filter=" + filter + "&fpage=" + page + "&fscope=" + scope;
+	var query = "faction=" + document.getElementById("flickr-action").value + "&photoSize=" + size.options[size.selectedIndex].value + "&filter=" + filter + "&fpage=" + page + "&fscope=" + scope + "&flightbox=" + lightbox;
 	var url = plugin_dir + "flickr-ajax.php";
 	displayLoading(destId);
 	var flickr_ajax = new Ajax.Updater({success: destId}, url, {method: 'get', parameters: query, onFailure: function(){ returnError(destId); }});

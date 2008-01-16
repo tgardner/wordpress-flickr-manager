@@ -40,11 +40,13 @@
 			return;
 		}
 		
-		$page = (isset($_REQUEST['fpage'])) ? $_REQUEST['fpage'] : '1';
+		$page = (isset($_REQUEST['fpage']) && !empty($_REQUEST['fpage'])) ? $_REQUEST['fpage'] : '1';
+		$exists = $wpdb->get_var("SELECT value FROM $flickr_table WHERE name='per_page'");
+		if(!empty($exists)) $_REQUEST['fper_page'] = $exists;
 		$per_page = (isset($_REQUEST['fper_page'])) ? $_REQUEST['fper_page'] : '5';
 		$nsid = $wpdb->get_var("SELECT value FROM $flickr_table WHERE name='nsid'");
 		$fscope = $_REQUEST['fscope'];
-		$params = array('per_page' => $per_page, 'page' => $page, 'auth_token' => $token, 'extras' => 'license,owner_name,original_format');
+		$params = array('auth_token' => $token,'extras' => 'original_format,license,owner_name'); 
 		if($fscope == "Personal") {
 			$params = array_merge($params, array('user_id' => $nsid));
 		} else {
@@ -66,6 +68,7 @@
 		if($fscope == "Public" && $flickr_function == 'flickr.photos.search') {
 			$params = array_merge($params, array('license' => $licence_search));
 		}
+		$params = array_merge($params,array('per_page' => $per_page, 'page' => $page));
 		$photos = flickr_call($flickr_function, $params, true);
 		$pages = $photos['photos']['pages'];
 	?>
@@ -134,7 +137,7 @@
 					?>
 					
 				</select></label>
-				<label><input type="checkbox" id="flickr-lightbox" name="flickr-lightbox" value="1" /> Insert with lightbox support</label>
+				<label><input type="checkbox" id="flickr-lightbox" name="flickr-lightbox" value="1" <?php if($_REQUEST['flightbox'] == "true") echo 'checked="checked"'; ?>/> Insert with lightbox support</label>
 		</div>
 		
 <?php

@@ -3,7 +3,7 @@
 Plugin Name: Flickr Manager
 Plugin URI: http://tgardner.net/
 Description: Handles uploading, modifying images on Flickr, and insertion into posts.
-Version: 1.4.0b
+Version: 1.4.0
 Author: Trent Gardner
 Author URI: http://tgardner.net/
 
@@ -366,6 +366,19 @@ function flickr_options_page() {
 				$sql = "DELETE FROM $flickr_table";
 				$wpdb->query($sql);
 				break;
+				
+			case 3:
+				if(!isset($_REQUEST['fper_page']) || !is_numeric($_REQUEST['fper_page']) || intval($_REQUEST['fper_page']) <= 0) $_REQUEST['fper_page'] = 5;
+				$per_page = $_REQUEST['fper_page'];
+				$exists = $wpdb->get_var("SELECT COUNT(value) FROM $flickr_table WHERE name='per_page'");
+						
+				if(empty($exists)) {
+					$sql = "INSERT INTO $flickr_table (name, value) VALUES ('per_page', '$per_page')";
+				} else {
+					$sql = "UPDATE $flickr_table SET value='$per_page' WHERE name='per_page'";
+				}
+				$wpdb->query($sql);
+				break;
 			
 		}
 	}
@@ -457,6 +470,26 @@ function flickr_options_page() {
 				<td><?php echo $info['person']['photos']['count']['_content']; ?></td>
 			</tr>
 		</table>
+		
+		<p>&nbsp;</p>
+		
+		<h3>Optional Settings</h3>
+		
+		<?php 
+		if(!isset($_REQUEST['fper_page']) || !is_numeric($_REQUEST['fper_page']) || intval($_REQUEST['fper_page']) <= 0) $_REQUEST['fper_page'] = 5; 
+		$exists = $wpdb->get_var("SELECT value FROM $flickr_table WHERE name='per_page'");
+		if(!empty($exists)) $_REQUEST['fper_page'] = $exists;
+		?>
+		
+		<form method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">
+			<!-- action=3 - Update Options -->
+			<input type="hidden" name="action" value="3" />
+			<label>Images per page: <input type="text" name="fper_page" value="<?php echo $_REQUEST['fper_page']; ?>" style="padding: 3px; width: 50px;" /></label>
+			<p class="submit">
+				
+				<input type="submit" name="Submit" value="<?php _e('Submit') ?> &raquo;" style="font-size: 1.5em;" />
+			</p>
+		</form>
 		
 			<?php endif; ?>
 		<?php endif; ?>

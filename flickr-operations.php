@@ -154,7 +154,7 @@ function flickr_auth_url($frob, $perms) {
 
 function flickr_photo_url($photo, $size) {
 	$sizes = array('square' => '_s', 'thumbnail' => '_t', 'small' => '_m', 'medium' => '', 'large' => '_b', 'original' => '_o');
-	
+	if(!isset($photo['originalformat']) && strtolower($size) == "original") $size = 'medium';
 	if(($size = strtolower($size)) != 'original') {
 		$url = "http://farm{$photo['farm']}.static.flickr.com/{$photo['server']}/{$photo['id']}_{$photo['secret']}{$sizes[$size]}.jpg";
 	} else {

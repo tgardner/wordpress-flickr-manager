@@ -32,11 +32,11 @@
 			$auth_status = flickr_call('flickr.auth.checkToken',$params, true); 
 			$auth_status = $auth_status['stat'];
 			if($auth_status != 'ok') {
-				echo '<h3>Error: Please authenticate through Options->Flickr</h3>';
+				echo '<h3>Error: Please authenticate through <a href="'.get_option('siteurl').'/wp-admin/options-general.php?page=wordpress-flickr-manager/flickr-manager-plugin.php">Options->Flickr</a></h3>';
 				return;
 			}
 		} else {
-			echo '<h3>Error: Please authenticate through Options->Flickr</h3>';
+			echo '<h3>Error: Please authenticate through <a href="'.get_option('siteurl').'/wp-admin/options-general.php?page=wordpress-flickr-manager/flickr-manager-plugin.php">Options->Flickr</a></h3>';
 			return;
 		}
 		
@@ -155,11 +155,11 @@
 			$auth_status = flickr_call('flickr.auth.checkToken',$params, true); 
 			$auth_status = $auth_status['stat'];
 			if($auth_status != 'ok') {
-				echo '<h3>Error: Please authenticate through Options->Flickr</h3>';
+				echo '<h3>Error: Please authenticate through <a href="'.get_option('siteurl').'/wp-admin/options-general.php?page=wordpress-flickr-manager/flickr-manager-plugin.php">Options->Flickr</a></h3>';
 				return;
 			}
 		} else {
-			echo '<h3>Error: Please authenticate through Options->Flickr</h3>';
+			echo '<h3>Error: Please authenticate through <a href="'.get_option('siteurl').'/wp-admin/options-general.php?page=wordpress-flickr-manager/flickr-manager-plugin.php">Options->Flickr</a></h3>';
 			return;
 		}
 

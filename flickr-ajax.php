@@ -80,7 +80,7 @@
 			<div class="flickr-img" id="flickr-<?php echo $photo['id']; ?>">
 				<!-- <a href="http://www.flickr.com/photos/<?php echo "{$photo['owner']}/{$photo['id']}/"; ?>" title="<?php echo $photo['title']; ?>"> -->
 				
-					<img src="<?php echo flickr_photo_url($photo,$size); ?>" alt="<?php echo $photo['title']; ?>" onclick="return insertImage(this,'<?php echo $photo['owner']; ?>','<?php echo $photo['id']; ?>','<?php echo str_replace("'","&lsquo;",$photo['ownername']); ?>')" />
+					<img src="<?php echo flickr_photo_url($photo,$size); ?>" alt="<?php echo str_replace("&amp;amp;","&amp;",str_replace("&","&amp;",$photo['title'])); ?>" onclick="return insertImage(this,'<?php echo $photo['owner']; ?>','<?php echo $photo['id']; ?>','<?php echo str_replace("'","&lsquo;",$photo['ownername']); ?>')" />
 					
 					<?php 
 					if($fscope == "Public") {
@@ -116,6 +116,7 @@
 				<input type="hidden" name="faction" id="flickr-action" value="<?php echo $_REQUEST['faction']; ?>" />
 				<input type="hidden" name="fpage" id="flickr-page" value="<?php echo $_REQUEST['fpage']; ?>" />
 				<input type="hidden" name="fold_filter" id="flickr-old-filter" value="<?php echo $_REQUEST['filter']; ?>" />
+				<input type="hidden" name="flickr_blank" id="flickr_blank" value="<?php echo $wpdb->get_var("SELECT value FROM $flickr_table WHERE name='new_window'"); ?>" />
 				<input type="submit" name="button" value="Filter" onclick="return performFilter('flickr-ajax')" />
 				
 				<?php if($page < $pages) :?>

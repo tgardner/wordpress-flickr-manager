@@ -370,12 +370,22 @@ function flickr_options_page() {
 			case 3:
 				if(!isset($_REQUEST['fper_page']) || !is_numeric($_REQUEST['fper_page']) || intval($_REQUEST['fper_page']) <= 0) $_REQUEST['fper_page'] = 5;
 				$per_page = $_REQUEST['fper_page'];
+				$new_window = $_REQUEST['fnew_window'];
 				$exists = $wpdb->get_var("SELECT COUNT(value) FROM $flickr_table WHERE name='per_page'");
 						
 				if(empty($exists)) {
 					$sql = "INSERT INTO $flickr_table (name, value) VALUES ('per_page', '$per_page')";
 				} else {
 					$sql = "UPDATE $flickr_table SET value='$per_page' WHERE name='per_page'";
+				}
+				$wpdb->query($sql);
+				
+				$exists = $wpdb->get_var("SELECT COUNT(value) FROM $flickr_table WHERE name='new_window'");
+						
+				if(empty($exists)) {
+					$sql = "INSERT INTO $flickr_table (name, value) VALUES ('new_window', '$new_window')";
+				} else {
+					$sql = "UPDATE $flickr_table SET value='$new_window' WHERE name='new_window'";
 				}
 				$wpdb->query($sql);
 				break;
@@ -479,12 +489,14 @@ function flickr_options_page() {
 		if(!isset($_REQUEST['fper_page']) || !is_numeric($_REQUEST['fper_page']) || intval($_REQUEST['fper_page']) <= 0) $_REQUEST['fper_page'] = 5; 
 		$exists = $wpdb->get_var("SELECT value FROM $flickr_table WHERE name='per_page'");
 		if(!empty($exists)) $_REQUEST['fper_page'] = $exists;
+		$_REQUEST['fnew_window'] = $wpdb->get_var("SELECT value FROM $flickr_table WHERE name='new_window'");
 		?>
 		
 		<form method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">
 			<!-- action=3 - Update Options -->
 			<input type="hidden" name="action" value="3" />
 			<label>Images per page: <input type="text" name="fper_page" value="<?php echo $_REQUEST['fper_page']; ?>" style="padding: 3px; width: 50px;" /></label>
+			<br /><label><input type="checkbox" name="fnew_window" value="true" style="margin: 5px 0px;" <?php if($_REQUEST['fnew_window'] == "true") echo 'checked="checked" '; ?>/> Add target="_blank" to image page links.</label>
 			<p class="submit">
 				
 				<input type="submit" name="Submit" value="<?php _e('Submit') ?> &raquo;" style="font-size: 1.5em;" />

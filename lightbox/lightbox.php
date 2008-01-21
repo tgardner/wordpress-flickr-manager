@@ -44,8 +44,8 @@ header('Pragma: no-cache');
 var plugin_dir = "<?php echo get_option('siteurl'); ?>/wp-content/plugins/wordpress-flickr-manager/";
 
 // If you would like to use a custom loading image or close button reference them in the next two lines.
-var loadingImage = plugin_dir + 'lightbox/loading.gif';		
-var closeButton = plugin_dir + 'lightbox/close.gif';		
+var flickr_loading = plugin_dir + 'lightbox/loading.gif';		
+var flickr_close = plugin_dir + 'lightbox/close.gif';		
 
 
 
@@ -291,7 +291,7 @@ function showLightbox(objLink)
 // The function also inserts html markup at the top of the page which will be used as a
 // container for the overlay pattern and the inline image.
 //
-function initLightbox()
+function flickr_initLightbox()
 {
 	if (!document.getElementsByTagName){ return; }
 	var anchors = document.getElementsByTagName("a");
@@ -368,7 +368,7 @@ function initLightbox()
 		objOverlay.appendChild(objLoadingImageLink);
 		
 		var objLoadingImage = document.createElement("img");
-		objLoadingImage.src = loadingImage;
+		objLoadingImage.src = flickr_loading;
 		objLoadingImage.setAttribute('id','loadingImage');
 		objLoadingImage.style.position = 'absolute';
 		objLoadingImage.style.zIndex = '150';
@@ -379,7 +379,7 @@ function initLightbox()
 		return false;
 	};
 
-	imgPreloader.src = loadingImage;
+	imgPreloader.src = flickr_loading;
 
 	// create lightbox div, same note about styles as above
 	var objLightbox = document.createElement("div");
@@ -405,7 +405,7 @@ function initLightbox()
 	imgPreloadCloseButton.onload = function() {
 
 		var objCloseButton = document.createElement("img");
-		objCloseButton.src = closeButton;
+		objCloseButton.src = flickr_close;
 		objCloseButton.setAttribute('id','closeButton');
 		objCloseButton.style.position = 'absolute';
 		objCloseButton.style.zIndex = '200';
@@ -414,7 +414,7 @@ function initLightbox()
 		return false;
 	};
 
-	imgPreloadCloseButton.src = closeButton;
+	imgPreloadCloseButton.src = flickr_close;
 
 	// create image
 	var objImage = document.createElement("img");
@@ -465,4 +465,4 @@ function addLoadEvent(func)
 
 
 
-addLoadEvent(initLightbox);	// run initLightbox onLoad
+addLoadEvent(flickr_initLightbox);	// run initLightbox onLoad

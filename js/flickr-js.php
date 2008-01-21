@@ -99,6 +99,23 @@ addLoadEvent(function () {
 	prepareLinks('flickr-content','flickr-ajax');
 });
 
+function insertAtCursor(myField, myValue) {
+	// IE support
+	if (document.selection) {
+		myField.focus();
+		var sel = document.selection.createRange();
+		sel.text = myValue;
+	}
+	// MOZILLA/NETSCAPE support
+	else if (myField.selectionStart || myField.selectionStart === 0) {
+		var startPos = myField.selectionStart;
+		var endPos = myField.selectionEnd;
+		myField.value = myField.value.substring(0, startPos) + myValue + myField.value.substring(endPos, myField.value.length);
+	} else {
+		myField.value += myValue;
+	}
+}
+
 function insertImage(image,owner,id,name) {
 	if ( typeof tinyMCE != 'undefined' ) {
 		var imgHTML = "";
@@ -113,12 +130,14 @@ function insertImage(image,owner,id,name) {
 		if(license) {
 			imgHTML = imgHTML + "<br /><small><a href='" + license.href + "' title='" + license.title + "' rel='license'>" + license.innerHTML + "</a> by <a href='http://www.flickr.com/people/"+owner+"/'>"+name+"</a></small>&nbsp;";
 		}
-		var i = tinyMCE.getInstanceById('content');
-		if(typeof i ==  'undefined') {
-			return false;
+		
+		var i = document.getElementById("content");
+		if(i.style.display != "none") {
+			insertAtCursor(i, imgHTML);
+		} else {
+			tinyMCE.execCommand('mceFocus',false,'content');
+			tinyMCE.execCommand('mceInsertContent',false,imgHTML);
 		}
-		i.contentWindow.focus();
-		tinyMCE.execCommand('mceInsertContent',false,imgHTML);
 	}
 	return false;
 }

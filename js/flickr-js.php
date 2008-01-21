@@ -117,31 +117,32 @@ function insertAtCursor(myField, myValue) {
 }
 
 function insertImage(image,owner,id,name) {
-	if ( typeof tinyMCE != 'undefined' ) {
-		var imgHTML = "";
-		var target = "";
-		if(document.getElementById("flickr_blank") && document.getElementById("flickr_blank").value == "true") {
-			target = ' target="_blank" ';
-		}
-		if(document.getElementById("flickr-lightbox").checked) {
-			imgHTML = '<a href="http://www.flickr.com/photos/' + owner + "/" + id + '/"' + target;
-			imgHTML = imgHTML + ' rel="flickr-mgr"><img src="' + image.src + '" alt="' + image.alt + '" /></a>';
-		} else {
-			imgHTML = '<a href="http://www.flickr.com/photos/' + owner + "/" + id + '/" title="' + image.alt + '"' + target + '>';
-			imgHTML = imgHTML + '<img src="' + image.src + '" alt="' + image.alt + '" /></a>';
-		}
-		var license = document.getElementById("license-" + id);
-		if(license) {
-			imgHTML = imgHTML + "<br /><small><a href='" + license.href + "' title='" + license.title + "' rel='license' " + target + ">" + license.innerHTML + "</a> by <a href='http://www.flickr.com/people/"+owner+"/'"+ target +">"+name+"</a></small>&nbsp;";
-		}
-		
-		var i = document.getElementById("content");
-		if(i.style.display != "none") {
-			insertAtCursor(i, imgHTML);
-		} else {
+	var imgHTML = "";
+	var target = "";
+	if(document.getElementById("flickr_blank") && document.getElementById("flickr_blank").value == "true") {
+		target = ' target="_blank" ';
+	}
+	if(document.getElementById("flickr-lightbox").checked) {
+		imgHTML = '<a href="http://www.flickr.com/photos/' + owner + "/" + id + '/"' + target;
+		imgHTML = imgHTML + ' rel="flickr-mgr"><img src="' + image.src + '" alt="' + image.alt + '" /></a>';
+	} else {
+		imgHTML = '<a href="http://www.flickr.com/photos/' + owner + "/" + id + '/" title="' + image.alt + '"' + target + '>';
+		imgHTML = imgHTML + '<img src="' + image.src + '" alt="' + image.alt + '" /></a>';
+	}
+	var license = document.getElementById("license-" + id);
+	if(license) {
+		imgHTML = imgHTML + "<br /><small><a href='" + license.href + "' title='" + license.title + "' rel='license' " + target + ">" + license.innerHTML + "</a> by <a href='http://www.flickr.com/people/"+owner+"/'"+ target +">"+name+"</a></small>&nbsp;";
+	}
+	
+	var i = document.getElementById("content");
+	if(i.style.display != "none") {
+		insertAtCursor(i, imgHTML);
+	} else {
+		if ( typeof tinyMCE != 'undefined' ) {
 			tinyMCE.execCommand('mceFocus',false,'content');
 			tinyMCE.execCommand('mceInsertContent',false,imgHTML);
 		}
 	}
+
 	return false;
 }

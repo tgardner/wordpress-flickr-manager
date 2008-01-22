@@ -123,16 +123,17 @@ function insertImage(image,owner,id,name) {
 		target = ' target="_blank" ';
 	}
 	if(document.getElementById("flickr-lightbox").checked) {
-		imgHTML = '<a href="http://www.flickr.com/photos/' + owner + "/" + id + '/"' + target;
+		imgHTML = '<a href="http://www.flickr.com/photos/' + owner + "/" + id + '/"' + target + 'title="' + image.alt + '"';
 		imgHTML = imgHTML + ' rel="flickr-mgr"><img src="' + image.src + '" alt="' + image.alt + '" /></a>';
 	} else {
-		imgHTML = '<a href="http://www.flickr.com/photos/' + owner + "/" + id + '/" title="' + image.alt + '"' + target + '>';
+		imgHTML = '<a href="http://www.flickr.com/photos/' + owner + "/" + id + '/" title="' + image.alt + '"' + target + 'title="' + image.alt + '"' + '>';
 		imgHTML = imgHTML + '<img src="' + image.src + '" alt="' + image.alt + '" /></a>';
 	}
 	var license = document.getElementById("license-" + id);
 	if(license) {
-		imgHTML = imgHTML + "<br /><small><a href='" + license.href + "' title='" + license.title + "' rel='license' " + target + ">" + license.innerHTML + "</a> by <a href='http://www.flickr.com/people/"+owner+"/'"+ target +">"+name+"</a></small>&nbsp;";
+		imgHTML = imgHTML + "<br /><small><a href='" + license.href + "' title='" + license.title + "' rel='license' " + target + ">" + license.innerHTML + "</a> by <a href='http://www.flickr.com/people/"+owner+"/'"+ target +">"+name+"</a></small>";
 	}
+	imgHTML = imgHTML + "&nbsp;";
 	
 	var i = document.getElementById("content");
 	if(i.style.display != "none") {

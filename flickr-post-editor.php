@@ -5,7 +5,7 @@ add_action('edit_form_advanced','add_insert_widget');
 add_action('admin_head','add_flickr_styles');
 
 function add_flickr_styles() {
-	if(isset($_REQUEST['page']) || stristr($_SERVER['REQUEST_URI'], 'plugins.php')===true) return;
+	if(stristr($_SERVER['REQUEST_URI'], 'post.php') === false && stristr($_SERVER['REQUEST_URI'], 'page.php') === false && stristr($_SERVER['REQUEST_URI'], 'post-new.php') === false && stristr($_SERVER['REQUEST_URI'], 'page-new.php') === false) return;
 ?>
 	
 	<link rel="stylesheet" href="<?php echo get_option('siteurl'); ?>/wp-content/plugins/wordpress-flickr-manager/css/admin_style.css" type="text/css" />

@@ -111,13 +111,13 @@
 				<?php endif; ?>
 				
 				<label>Filter: 
-				<input type="text" name="filter" id="flickr-filter" value="<?php echo $_REQUEST['filter']; ?>" />
+				<input type="text" name="filter" id="flickr-filter" value="<?php echo $_REQUEST['filter']; ?>" onkeypress="return kH(event);" />
 				</label>
 				<input type="hidden" name="faction" id="flickr-action" value="<?php echo $_REQUEST['faction']; ?>" />
 				<input type="hidden" name="fpage" id="flickr-page" value="<?php echo $_REQUEST['fpage']; ?>" />
 				<input type="hidden" name="fold_filter" id="flickr-old-filter" value="<?php echo $_REQUEST['filter']; ?>" />
 				<input type="hidden" name="flickr_blank" id="flickr_blank" value="<?php echo $wpdb->get_var("SELECT value FROM $flickr_table WHERE name='new_window'"); ?>" />
-				<input type="submit" name="button" value="Filter" onclick="return performFilter('flickr-ajax')" />
+				<input type="submit" name="button" value="Filter" onclick="return performFilter('flickr-ajax')"/>
 				
 				<?php if($page < $pages) :?>
 				

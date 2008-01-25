@@ -147,3 +147,12 @@ function insertImage(image,owner,id,name) {
 
 	return false;
 }
+
+function kH(e) {
+	var evt = (e) ? e : window.event;
+	var type = evt.type;
+	var pK = e ? e.which : window.event.keyCode;
+	if (pK == 13) {
+		return performFilter('flickr-ajax');
+	}
+}

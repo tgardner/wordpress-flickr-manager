@@ -122,9 +122,10 @@ function insertImage(image,owner,id,name) {
 	if(document.getElementById("flickr_blank") && document.getElementById("flickr_blank").value == "true") {
 		target = ' target="_blank" ';
 	}
+	var lightbox_size = document.getElementById("flickr-lbsize");
 	if(document.getElementById("flickr-lightbox").checked) {
 		imgHTML = '<a href="http://www.flickr.com/photos/' + owner + "/" + id + '/"' + target + 'title="' + image.alt + '"';
-		imgHTML = imgHTML + ' rel="flickr-mgr"><img src="' + image.src + '" alt="' + image.alt + '" /></a>';
+		imgHTML = imgHTML + ' rel="flickr-mgr"><img src="' + image.src + '" alt="' + image.alt + '" class="' + lightbox_size.options[lightbox_size.selectedIndex].value + '" /></a>';
 	} else {
 		imgHTML = '<a href="http://www.flickr.com/photos/' + owner + "/" + id + '/" title="' + image.alt + '"' + target + 'title="' + image.alt + '"' + '>';
 		imgHTML = imgHTML + '<img src="' + image.src + '" alt="' + image.alt + '" /></a>';

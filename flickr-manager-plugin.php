@@ -3,7 +3,7 @@
 Plugin Name: Flickr Manager
 Plugin URI: http://tgardner.net/
 Description: Handles uploading, modifying images on Flickr, and insertion into posts.
-Version: 1.4.01
+Version: 1.4.5
 Author: Trent Gardner
 Author URI: http://tgardner.net/
 
@@ -371,6 +371,8 @@ function flickr_options_page() {
 				if(!isset($_REQUEST['fper_page']) || !is_numeric($_REQUEST['fper_page']) || intval($_REQUEST['fper_page']) <= 0) $_REQUEST['fper_page'] = 5;
 				$per_page = $_REQUEST['fper_page'];
 				$new_window = $_REQUEST['fnew_window'];
+				$lightbox_default = $_REQUEST['flbox_default'];
+				$lightbox_enable = $_REQUEST['flightbox_enable'];
 				$exists = $wpdb->get_var("SELECT COUNT(value) FROM $flickr_table WHERE name='per_page'");
 						
 				if(empty($exists)) {
@@ -386,6 +388,24 @@ function flickr_options_page() {
 					$sql = "INSERT INTO $flickr_table (name, value) VALUES ('new_window', '$new_window')";
 				} else {
 					$sql = "UPDATE $flickr_table SET value='$new_window' WHERE name='new_window'";
+				}
+				$wpdb->query($sql);
+				
+				$exists = $wpdb->get_var("SELECT COUNT(value) FROM $flickr_table WHERE name='lightbox_default'");
+				
+				if(empty($exists)) {
+					$sql = "INSERT INTO $flickr_table (name, value) VALUES ('lightbox_default', '$lightbox_default')";
+				} else {
+					$sql = "UPDATE $flickr_table SET value='$lightbox_default' WHERE name='lightbox_default'";
+				}
+				$wpdb->query($sql);
+				
+				$exists = $wpdb->get_var("SELECT COUNT(value) FROM $flickr_table WHERE name='lightbox_enable'");
+				
+				if(empty($exists)) {
+					$sql = "INSERT INTO $flickr_table (name, value) VALUES ('lightbox_enable', '$lightbox_enable')";
+				} else {
+					$sql = "UPDATE $flickr_table SET value='$lightbox_enable' WHERE name='lightbox_enable'";
 				}
 				$wpdb->query($sql);
 				break;
@@ -490,13 +510,37 @@ function flickr_options_page() {
 		$exists = $wpdb->get_var("SELECT value FROM $flickr_table WHERE name='per_page'");
 		if(!empty($exists)) $_REQUEST['fper_page'] = $exists;
 		$_REQUEST['fnew_window'] = $wpdb->get_var("SELECT value FROM $flickr_table WHERE name='new_window'");
+		$_REQUEST['flightbox_enable'] = $wpdb->get_var("SELECT value FROM $flickr_table WHERE name='lightbox_enable'");
+		$exists = $wpdb->get_var("SELECT value FROM $flickr_table WHERE name='lightbox_default'");
+		$_REQUEST['flbox_default'] = "medium";
+		if(!empty($exists)) $_REQUEST['flbox_default'] = $exists;
 		?>
 		
 		<form method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">
 			<!-- action=3 - Update Options -->
 			<input type="hidden" name="action" value="3" />
+			
+			<div>
+			<strong>Miscellaneous</strong><br />
 			<label>Images per page: <input type="text" name="fper_page" value="<?php echo $_REQUEST['fper_page']; ?>" style="padding: 3px; width: 50px;" /></label>
 			<br /><label><input type="checkbox" name="fnew_window" value="true" style="margin: 5px 0px;" <?php if($_REQUEST['fnew_window'] == "true") echo 'checked="checked" '; ?>/> Add target="_blank" to image page links.</label>
+			</div>
+			<br />
+			<div>
+			<strong>Lightbox</strong><br />
+			<label><input type="checkbox" name="flightbox_enable" value="true" <?php if($_REQUEST['flightbox_enable'] == "true") echo 'checked="checked" '; ?>/> Enable lightbox support by default</label><br />
+			<label>Default lightbox picture: <select name="flbox_default">
+			<?php
+				$sizes = array("small","medium","large");
+				foreach ($sizes as $size) {
+					echo "<option value=\"$size\"";
+					if($_REQUEST['flbox_default'] == $size) echo ' selected="selected" ';
+					echo ">" . ucfirst($size) . "</option>\n";
+				}
+			?>
+			</select></label>
+			</div>
+			
 			<p class="submit">
 				
 				<input type="submit" name="Submit" value="<?php _e('Submit') ?> &raquo;" style="font-size: 1.5em;" />
@@ -554,7 +598,9 @@ add_action('wp_head', 'add_flickr_lightbox');
 
 function add_flickr_lightbox() {?>
 
-	<link rel="stylesheet" href="<?php echo get_option('siteurl'); ?>/wp-content/plugins/wordpress-flickr-manager/lightbox/lightbox.css" type="text/css" />
+	<link rel="stylesheet" href="<?php echo get_option('siteurl'); ?>/wp-content/plugins/wordpress-flickr-manager/lightbox/css/lightbox.css" type="text/css" />
+	<script type="text/javascript" src="<?php echo get_option('siteurl'); ?>/wp-includes/js/prototype.js"></script>
+	<script type="text/javascript" src="<?php echo get_option('siteurl'); ?>/wp-includes/js/scriptaculous/scriptaculous.js?load=effects"></script>
 	<script type="text/javascript" src="<?php echo get_option('siteurl'); ?>/wp-content/plugins/wordpress-flickr-manager/lightbox/lightbox.php"></script>
 	
 <?php }

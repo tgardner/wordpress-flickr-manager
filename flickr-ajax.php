@@ -40,6 +40,8 @@
 			return;
 		}
 		
+		$_REQUEST['flightbox'] = $wpdb->get_var("SELECT value FROM $flickr_table WHERE name='lightbox_enable'");
+		
 		$page = (isset($_REQUEST['fpage']) && !empty($_REQUEST['fpage'])) ? $_REQUEST['fpage'] : '1';
 		$exists = $wpdb->get_var("SELECT value FROM $flickr_table WHERE name='per_page'");
 		if(!empty($exists)) $_REQUEST['fper_page'] = $exists;
@@ -71,6 +73,9 @@
 		$params = array_merge($params,array('per_page' => $per_page, 'page' => $page));
 		$photos = flickr_call($flickr_function, $params, true);
 		$pages = $photos['photos']['pages'];
+		
+		$exists = $wpdb->get_var("SELECT value FROM $flickr_table WHERE name='lightbox_default'");
+		$lightbox_default = ($exists) ? $exists : "medium";
 	?>
 		
 		<div id="flickr-browse">
@@ -101,6 +106,21 @@
 		</div>
 			
 		<div style="clear: both;">&nbsp;</div>
+		<div style="float: right; text-align: left;">
+			<div style="text-align:center;"><strong>Lightbox</strong></div>
+			<label>Insert with lightbox: <input type="checkbox" id="flickr-lightbox" name="flickr-lightbox" value="1" <?php if($_REQUEST['flightbox'] == "true") echo 'checked="checked"'; ?>/></label>
+			<br /><label>Lightbox size: <select name="flickr-lbsize" id="flickr-lbsize">
+			<?php
+			$lightbox_sizes = array("small","medium","large");
+			foreach ($lightbox_sizes as $lightbox_size) {
+				echo "<option value=\"flickr-$lightbox_size\"";
+				if($lightbox_default == $lightbox_size) echo ' selected="selected"';
+				echo ">" . ucfirst($lightbox_size) . "</option>\n";
+			}
+			?>
+			</select></label>
+		</div>
+		
 		<div id="flickr-nav">
 			
 				<?php if($page > 1) :?>
@@ -138,7 +158,8 @@
 					?>
 					
 				</select></label>
-				<label><input type="checkbox" id="flickr-lightbox" name="flickr-lightbox" value="1" <?php if($_REQUEST['flightbox'] == "true") echo 'checked="checked"'; ?>/> Insert with lightbox support</label>
+				
+				<div style="width: 100%; height: 1%; clear: both;"></div>
 		</div>
 		
 <?php

@@ -2,9 +2,9 @@
 Contributors: tgardner
 Donate link: http://tgardner.net/
 Tags: flickr, images
-Requires at least: 2.2
+Requires at least: 2.3
 Tested up to: 2.3.1
-Stable tag: 1.4.01
+Stable tag: 1.4.5
 
 Handles uploading, modifying images on Flickr, and insertion into posts.
 

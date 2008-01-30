@@ -5,8 +5,9 @@ require_once("../../../wp-config.php");
 require_once("../../../wp-includes/wp-db.php");
 require_once("../../../wp-includes/pluggable.php");
 
-$current_user = wp_get_current_user();
-if($current_user->user_level < 2) die("Unauthorized Access");
+if(!current_user_can('edit_plugins')) {
+	die('Oops, sorry, you are not authorized to fiddle with plugins!');
+}
 
 $flickr_table = $wpdb->prefix . "flickr";
 

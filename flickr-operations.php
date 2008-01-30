@@ -4,7 +4,7 @@ $flickr_secret = "b1e94e2cb7e1ff41";
 
 function flickr_call($method, $params, $sign = false, $rsp_format = "php_serial") {
 	
-	if(!is_array($params)) return false;
+	if(!is_array($params)) $params = array();
 	
 	global $flickr_apikey;
 	$call_includes = array( 'api_key'	=> $flickr_apikey, 

@@ -400,6 +400,11 @@ FlickrLightbox.prototype = {
 						image_link.pop();
 						image_link[image_link.length - 1] = image_link[image_link.length - 1] + imageSize + ".jpg";
 						image_link = image_link.join("_");
+					} else if(!image_link.match(/b\.jpg/)) {
+						image_link = image_link.split(".");
+						image_link.pop();
+						image_link[image_link.length - 1] = image_link[image_link.length - 1] + imageSize + ".jpg";
+						image_link = image_link.join(".");
 					}
 					this.href = image_link;
 					// --------------------------------------------------------------------------

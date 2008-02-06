@@ -381,6 +381,9 @@ FlickrLightbox.prototype = {
 					save_anchor = this;
 					var image_link = image.getAttribute("src");
 					var imageSize = "";
+					if(!this.getAttribute("title")) {
+						this.setAttribute("title", " ");
+					}
 					if(testClass) {
 						var testResult = testClass.match(/flickr\-small|flickr\-medium|flickr\-large/);
 						switch(testResult.toString()) {

@@ -29,7 +29,7 @@ require_once(dirname(__FILE__) . "/FlickrCore.php");
 
 class FlickrManager extends FlickrCore {
 	
-	private $db_version = '1.0';
+	public $db_version;
 	public $db_table;
 	public $plugin_directory;
 	public $plugin_filename;
@@ -40,6 +40,7 @@ class FlickrManager extends FlickrCore {
 		global $wpdb;
 		
 		$this->db_table = $wpdb->prefix . "flickr";
+		$this->db_version = '1.0';
 		
 		$filename = explode("/", __FILE__);
 		$this->plugin_directory = $filename[count($filename) - 2];

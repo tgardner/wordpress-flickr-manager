@@ -22,7 +22,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+*/ 
+
+$version = explode(".",phpversion()); 
+
+if(intval($version[0]) < 5) {
+	$filename = explode("/", __FILE__);
+	$plugin = "{$filename[count($filename) - 2]}/{$filename[count($filename) - 1]}";
+	echo "<b>ERROR: You're currently running " . phpversion() . " and you must have at least PHP 5 in order to use Flickr Manager!</b>";
+	return;
+} 
 
 if(class_exists('FlickrManager')) return;
 require_once(dirname(__FILE__) . "/FlickrCore.php");

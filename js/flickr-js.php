@@ -152,7 +152,7 @@ function insertImage(image,owner,id,name) {
 		imgHTML = imgHTML + relation + '><img src="' + image_url + '" alt="' + image.alt + '" class="' + lightbox_size.options[lightbox_size.selectedIndex].value + '" /></a>';
 	} else {
 		imgHTML = '<a href="http://www.flickr.com/photos/' + owner + "/" + id + '/" title="' + image.alt + '"' + target + 'title="' + image.alt + '"' + '>';
-		imgHTML = imgHTML + '<img src="' + image.src + '" alt="' + image.alt + '" /></a>';
+		imgHTML = imgHTML + '<img src="' + image_url + '" alt="' + image.alt + '" /></a>';
 	}
 	var license = document.getElementById("license-" + id);
 	if(license) {

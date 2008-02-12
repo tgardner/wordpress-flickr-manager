@@ -96,7 +96,14 @@ function displayBrowse() {
 		<?php foreach ($photos['photos']['photo'] as $photo) : ?>
 
 		<div class="flickr-img" id="flickr-<?php echo $photo['id']; ?>">
-			<?php if($fscope == "Personal" && !empty($_REQUEST['fphotoset'])) $photo['owner'] = $owner; ?>
+		
+			<?php 
+			if($fscope == "Personal" && !empty($_REQUEST['fphotoset'])) $photo['owner'] = $owner; 
+			$patterns = array('/\&quot\;/','/\"/');
+			$photo['title'] = preg_replace($patterns,"'",$photo['title']);
+			?>
+			
+			
 			<img src="<?php echo $flickr_manager->getPhotoUrl($photo,$size); ?>" alt="<?php echo str_replace("&amp;amp;","&amp;",str_replace("&","&amp;",$photo['title'])); ?>" onclick="return insertImage(this,'<?php echo $photo['owner']; ?>','<?php echo $photo['id']; ?>','<?php echo str_replace("'","&lsquo;",$photo['ownername']); ?>')" />
 			
 			<?php 

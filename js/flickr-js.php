@@ -43,6 +43,16 @@ function executeLink(link, destId) {
 	if(lightbox) {
 		 query = query + "&flightbox=" + lightbox.checked;
 	}
+	var usePset = document.getElementById("lbox-photoset");
+	var insertSet = "false";
+	var psetname = "";
+	if(usePset) {
+		if(usePset.checked === true) {
+			insertSet = "true";
+		}
+		psetname = document.getElementById("fphotoset-name").value;
+		query = query + "&flbox-photoset=" + insertSet + "&fphotoset-name=" + psetname;
+	}
 	var url = plugin_dir + "flickr-ajax.php";
 	displayLoading(destId);
 	var flickr_ajax = new Ajax.Updater({success: destId}, url, {method: 'get', parameters: query, onFailure: function(){ returnError(destId); }});
@@ -55,13 +65,20 @@ function performFilter(destId) {
 	var scope = document.getElementById("flickr-public").value;
 	var page = document.getElementById("flickr-page").value;
 	var lightbox = document.getElementById("flickr-lightbox").checked;
+	var photoset = document.getElementById("flickr-photosets").value;
+	var insertSet = "false";
+	var psetname = document.getElementById("fphotoset-name").value;
+	
+	if(document.getElementById("lbox-photoset").checked === true) {
+		insertSet = "true";
+	}
 	if(filter != document.getElementById("flickr-old-filter").value) {
 		page = 1;
 	}
 	if(document.getElementById("flickr-personal").checked === true) {
 		scope = document.getElementById("flickr-personal").value;
 	}
-	var query = "faction=" + document.getElementById("flickr-action").value + "&photoSize=" + size.options[size.selectedIndex].value + "&filter=" + filter + "&fpage=" + page + "&fscope=" + scope + "&flightbox=" + lightbox;
+	var query = "faction=" + document.getElementById("flickr-action").value + "&photoSize=" + size.options[size.selectedIndex].value + "&filter=" + filter + "&fpage=" + page + "&fscope=" + scope + "&flightbox=" + lightbox + "&fphotoset=" + photoset + "&flbox-photoset=" + insertSet + "&fphotoset-name=" + psetname;
 	var url = plugin_dir + "flickr-ajax.php";
 	displayLoading(destId);
 	var flickr_ajax = new Ajax.Updater({success: destId}, url, {method: 'get', parameters: query, onFailure: function(){ returnError(destId); }});
@@ -120,14 +137,19 @@ function insertAtCursor(myField, myValue) {
 function insertImage(image,owner,id,name) {
 	var imgHTML = "";
 	var target = "";
+	var relation = ' rel="flickr-mgr"';
 	var image_url = document.getElementById("url-" + id).value;
 	if(document.getElementById("flickr_blank") && document.getElementById("flickr_blank").value == "true") {
 		target = ' target="_blank" ';
 	}
 	var lightbox_size = document.getElementById("flickr-lbsize");
 	if(document.getElementById("flickr-lightbox").checked) {
+		if(document.getElementById("lbox-photoset").checked === true) {
+			var psetname = document.getElementById("fphotoset-name").value;
+			relation = ' rel="flickr-mgr[' + psetname + ']"';
+		} 
 		imgHTML = '<a href="http://www.flickr.com/photos/' + owner + "/" + id + '/"' + target + ' title="' + image.alt + '"';
-		imgHTML = imgHTML + ' rel="flickr-mgr"><img src="' + image_url + '" alt="' + image.alt + '" class="' + lightbox_size.options[lightbox_size.selectedIndex].value + '" /></a>';
+		imgHTML = imgHTML + relation + '><img src="' + image_url + '" alt="' + image.alt + '" class="' + lightbox_size.options[lightbox_size.selectedIndex].value + '" /></a>';
 	} else {
 		imgHTML = '<a href="http://www.flickr.com/photos/' + owner + "/" + id + '/" title="' + image.alt + '"' + target + 'title="' + image.alt + '"' + '>';
 		imgHTML = imgHTML + '<img src="' + image.src + '" alt="' + image.alt + '" /></a>';

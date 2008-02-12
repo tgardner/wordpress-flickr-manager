@@ -46,7 +46,7 @@ function displayBrowse() {
 	$params = array('extras' => 'original_format,license,owner_name'); 
 	
 	if($fscope == "Personal") {
-		$params = array_merge($params, array('user_id' => $nsid));
+		$params = array_merge($params, array('user_id' => $nsid, 'auth_token' => $token));
 	} else {
 		$licences = $flickr_manager->call('flickr.photos.licenses.getInfo',array());
 		$licence_search = array();
@@ -72,8 +72,17 @@ function displayBrowse() {
 	}
 	
 	$params = array_merge($params,array('per_page' => $per_page, 'page' => $page));
-	$photos = $flickr_manager->call('flickr.photos.search', $params);
-
+	
+	if($fscope == "Personal" && !empty($_REQUEST['fphotoset'])) {
+		$params = array('per_page' => $per_page, 'page' => $page, 'extras' => 'original_format,license,owner_name', 'photoset_id' => $_REQUEST['fphotoset'], 'auth_token' => $token);
+		if(isset($_REQUEST['filter']) && !empty($_REQUEST['filter'])) $params = array_merge($params,array('tags' => $_REQUEST['filter'],'tag_mode' => 'all'));
+		$photos = $flickr_manager->call('flickr.photosets.getPhotos', $params, true);
+		$photos['photos'] = $photos['photoset'];
+		unset($photos['photoset']);
+	} else {
+		$photos = $flickr_manager->call('flickr.photos.search', $params, true);
+	}
+	
 	$pages = $photos['photos']['pages'];
 	
 	$exists = $wpdb->get_var("SELECT value FROM $flickr_manager->db_table WHERE name='lightbox_default'");
@@ -108,6 +117,31 @@ function displayBrowse() {
 	</div>
 	
 	<div style="clear: both;">&nbsp;</div>
+	
+	<div style="float: left; text-align: left; width: 180px;">
+		<div style="text-align:center;"><strong>Photosets</strong></div>
+		<?php if($fscope == "Personal") : ?>
+			
+		<select name="flickr-photosets" id="flickr-photosets" onchange="performFilter('flickr-ajax');" style="width: 180px;">
+			<option value="" <?php if(empty($_REQUEST['fphotoset'])) echo 'selected="selected"'; ?>></option>
+					
+			<?php	
+			$photosets = $flickr_manager->call('flickr.photosets.getList', array('user_id' => $nsid), true);
+			foreach ($photosets['photosets']['photoset'] as $photoset) :
+			?>
+			
+			<option value="<?php echo $photoset['id']; ?>" <?php if($_REQUEST['fphotoset'] == $photoset['id']) echo 'selected="selected"'; ?>><?php echo $photoset['title']['_content']; ?></option>
+		
+			<?php endforeach; ?>
+		
+		</select><br />
+		
+		<?php endif; ?>
+		
+		<label><input type="checkbox" name="lbox-photoset" id="lbox-photoset" value="true" <?php if($_REQUEST['flbox-photoset'] == "true") echo 'checked="checked"'; ?> onchange="document.getElementById('fphotoset-name').focus();" /> Insert into a set </label><br /><label>with the name: 
+		<input type="text" name="fphotoset-name" id="fphotoset-name" value="<?php echo $_REQUEST['fphotoset-name']; ?>" style="width: 70px; padding: 2px;" /></label>
+		
+	</div>
 	
 	<div style="float: right; text-align: left;">
 		<div style="text-align:center;"><strong>Lightbox</strong></div>

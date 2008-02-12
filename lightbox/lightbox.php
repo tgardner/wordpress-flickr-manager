@@ -4,6 +4,7 @@ require_once("../../../../wp-config.php");
 header('Content-Type: text/javascript');
 header('Cache-Control: no-cache');
 header('Pragma: no-cache');
+global $flickr_manager;
 ?>
 // -----------------------------------------------------------------------------------
 //
@@ -75,7 +76,7 @@ header('Pragma: no-cache');
 // Trent Gardner
 //
 // --------------------------------------------------------------------------
-var plugin_dir = "<?php echo get_option('siteurl'); ?>/wp-content/plugins/wordpress-flickr-manager/";
+var plugin_dir = "<?php echo $flickr_manager->getAbsoluteUrl(); ?>/";
 
 // If you would like to use a custom loading image or close button reference them in the next two lines.
 var flickr_loading = plugin_dir + 'lightbox/images/loading.gif';		
@@ -345,9 +346,64 @@ FlickrLightbox.prototype = {
 		objBottomNavCloseLink.appendChild(objBottomNavCloseImage);
 	},
 	
+	
+	
+	//
+	// EDIT: WordPress Flickr Manager
+	// Trent Gardner
+	//
+	// --------------------------------------------------------------------------
 	save_url: {}, save_anchor: {},
 
-
+	
+	updateAnchorHref: function(anchor) {
+		var image = anchor.getElementsByTagName("img");
+		image = image[0];
+		var testClass = image.getAttribute("class");
+		myLightbox.save_url = anchor.getAttribute("href");
+		myLightbox.save_anchor = anchor;
+		var image_link = image.getAttribute("src");
+		var imageSize = "";
+		if(!anchor.getAttribute("title")) {
+			anchor.setAttribute("title", " ");
+		}
+		if(testClass) {
+			var testResult = testClass.match(/flickr\-small|flickr\-medium|flickr\-large/);
+			switch(testResult.toString()) {
+				case "flickr-large":
+					imageSize = "_b";
+					break;
+				case "flickr-medium":
+					imageSize = "";
+					break;
+				case "flickr-small":
+					imageSize = "_m";
+					break;
+			}
+		}
+		if(image_link.match(/[s,t,m]\.jpg/)) {
+			image_link = image_link.split("_");
+			image_link.pop();
+			image_link[image_link.length - 1] = image_link[image_link.length - 1] + imageSize + ".jpg";
+			image_link = image_link.join("_");
+		} else if(!image_link.match(/b\.jpg/)) {
+			image_link = image_link.split(".");
+			image_link.pop();
+			image_link[image_link.length - 1] = image_link[image_link.length - 1] + imageSize + ".jpg";
+			image_link = image_link.join(".");
+		}
+		anchor.href = image_link;
+	},
+	
+	
+	restoreAnchorHref: function() {
+		this.save_anchor.setAttribute("href", this.save_url);
+	},
+	
+	// --------------------------------------------------------------------------
+	
+	
+	
 	//
 	// updateImageList()
 	// Loops through anchor tags looking for 'lightbox' references and applies onclick
@@ -366,52 +422,8 @@ FlickrLightbox.prototype = {
 			
 			// use the string.match() method to catch 'lightbox' references in the rel attribute
 			if (anchor.getAttribute('href') && (relAttribute.toLowerCase().match('flickr-mgr'))){
-				
+			
 				anchor.onclick = function () {
-					
-					//
-					// EDIT: WordPress Flickr Manager
-					// Trent Gardner
-					//
-					// --------------------------------------------------------------------------
-					var image = this.getElementsByTagName("img");
-					image = image[0];
-					var testClass = image.getAttribute("class");
-					save_url = this.getAttribute("href");
-					save_anchor = this;
-					var image_link = image.getAttribute("src");
-					var imageSize = "";
-					if(!this.getAttribute("title")) {
-						this.setAttribute("title", " ");
-					}
-					if(testClass) {
-						var testResult = testClass.match(/flickr\-small|flickr\-medium|flickr\-large/);
-						switch(testResult.toString()) {
-							case "flickr-large":
-								imageSize = "_b";
-								break;
-							case "flickr-medium":
-								imageSize = "";
-								break;
-							case "flickr-small":
-								imageSize = "_m";
-								break;
-						}
-					}
-					if(image_link.match(/[s,t,m]\.jpg/)) {
-						image_link = image_link.split("_");
-						image_link.pop();
-						image_link[image_link.length - 1] = image_link[image_link.length - 1] + imageSize + ".jpg";
-						image_link = image_link.join("_");
-					} else if(!image_link.match(/b\.jpg/)) {
-						image_link = image_link.split(".");
-						image_link.pop();
-						image_link[image_link.length - 1] = image_link[image_link.length - 1] + imageSize + ".jpg";
-						image_link = image_link.join(".");
-					}
-					this.href = image_link;
-					// --------------------------------------------------------------------------
-					
 					myLightbox.start(this); 
 					return false;
 				}
@@ -458,7 +470,9 @@ FlickrLightbox.prototype = {
 		// if image is NOT part of a set..
 		if((imageLink.getAttribute('rel') == 'flickr-mgr')){
 			// add single image to imageArray
-			imageArray.push(new Array(imageLink.getAttribute('href'), imageLink.getAttribute('title')));			
+			this.updateAnchorHref(imageLink);
+			imageArray.push(new Array(imageLink.getAttribute('href'), imageLink.getAttribute('title')));
+			this.restoreAnchorHref();
 		} else {
 		// if image is part of a set..
 
@@ -466,11 +480,15 @@ FlickrLightbox.prototype = {
 			for (var i=0; i<anchors.length; i++){
 				var anchor = anchors[i];
 				if (anchor.getAttribute('href') && (anchor.getAttribute('rel') == imageLink.getAttribute('rel'))){
+					this.updateAnchorHref(anchor);
 					imageArray.push(new Array(anchor.getAttribute('href'), anchor.getAttribute('title')));
+					this.restoreAnchorHref();
 				}
 			}
 			imageArray.removeDuplicates();
+			this.updateAnchorHref(imageLink);
 			while(imageArray[imageNum][0] != imageLink.getAttribute('href')) { imageNum++;}
+			this.restoreAnchorHref();
 		}
 
 		// calculate top and left offset for the lightbox 
@@ -689,7 +707,6 @@ FlickrLightbox.prototype = {
 		new Effect.Fade('overlay', { duration: overlayDuration});
 		showSelectBoxes();
 		showFlash();
-		save_anchor.setAttribute("href",save_url);
 	}
 }
 

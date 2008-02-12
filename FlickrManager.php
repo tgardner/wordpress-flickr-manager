@@ -3,7 +3,7 @@
 Plugin Name: Flickr Manager
 Plugin URI: http://tgardner.net/
 Description: Handles uploading, modifying images on Flickr, and insertion into posts.
-Version: 1.5.0a
+Version: 1.5.0
 Author: Trent Gardner
 Author URI: http://tgardner.net/
 
@@ -649,10 +649,10 @@ class FlickrManager extends FlickrCore {
 			
 				<div id="flickr-menu">
 					<a href="#?faction=upload" title="Upload Photo">Upload Photo</a>
-					<a href="#?faction=browse" title="Browse Photos">Browse Photos</a>
+					<a href="#?faction=browse" id="fbrowse-photos" title="Browse Photos">Browse Photos</a>
 					<div id="scope-block">
-					<label><input type="radio" name="fscope" id="flickr-personal" value="Personal" checked="checked" /> Personal</label>
-					<label><input type="radio" name="fscope" id="flickr-public" value="Public" /> Public</label>
+					<label><input type="radio" name="fscope" id="flickr-personal" value="Personal" checked="checked" onchange="executeLink(document.getElementById('fbrowse-photos'),'flickr-ajax');" /> Personal</label>
+					<label><input type="radio" name="fscope" id="flickr-public" value="Public" onchange="executeLink(document.getElementById('fbrowse-photos'),'flickr-ajax');" /> Public</label>
 					</div>
 					<div style="clear: both; height: 1%;"></div>
 				</div>

@@ -79,6 +79,7 @@ function displayBrowse() {
 		$photos = $flickr_manager->call('flickr.photosets.getPhotos', $params, true);
 		$photos['photos'] = $photos['photoset'];
 		unset($photos['photoset']);
+		$owner = $photos['photos']['owner'];
 	} else {
 		$photos = $flickr_manager->call('flickr.photos.search', $params, true);
 	}
@@ -95,7 +96,7 @@ function displayBrowse() {
 		<?php foreach ($photos['photos']['photo'] as $photo) : ?>
 
 		<div class="flickr-img" id="flickr-<?php echo $photo['id']; ?>">
-			
+			<?php if($fscope == "Personal" && !empty($_REQUEST['fphotoset'])) $photo['owner'] = $owner; ?>
 			<img src="<?php echo $flickr_manager->getPhotoUrl($photo,$size); ?>" alt="<?php echo str_replace("&amp;amp;","&amp;",str_replace("&","&amp;",$photo['title'])); ?>" onclick="return insertImage(this,'<?php echo $photo['owner']; ?>','<?php echo $photo['id']; ?>','<?php echo str_replace("'","&lsquo;",$photo['ownername']); ?>')" />
 			
 			<?php 

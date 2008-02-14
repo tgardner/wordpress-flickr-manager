@@ -1,12 +1,12 @@
 <?php
 class FlickrCore {
 	
-	protected $api_key = "0d3960999475788aee64408b64563028";
-	protected $secret = "b1e94e2cb7e1ff41";
+	var $api_key = "0d3960999475788aee64408b64563028";
+	var $secret = "b1e94e2cb7e1ff41";
 	
 	
 	
-	public function call($method, $params, $sign = false, $rsp_format = "php_serial") {
+	function call($method, $params, $sign = false, $rsp_format = "php_serial") {
 		if(!is_array($params)) $params = array();
 		
 		$call_includes = array( 'api_key'	=> $this->api_key, 
@@ -24,7 +24,7 @@ class FlickrCore {
 	
 	
 	
-	public function post($method, $params, $sign = false, $rsp_format = "php_serial") {
+	function post($method, $params, $sign = false, $rsp_format = "php_serial") {
 		if(!is_array($params) || !is_string($method) || !is_string($rsp_format) || !is_bool($sign)) return false;
 		
 		$call_includes = array( 'api_key'	=> $this->api_key, 
@@ -62,7 +62,7 @@ class FlickrCore {
 	
 	
 	
-	private function getRequest($url) {
+	function getRequest($url) {
 		if(function_exists('curl_init')) {
 			$session = curl_init($url);
 			curl_setopt($session, CURLOPT_HEADER, false);
@@ -88,7 +88,7 @@ class FlickrCore {
 	
 	
 	
-	private function postRequest($url, $params) {
+	function postRequest($url, $params) {
 		if(function_exists('curl_init')) {
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_URL, $url);
@@ -131,7 +131,7 @@ class FlickrCore {
 	
 	
 	
-	protected function getSignature($params) {
+	function getSignature($params) {
 		ksort($params);
 		
 		$api_sig = $this->secret;
@@ -145,7 +145,7 @@ class FlickrCore {
 	
 	
 	
-	protected function encodeParameters($params) {
+	function encodeParameters($params) {
 		$encoded_params = array();
 	
 		foreach ($params as $k => $v){
@@ -157,7 +157,7 @@ class FlickrCore {
 	
 	
 	
-	protected function getAuthUrl($frob, $perms) {
+	function getAuthUrl($frob, $perms) {
 		$params = array('api_key' => $this->api_key, 'perms' => $perms, 'frob' => $frob);
 		$params = array_merge($params, array('api_sig' => $this->getSignature($params)));
 		
@@ -167,7 +167,7 @@ class FlickrCore {
 	
 	
 	
-	public function getPhotoUrl($photo, $size) {
+	function getPhotoUrl($photo, $size) {
 		$sizes = array('square' => '_s', 'thumbnail' => '_t', 'small' => '_m', 'medium' => '', 'large' => '_b', 'original' => '_o');
 		if(!isset($photo['originalformat']) && strtolower($size) == "original") $size = 'medium';
 		if(($size = strtolower($size)) != 'original') {

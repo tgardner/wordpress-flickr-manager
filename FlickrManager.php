@@ -3,7 +3,7 @@
 Plugin Name: Flickr Manager
 Plugin URI: http://tgardner.net/
 Description: Handles uploading, modifying images on Flickr, and insertion into posts.
-Version: 1.5.0
+Version: 1.5.1
 Author: Trent Gardner
 Author URI: http://tgardner.net/
 
@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 $version = explode(".",phpversion()); 
 
-if(intval($version[0]) < 5) {
+if(intval($version[0]) < 5 && intval($version[1]) < 4) {
 	$filename = explode("/", __FILE__);
 	$plugin = "{$filename[count($filename) - 2]}/{$filename[count($filename) - 1]}";
 	echo "<b>ERROR: You're currently running " . phpversion() . " and you must have at least PHP 5 in order to use Flickr Manager!</b>";
@@ -38,14 +38,14 @@ require_once(dirname(__FILE__) . "/FlickrCore.php");
 
 class FlickrManager extends FlickrCore {
 	
-	public $db_version;
-	public $db_table;
-	public $plugin_directory;
-	public $plugin_filename;
+	var $db_version;
+	var $db_table;
+	var $plugin_directory;
+	var $plugin_filename;
 	
 	
 	
-	public function FlickrManager() {
+	function FlickrManager() {
 		global $wpdb;
 		
 		$this->db_table = $wpdb->prefix . "flickr";
@@ -67,7 +67,7 @@ class FlickrManager extends FlickrCore {
 	
 	
 	
-	public function install() {
+	function install() {
 		global $wpdb;
 		
 		if($wpdb->get_var("SHOW TABLES LIKE '$this->db_table'") != $this->db_table) {
@@ -89,7 +89,7 @@ class FlickrManager extends FlickrCore {
 	
 	
 	
-	public function add_menus() {
+	function add_menus() {
 		// Add a new submenu under Options
 		add_options_page('Flickr Options', 'Flickr', 5, __FILE__, array(&$this, 'options_page'));
 		
@@ -99,7 +99,7 @@ class FlickrManager extends FlickrCore {
 	
 	
 	
-	public function options_page() {
+	function options_page() {
 		global $wpdb;
 		if(isset($_REQUEST['action'])) {
 			switch($_REQUEST['action']) {
@@ -346,7 +346,7 @@ class FlickrManager extends FlickrCore {
 	
 	
 	
-	public function manage_page() {
+	function manage_page() {
 		global $wpdb;
 		$token = $wpdb->get_var("SELECT value FROM $this->db_table WHERE name='token'");
 		if(empty($token)) {
@@ -586,13 +586,13 @@ class FlickrManager extends FlickrCore {
 	
 	
 	
-	public function filterContent($content) {
+	function filterContent($content) {
 		return preg_replace_callback("/\[img\:(\d+),(.+)\]/", array(&$this, 'filterCallback'), $content);
 	}
 	
 	
 	
-	private function filterCallback($match) {
+	function filterCallback($match) {
 		$pid = $match[1];
 		$size = $match[2];
 		$params = array('photo_id' => $pid, 'auth_token' => $token);
@@ -607,7 +607,7 @@ class FlickrManager extends FlickrCore {
 	
 	
 	
-	public function add_headers() {
+	function add_headers() {
 	?>
 		
 		<link rel="stylesheet" href="<?php echo $this->getAbsoluteUrl(); ?>/lightbox/css/lightbox.css" type="text/css" />
@@ -620,13 +620,13 @@ class FlickrManager extends FlickrCore {
 	
 	
 	
-	public function getAbsoluteUrl() {
+	function getAbsoluteUrl() {
 		return get_option('siteurl') . "/wp-content/plugins/" . $this->plugin_directory;
 	}
 	
 	
 	
-	public function add_admin_headers() {
+	function add_admin_headers() {
 		if(stristr($_SERVER['REQUEST_URI'], 'post.php') === false && stristr($_SERVER['REQUEST_URI'], 'page.php') === false && stristr($_SERVER['REQUEST_URI'], 'post-new.php') === false && stristr($_SERVER['REQUEST_URI'], 'page-new.php') === false) return;
 	?>
 		
@@ -638,7 +638,7 @@ class FlickrManager extends FlickrCore {
 	
 	
 	
-	public function add_flickr_panel() {
+	function add_flickr_panel() {
 	?>
 
 		<div class="dbx-box" id="flickr-insert-widget">

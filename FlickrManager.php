@@ -627,7 +627,12 @@ class FlickrManager extends FlickrCore {
 	
 	
 	function add_admin_headers() {
-		if(stristr($_SERVER['REQUEST_URI'], 'post.php') === false && stristr($_SERVER['REQUEST_URI'], 'page.php') === false && stristr($_SERVER['REQUEST_URI'], 'post-new.php') === false && stristr($_SERVER['REQUEST_URI'], 'page-new.php') === false) return;
+		$filename = explode("/", $_SERVER['REQUEST_URI']);
+		$filename = $filename[count($filename) - 1];
+		if($end = strpos($filename,"?")) $filename = substr($filename,0,$end);
+		$filename = strtolower($filename);
+		
+		if($filename != "post.php" && $filename != "page.php" && $filename != "post-new.php" && $filename != "page-new.php") return;
 	?>
 		
 		<link rel="stylesheet" href="<?php echo $this->getAbsoluteUrl(); ?>/css/admin_style.css" type="text/css" />

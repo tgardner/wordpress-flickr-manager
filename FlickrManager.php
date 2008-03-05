@@ -3,7 +3,7 @@
 Plugin Name: Flickr Manager
 Plugin URI: http://tgardner.net/
 Description: Handles uploading, modifying images on Flickr, and insertion into posts.
-Version: 1.5.1
+Version: 1.5.2
 Author: Trent Gardner
 Author URI: http://tgardner.net/
 
@@ -29,7 +29,7 @@ $version = explode(".",phpversion());
 if(intval($version[0]) < 5 && intval($version[1]) < 4) {
 	$filename = explode("/", __FILE__);
 	$plugin = "{$filename[count($filename) - 2]}/{$filename[count($filename) - 1]}";
-	echo "<b>ERROR: You're currently running " . phpversion() . " and you must have at least PHP 5 in order to use Flickr Manager!</b>";
+	echo "<b>ERROR: You're currently running " . phpversion() . " and you must have at least PHP 4.4.x in order to use Flickr Manager!</b>";
 	return;
 } 
 
@@ -247,10 +247,17 @@ class FlickrManager extends FlickrCore {
 				<?php
 				$nsid = $wpdb->get_var("SELECT value FROM $this->db_table WHERE name='nsid'");
 				$info = $this->call('flickr.people.getInfo',array('user_id' => $nsid));
+				$exists = $wpdb->get_var("SELECT COUNT(value) FROM $this->db_table WHERE name='is_pro'");
+				if(empty($exists)) {
+					$sql = "INSERT INTO $this->db_table (name,value) VALUES ('is_pro','{$info['person']['ispro']}')";
+				} else {
+					$sql = "UPDATE $this->db_table SET value='{$info['person']['ispro']}' WHERE name='is_pro'";
+				}
+				$wpdb->query($sql);
 				if($info['stat'] == 'ok') :
 				?>
 				
-				<h3>User Information</h3>
+				<h3>User Information <?php if($info['person']['ispro'] != 0) echo '<img src="' . $this->getAbsoluteUrl() . '/images/badge_pro.gif" alt="pro" style="vertical-align: middle;" />'; ?></h3>
 		
 				<table width="100%" border="0">
 					<tr>
@@ -339,6 +346,21 @@ class FlickrManager extends FlickrCore {
 				endif;
 			endif; 
 			?>
+			
+			<p>&nbsp;</p>
+		
+			<div style="text-align:center">
+				
+				<b>This plugin takes a great deal of time and effort developing, so please if you like the plugin feel free to donate!</b>
+				
+				<form action="https://www.paypal.com/cgi-bin/webscr" method="post" style="text-align: center;">
+					<input type="hidden" name="cmd" value="_s-xclick" />
+					<input type="image" src="https://www.paypal.com/en_US/i/btn/x-click-but21.gif" name="submit" alt="Make payments with PayPal - it's fast, free and secure!" style="border: 0px; background: none;" />
+					<img alt="" src="https://www.paypal.com/en_AU/i/scr/pixel.gif" width="1" height="1" />
+					<input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----MIIHRwYJKoZIhvcNAQcEoIIHODCCBzQCAQExggEwMIIBLAIBADCBlDCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb20CAQAwDQYJKoZIhvcNAQEBBQAEgYB16qR1NRclgo7aWm2etd6ClNamO/EOXE7e7KrhiKQaHRt6rWF140fIR8MX75dcRogNBfFoLMBv1GMtFc7tyMhtNn88povxwmOJzFGMHSpAo35I6gMrBU4XU/mS+u/Qm7jRy5KFtRkXwq2/eomQSPkE3psrjj5J34mmty9WbRXs4TELMAkGBSsOAwIaBQAwgcQGCSqGSIb3DQEHATAUBggqhkiG9w0DBwQIumPK6hGIvjqAgaBc2nNrEirCcC13OewohDWJPcb7vQJ0yXKb6Z8uDlZ5NVsK3MlV1eChRa2dHwpvGrljEQ35f6sRXdHZ4LSALZpzdXOBL+DI/Dy5DZ4eo4PcRiaGYkNeDM2hWxhHu2SrAwzUjO8y7WnKvQ7anoYTnaNgtebaULLJZ1No/ibTjxEY3UYGcVZWtuvOOLZTEw2AWGdvLOpMo7RLVwd0HPCgPrMJoIIDhzCCA4MwggLsoAMCAQICAQAwDQYJKoZIhvcNAQEFBQAwgY4xCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEUMBIGA1UEChMLUGF5UGFsIEluYy4xEzARBgNVBAsUCmxpdmVfY2VydHMxETAPBgNVBAMUCGxpdmVfYXBpMRwwGgYJKoZIhvcNAQkBFg1yZUBwYXlwYWwuY29tMB4XDTA0MDIxMzEwMTMxNVoXDTM1MDIxMzEwMTMxNVowgY4xCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEUMBIGA1UEChMLUGF5UGFsIEluYy4xEzARBgNVBAsUCmxpdmVfY2VydHMxETAPBgNVBAMUCGxpdmVfYXBpMRwwGgYJKoZIhvcNAQkBFg1yZUBwYXlwYWwuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDBR07d/ETMS1ycjtkpkvjXZe9k+6CieLuLsPumsJ7QC1odNz3sJiCbs2wC0nLE0uLGaEtXynIgRqIddYCHx88pb5HTXv4SZeuv0Rqq4+axW9PLAAATU8w04qqjaSXgbGLP3NmohqM6bV9kZZwZLR/klDaQGo1u9uDb9lr4Yn+rBQIDAQABo4HuMIHrMB0GA1UdDgQWBBSWn3y7xm8XvVk/UtcKG+wQ1mSUazCBuwYDVR0jBIGzMIGwgBSWn3y7xm8XvVk/UtcKG+wQ1mSUa6GBlKSBkTCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb22CAQAwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOBgQCBXzpWmoBa5e9fo6ujionW1hUhPkOBakTr3YCDjbYfvJEiv/2P+IobhOGJr85+XHhN0v4gUkEDI8r2/rNk1m0GA8HKddvTjyGw/XqXa+LSTlDYkqI8OwR8GEYj4efEtcRpRYBxV8KxAW93YDWzFGvruKnnLbDAF6VR5w/cCMn5hzGCAZowggGWAgEBMIGUMIGOMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFjAUBgNVBAcTDU1vdW50YWluIFZpZXcxFDASBgNVBAoTC1BheVBhbCBJbmMuMRMwEQYDVQQLFApsaXZlX2NlcnRzMREwDwYDVQQDFAhsaXZlX2FwaTEcMBoGCSqGSIb3DQEJARYNcmVAcGF5cGFsLmNvbQIBADAJBgUrDgMCGgUAoF0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMDcxMjAyMjM0ODEyWjAjBgkqhkiG9w0BCQQxFgQUlPFJas6Jks1wCqYlP3C4ZtYbqhQwDQYJKoZIhvcNAQEBBQAEgYAQIbalF8XjVhNabSfdNbTQl/1MNjyxh/aTHl4/mE1yDUgr9OjHNoJAbMrsO6eHzTC/FCopn31Vk5jjMBWE1WupCa6Ll7TgnVDpNoQH09qucGU8WN21iadeHHRBiV9SLXaP1WRmZrXGsjm2DACJJEbNdCFw5oU+SFm11/jKmMqP9Q==-----END PKCS7-----" />
+				</form>
+			</div>
+			
 		</div>
 		
 		<?php
@@ -587,14 +609,44 @@ class FlickrManager extends FlickrCore {
 	
 	
 	function filterContent($content) {
-		return preg_replace_callback("/\[img\:(\d+),(.+)\]/", array(&$this, 'filterCallback'), $content);
+		$content = preg_replace_callback("/\[img\:(\d+),(.+)\]/", array(&$this, 'filterCallback'), $content);
+		$content = preg_replace_callback("/\[imgset\:(\d+),(.+),(.+)\]/", array(&$this, 'filterSets'), $content);
+		return $content;
+	}
+	
+	
+	
+	function filterSets($match) {
+		global $wpdb;
+		$setid = $match[1];
+		$size = $match[2];
+		$lightbox = $match[3];
+		$lightbox = ($lightbox == "true") ? true : false;
+		$token = $wpdb->get_var("SELECT value FROM $this->db_table WHERE name='token'");
+		$params = array('photoset_id' => $setid, 'auth_token' => $token, 'extras' => 'original_format');
+		$photoset = $this->call('flickr.photosets.getPhotos',$params, true);
+		
+		/* echo '<pre>'; var_dump($photoset); echo '</pre>'; */
+		
+		foreach ($photoset['photoset']['photo'] as $photo) {
+			$replace .= "<a href=\"http://www.flickr.com/photos/{$photoset['photoset']['owner']}/{$photo['id']}/\" title=\"{$photo['title']}\" ";
+			if($lightbox) $replace .= "rel=\"flickr-mgr[$setid]\" ";
+			$replace .= "class=\"flickr-image\" >\n";
+			$replace .= '	<img src="' . $this->getPhotoUrl($photo,$size) . "\" alt=\"{$photo['title']}\" ";
+			if($lightbox) $replace .= 'class="flickr-medium" ';
+			$replace .= "/>\n";
+			$replace .= "</a>\n";
+		}
+		return $replace;
 	}
 	
 	
 	
 	function filterCallback($match) {
+		global $wpdb;
 		$pid = $match[1];
 		$size = $match[2];
+		$token = $wpdb->get_var("SELECT value FROM $this->db_table WHERE name='token'");
 		$params = array('photo_id' => $pid, 'auth_token' => $token);
 		$photo = $this->call('flickr.photos.getInfo',$params, true);
 		$url = $this->getPhotoUrl($photo['photo'],$size);

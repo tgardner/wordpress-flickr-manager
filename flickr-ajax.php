@@ -35,6 +35,8 @@ function displayBrowse() {
 	
 	$_REQUEST['flightbox'] = $wpdb->get_var("SELECT value FROM $flickr_manager->db_table WHERE name='lightbox_enable'");
 	
+	$is_pro = $wpdb->get_var("SELECT value FROM $flickr_manager->db_table WHERE name='is_pro'");
+	
 	$page = (isset($_REQUEST['fpage']) && !empty($_REQUEST['fpage'])) ? $_REQUEST['fpage'] : '1';
 	
 	$exists = $wpdb->get_var("SELECT value FROM $flickr_manager->db_table WHERE name='per_page'");
@@ -129,7 +131,13 @@ function displayBrowse() {
 	<div style="float: left; text-align: left; width: 180px;">
 		<div style="text-align:center;"><strong>Photosets</strong></div>
 		<?php if($fscope == "Personal") : ?>
-			
+		
+		<?php
+		if(!empty($_REQUEST['fphotoset'])) {
+			echo '<div style="text-align:center;"><a href="javascript:void(0);" onclick="return insertSet('."'{$_REQUEST['fphotoset']}');\" >Insert Set</a></div>\n";
+		}
+		?>
+		
 		<select name="flickr-photosets" id="flickr-photosets" onchange="performFilter('flickr-ajax');" style="width: 180px;">
 			<option value="" <?php if(empty($_REQUEST['fphotoset'])) echo 'selected="selected"'; ?>></option>
 					
@@ -191,7 +199,10 @@ function displayBrowse() {
 		
 		<?php endif; ?>
 		<br>
-		<?php $sizes = array("square", 'thumbnail', 'small', 'medium', 'original'); ?>
+		<?php 
+		$sizes = array("square", 'thumbnail', 'small', 'medium', 'large'); 
+		if(!empty($is_pro)) $sizes = array_merge($sizes,array('original'));
+		?>
 		<label>Size: <select name="photoSize" id="flickr-size" onchange="return performFilter('flickr-ajax')">
 		
 			<?php

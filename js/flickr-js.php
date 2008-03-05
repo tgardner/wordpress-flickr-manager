@@ -148,10 +148,10 @@ function insertImage(image,owner,id,name) {
 			var psetname = document.getElementById("fphotoset-name").value;
 			relation = ' rel="flickr-mgr[' + psetname + ']"';
 		} 
-		imgHTML = '<a href="http://www.flickr.com/photos/' + owner + "/" + id + '/"' + target + ' title="' + image.alt + '"';
+		imgHTML = '<a href="http://www.flickr.com/photos/' + owner + "/" + id + '/" class="flickr-image" ' + target + ' title="' + image.alt + '"';
 		imgHTML = imgHTML + relation + '><img src="' + image_url + '" alt="' + image.alt + '" class="' + lightbox_size.options[lightbox_size.selectedIndex].value + '" /></a>';
 	} else {
-		imgHTML = '<a href="http://www.flickr.com/photos/' + owner + "/" + id + '/" title="' + image.alt + '"' + target + 'title="' + image.alt + '"' + '>';
+		imgHTML = '<a href="http://www.flickr.com/photos/' + owner + "/" + id + '/" class="flickr-image" title="' + image.alt + '"' + target + 'title="' + image.alt + '"' + '>';
 		imgHTML = imgHTML + '<img src="' + image_url + '" alt="' + image.alt + '" /></a>';
 	}
 	var license = document.getElementById("license-" + id);
@@ -167,6 +167,37 @@ function insertImage(image,owner,id,name) {
 		if ( typeof tinyMCE != 'undefined' ) {
 			tinyMCE.execCommand('mceFocus',false,'content');
 			tinyMCE.execCommand('mceInsertContent',false,imgHTML);
+		}
+	}
+
+	return false;
+}
+
+function insertSet(id) {
+	var lightbox = document.getElementById("flickr-lightbox");
+	var size = document.getElementById("flickr-size");
+	if(size) {
+		size = size.options[size.selectedIndex].value;
+	} else {
+		size = "thumbnail";
+	}
+	var setHTML;
+	if(lightbox) {
+		if(lightbox.checked) {
+			lightbox = "true";
+		} else {
+			lightbox = "false";
+		}
+	}
+	setHTML = "[imgset:" + id + "," + size + "," + lightbox + "]";
+	
+	var i = document.getElementById("content");
+	if(i.style.display != "none") {
+		insertAtCursor(i, setHTML);
+	} else {
+		if ( typeof tinyMCE != 'undefined' ) {
+			tinyMCE.execCommand('mceFocus',false,'content');
+			tinyMCE.execCommand('mceInsertContent',false,setHTML);
 		}
 	}
 

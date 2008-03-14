@@ -65,7 +65,7 @@ function performFilter(destId) {
 	var scope = document.getElementById("flickr-public").value;
 	var page = document.getElementById("flickr-page").value;
 	var lightbox = document.getElementById("flickr-lightbox").checked;
-	var photoset = document.getElementById("flickr-photosets").value;
+	var photoset = "";
 	var insertSet = "false";
 	var psetname = document.getElementById("fphotoset-name").value;
 	
@@ -77,6 +77,7 @@ function performFilter(destId) {
 	}
 	if(document.getElementById("flickr-personal").checked === true) {
 		scope = document.getElementById("flickr-personal").value;
+		photoset = document.getElementById("flickr-photosets").value;
 	}
 	var query = "faction=" + document.getElementById("flickr-action").value + "&photoSize=" + size.options[size.selectedIndex].value + "&filter=" + filter + "&fpage=" + page + "&fscope=" + scope + "&flightbox=" + lightbox + "&fphotoset=" + photoset + "&flbox-photoset=" + insertSet + "&fphotoset-name=" + psetname;
 	var url = plugin_dir + "flickr-ajax.php";

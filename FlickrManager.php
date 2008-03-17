@@ -52,9 +52,12 @@ class FlickrManager extends FlickrCore {
 		$this->db_version = '1.0';
 		
 		$filename = explode("/", __FILE__);
+		if(count($filename) <= 1) $filename = explode("\\", __FILE__);
 		$this->plugin_directory = $filename[count($filename) - 2];
 		$this->plugin_filename = $filename[count($filename) - 1];
-		add_action("activate_$this->plugin_directory/$this->plugin_filename", array(&$this, 'install'));
+		
+		// Thanks greg for this fix.
+		register_activation_hook( __FILE__, array(&$this, 'install') );
 		
 		add_action('admin_menu', array(&$this, 'add_menus'));
 		add_action('wp_head', array(&$this, 'add_headers'));

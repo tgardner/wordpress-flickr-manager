@@ -3,7 +3,7 @@
 Plugin Name: Flickr Manager
 Plugin URI: http://tgardner.net/
 Description: Handles uploading, modifying images on Flickr, and insertion into posts.
-Version: 1.5.2
+Version: 1.5.5
 Author: Trent Gardner
 Author URI: http://tgardner.net/
 
@@ -243,7 +243,9 @@ class FlickrManager extends FlickrCore {
 			<div align="center">
 				<form method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">
 					<input type="hidden" name="action" value="logout" />
-					<input type="submit" name="Submit" value="<?php _e('Logout &raquo;') ?>" style="background: url( images/fade-butt.png ); border: 3px double #999; border-left-color: #ccc; border-top-color: #ccc; color: #333; padding: 0.25em; font-size: 1.5em;" />
+					<p class="submit" style="text-align: center; border-top: none !important; margin-bottom: 20px !important; padding-top: 0px;">
+						<input type="submit" name="Submit" value="<?php _e('Logout &raquo;') ?>" class="button submit" style="font-size: 1.4em;" />
+					</p>
 				</form>
 			</div>
 			
@@ -701,11 +703,11 @@ class FlickrManager extends FlickrCore {
 	function add_flickr_panel() {
 	?>
 
-		<div class="dbx-box" id="flickr-insert-widget">
+		<div class="dbx-box postbox" id="flickr-insert-widget">
 		
 			<h3 class="dbx-handle">Flickr Manager</h3>
 			
-			<div id="flickr-content" class="dbx-content">
+			<div id="flickr-content" class="dbx-content inside">
 			
 				<div id="flickr-menu">
 					<a href="#?faction=upload" title="Upload Photo">Upload Photo</a>

@@ -190,7 +190,7 @@ function displayBrowse() {
 		<input type="hidden" name="fpage" id="flickr-page" value="<?php echo $_REQUEST['fpage']; ?>" />
 		<input type="hidden" name="fold_filter" id="flickr-old-filter" value="<?php echo $_REQUEST['filter']; ?>" />
 		<input type="hidden" name="flickr_blank" id="flickr_blank" value="<?php echo $wpdb->get_var("SELECT value FROM $flickr_manager->db_table WHERE name='new_window'"); ?>" />
-		<input type="submit" name="button" value="Filter" onclick="return performFilter('flickr-ajax')"/>
+		<input type="submit" class="button" name="button" value="Filter" onclick="return performFilter('flickr-ajax')"/>
 		
 		<?php if($page < $pages) :?>
 		
@@ -239,7 +239,7 @@ function displayUpload() {
 		echo '<h3>Error: Please authenticate through <a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$flickr_manager->plugin_directory/$flickr_manager->plugin_filename\">Options->Flickr</a></h3>";
 		return;
 	}
-
+	
 	echo '<iframe id="flickr-uploader" name="flickr-uploader" src="'.$flickr_manager->getAbsoluteUrl().'/upload.php"></iframe>';
 }
 

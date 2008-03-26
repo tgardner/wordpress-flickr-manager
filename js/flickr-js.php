@@ -7,7 +7,7 @@ header('Pragma: no-cache');
 global $flickr_manager;
 ?>
 
-/*global document, window, Ajax, tinyMCE */
+/*global document, window, Ajax, tinyMCE, jQuery */
 
 var plugin_dir = "<?php echo $flickr_manager->getAbsoluteUrl(); ?>/";
 
@@ -53,9 +53,27 @@ function executeLink(link, destId) {
 		psetname = document.getElementById("fphotoset-name").value;
 		query = query + "&flbox-photoset=" + insertSet + "&fphotoset-name=" + psetname;
 	}
-	var url = plugin_dir + "flickr-ajax.php";
+	var jurl = plugin_dir + "flickr-ajax.php";
 	displayLoading(destId);
-	var flickr_ajax = new Ajax.Updater({success: destId}, url, {method: 'get', parameters: query, onFailure: function(){ returnError(destId); }});
+	
+	if(typeof(jQuery) != "undefined") {
+		// jQuery request
+		var flickr_ajax = jQuery.ajax({
+			type: "POST",
+			url: jurl,
+			data: query,
+			error: function() {
+				returnError(destId);
+			},
+			success: function(msg) {
+				document.getElementById(destId).innerHTML = msg;
+			}
+		});
+	} else {
+		// Prototype Alternative
+		var flickr_ajax = new Ajax.Updater({success: destId}, jurl, {method: 'get', parameters: query, onFailure: function(){ returnError(destId); }});
+	}
+		
 	return false;
 }
 
@@ -80,9 +98,27 @@ function performFilter(destId) {
 		photoset = document.getElementById("flickr-photosets").value;
 	}
 	var query = "faction=" + document.getElementById("flickr-action").value + "&photoSize=" + size.options[size.selectedIndex].value + "&filter=" + filter + "&fpage=" + page + "&fscope=" + scope + "&flightbox=" + lightbox + "&fphotoset=" + photoset + "&flbox-photoset=" + insertSet + "&fphotoset-name=" + psetname;
-	var url = plugin_dir + "flickr-ajax.php";
+	var jurl = plugin_dir + "flickr-ajax.php";
 	displayLoading(destId);
-	var flickr_ajax = new Ajax.Updater({success: destId}, url, {method: 'get', parameters: query, onFailure: function(){ returnError(destId); }});
+	
+	if(typeof(jQuery) != "undefined") {
+		// jQuery request
+		var flickr_ajax = jQuery.ajax({
+			type: "POST",
+			url: jurl,
+			data: query,
+			error: function() {
+				returnError(destId);
+			},
+			success: function(msg) {
+				document.getElementById(destId).innerHTML = msg;
+			}
+		});
+	} else {
+		// Prototype Alternative
+		var flickr_ajax = new Ajax.Updater({success: destId}, jurl, {method: 'get', parameters: query, onFailure: function(){ returnError(destId); }});
+	}
+	
 	return false;
 }
 

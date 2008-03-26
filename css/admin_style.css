@@ -22,6 +22,14 @@
 	padding: 5px;
 }
 
+#flickrDesc, #flickrTags, #flickrTitle {
+	width: 200px;
+}
+
+#scope-block {
+	padding-top: 2px;
+}
+
 #flickr-nav {
 	text-align: center;
 	margin: auto;
@@ -70,6 +78,7 @@ div small a {
 	width: 500px;
 	height: 330px;
 	border: 0px;
+	overflow: hidden;
 }
 
 #flickr-browse {

@@ -37,11 +37,12 @@ if(isset($_FILES['uploadPhoto'])) {
 <html>
 
 <head>
+	<link rel='stylesheet' href='<?php echo get_option('siteurl'); ?>/wp-admin/css/global.css' type='text/css' />
 	<link rel='stylesheet' href='<?php echo get_option('siteurl'); ?>/wp-admin/wp-admin.css' type='text/css' />
 	<link rel="stylesheet" href="<?php echo $flickr_manager->getAbsoluteUrl(); ?>/css/admin_style.css" type="text/css" />
 </head>
 
-<body style="background-color: #f4f4f4;">
+<body style="background-color: #f4f4f4;" class="wp-admin">
 	<div id="uploadContainer">
 		<form id="file_upload_form" method="post" enctype="multipart/form-data" action="<?php echo $_SERVER['PHP_SELF']; ?>" style="padding: 0px 20px;">
 			<h3>Upload Photo</h3>

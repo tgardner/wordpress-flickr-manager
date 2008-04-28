@@ -5,8 +5,10 @@ require_once("../../../wp-includes/wp-db.php");
 require_once("../../../wp-includes/pluggable.php");
 global $flickr_manager;
 
-if(!current_user_can('edit_plugins')) {
-	die('Oops, sorry, you are not authorized to fiddle with plugins!');
+get_currentuserinfo();
+$upload_level = FlickrSettings::getSetting("upload_level");
+if(intval($userdata->user_level) < intval($upload_level)) {
+	die("You do not have permission to upload photos to this stream, you may adjust this in the settings page!");	
 }
 
 if(isset($_FILES['uploadPhoto'])) {
@@ -30,6 +32,7 @@ if(isset($_FILES['uploadPhoto'])) {
 			
 			$pindex = $index['PHOTOID'][0];
 			$pid = $vals[$pindex]['value'];
+			$upload_success = true;
 		}
 	}
 }
@@ -40,11 +43,19 @@ if(isset($_FILES['uploadPhoto'])) {
 	<link rel='stylesheet' href='<?php echo get_option('siteurl'); ?>/wp-admin/css/global.css' type='text/css' />
 	<link rel='stylesheet' href='<?php echo get_option('siteurl'); ?>/wp-admin/wp-admin.css' type='text/css' />
 	<link rel="stylesheet" href="<?php echo $flickr_manager->getAbsoluteUrl(); ?>/css/admin_style.css" type="text/css" />
+	<link rel="stylesheet" href="<?php echo get_option('siteurl'); ?>/wp-admin/css/colors-fresh.css?version=2.5" type="text/css" />
 </head>
 
-<body style="background-color: #f4f4f4;" class="wp-admin">
+<body class="wp-admin">
 	<div id="uploadContainer">
 		<form id="file_upload_form" method="post" enctype="multipart/form-data" action="<?php echo $_SERVER['PHP_SELF']; ?>" style="padding: 0px 20px;">
+			<?php if($upload_success) : ?>
+			
+				<div id="wfm-success">
+					<strong>Image successfully uploaded</strong>
+				</div>
+			
+			<?php endif; ?>
 			<h3>Upload Photo</h3>
 			
 			<table>
@@ -68,7 +79,7 @@ if(isset($_FILES['uploadPhoto'])) {
 				</tbody>
 			</table>
 			<p class="submit" style="text-align: right;">
-				<input type="submit" name="Submit" value="<?php _e('Upload &raquo;') ?>" />
+				<input type="submit" name="Submit" class="button submit" value="<?php _e('Upload &raquo;') ?>" />
 				<input type="hidden" name="faction" id="flickr-action" value="<?php echo $_REQUEST['faction']; ?>" />
 			</p>
 			

@@ -3,7 +3,7 @@
 Plugin Name: Flickr Manager
 Plugin URI: http://tgardner.net/
 Description: Handles uploading, modifying images on Flickr, and insertion into posts.
-Version: 1.5.5
+Version: 2.0.0
 Author: Trent Gardner
 Author URI: http://tgardner.net/
 
@@ -24,17 +24,14 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */ 
 
-$version = explode(".",phpversion()); 
-
-if(intval($version[0]) < 5 && intval($version[1]) < 4) {
-	$filename = explode("/", __FILE__);
-	$plugin = "{$filename[count($filename) - 2]}/{$filename[count($filename) - 1]}";
-	echo "<b>ERROR: You're currently running " . phpversion() . " and you must have at least PHP 4.4.x in order to use Flickr Manager!</b>";
+if(version_compare(PHP_VERSION, '4.4.0') < 0) {
+	echo "<b>ERROR: You're currently running " . PHP_VERSION . " and you must have at least PHP 4.4.x in order to use Flickr Manager!</b>";
 	return;
 } 
 
 if(class_exists('FlickrManager')) return;
 require_once(dirname(__FILE__) . "/FlickrCore.php");
+include_once(dirname(__FILE__) . "/MediaPanel.php");
 
 class FlickrManager extends FlickrCore {
 	
@@ -46,7 +43,7 @@ class FlickrManager extends FlickrCore {
 	
 	
 	function FlickrManager() {
-		global $wpdb;
+		global $wpdb, $wp_version;
 		
 		$this->db_table = $wpdb->prefix . "flickr";
 		$this->db_version = '1.0';
@@ -66,6 +63,15 @@ class FlickrManager extends FlickrCore {
 		add_action('edit_form_advanced', array(&$this, 'add_flickr_panel'));
 		
 		add_filter('the_content', array(&$this, 'filterContent'));
+		
+		/*
+		 * Wordpress 2.5 - New media button support
+		 */
+		add_action('media_buttons', array($this, 'addMediaButton'), 20);
+		add_action('media_upload_flickr', array($this, 'media_upload_flickr'));
+        add_action('admin_head_media_upload_flickr_form', 'media_admin_css');
+        add_action('admin_head_media_upload_flickr_form', array($this, 'addMediaCss'));
+		  
 	}
 	
 	
@@ -104,38 +110,17 @@ class FlickrManager extends FlickrCore {
 	
 	function options_page() {
 		global $wpdb;
-		if(isset($_REQUEST['action'])) {
-			switch($_REQUEST['action']) {
+		
+		if(!empty($_REQUEST['action'])) : 
+			switch ($_REQUEST['action']) :
+				
 				case 'token':
-					if($frob = $wpdb->get_var("SELECT value FROM $this->db_table WHERE name='frob'")) {
+					if($frob = FlickrSettings::getSetting('frob')) {
 						$token = $this->call('flickr.auth.getToken', array('frob' => $frob), true);
-						
 						if($token['stat'] == 'ok') {
-							
-							$exists = $wpdb->get_var("SELECT COUNT(value) FROM $this->db_table WHERE name='token'");
-							if(empty($exists)) {
-								$sql = "INSERT INTO $this->db_table (name, value) VALUES ('token', '{$token['auth']['token']['_content']}')";
-							} else {
-								$sql = "UPDATE $this->db_table SET value='{$token['auth']['token']['_content']}' WHERE name='token'";
-							}
-							$wpdb->query($sql);
-							
-							$exists = $wpdb->get_var("SELECT COUNT(value) FROM $this->db_table WHERE name='nsid'");
-							if(empty($exists)) {
-								$sql = "INSERT INTO $this->db_table (name,value) VALUES ('nsid','{$token['auth']['user']['nsid']}')";
-							} else {
-								$sql = "UPDATE $this->db_table SET value='{$token['auth']['user']['nsid']}' WHERE name='nsid'";
-							}
-							$wpdb->query($sql);
-							
-							$exists = $wpdb->get_var("SELECT COUNT(value) FROM $this->db_table WHERE name='username'");
-							if(empty($exists)) {
-								$sql = "INSERT INTO $this->db_table (name,value) VALUES ('username','{$token['auth']['user']['username']}')";
-							} else {
-								$sql = "UPDATE $this->db_table SET value='{$token['auth']['user']['username']}' WHERE name='username'";
-							}
-							$wpdb->query($sql);
-							
+							FlickrSettings::saveSetting('token', $token['auth']['token']['_content']);
+							FlickrSettings::saveSetting('nsid', $token['auth']['user']['nsid']);
+							FlickrSettings::saveSetting('username', $token['auth']['user']['username']);
 						}
 					}
 					break;
@@ -144,70 +129,45 @@ class FlickrManager extends FlickrCore {
 					$sql = "DELETE FROM $this->db_table";
 					$wpdb->query($sql);
 					break;
-					
+				
 				case 'save':
-					$_REQUEST['fper_page'] = (!isset($_REQUEST['fper_page']) || !is_numeric($_REQUEST['fper_page']) || intval($_REQUEST['fper_page']) <= 0) ? 5 : $_REQUEST['fper_page'];
+					$_REQUEST['wfm-per_page'] = (!empty($_REQUEST['wfm-per_page']) && is_numeric($_REQUEST['wfm-per_page']) && 
+												intval($_REQUEST['wfm-per_page']) > 0) ? intval($_REQUEST['wfm-per_page']) : 5;
 					
-					$exists = $wpdb->get_var("SELECT COUNT(value) FROM $this->db_table WHERE name='per_page'");
-					if(empty($exists)) {
-						$sql = "INSERT INTO $this->db_table (name,value) VALUES ('per_page','{$_REQUEST['fper_page']}')";
-					} else {
-						$sql = "UPDATE $this->db_table SET value='{$_REQUEST['fper_page']}' WHERE name='per_page'";
-					}
-					$wpdb->query($sql);
-					
-					$exists = $wpdb->get_var("SELECT COUNT(value) FROM $this->db_table WHERE name='new_window'");
-					if(empty($exists)) {
-						$sql = "INSERT INTO $this->db_table (name,value) VALUES ('new_window','{$_REQUEST['fnew_window']}')";
-					} else {
-						$sql = "UPDATE $this->db_table SET value='{$_REQUEST['fnew_window']}' WHERE name='new_window'";
-					}
-					$wpdb->query($sql);
-					
-					$exists = $wpdb->get_var("SELECT COUNT(value) FROM $this->db_table WHERE name='lightbox_default'");
-					if(empty($exists)) {
-						$sql = "INSERT INTO $this->db_table (name,value) VALUES ('lightbox_default','{$_REQUEST['flbox_default']}')";
-					} else {
-						$sql = "UPDATE $this->db_table SET value='{$_REQUEST['flbox_default']}' WHERE name='lightbox_default'";
-					}
-					$wpdb->query($sql);
-					
-					$exists = $wpdb->get_var("SELECT COUNT(value) FROM $this->db_table WHERE name='lightbox_enable'");
-					if(empty($exists)) {
-						$sql = "INSERT INTO $this->db_table (name,value) VALUES ('lightbox_enable','{$_REQUEST['flightbox_enable']}')";
-					} else {
-						$sql = "UPDATE $this->db_table SET value='{$_REQUEST['flightbox_enable']}' WHERE name='lightbox_enable'";
-					}
-					$wpdb->query($sql);
-					
-					if($_REQUEST['fbrowse_check'] == "true") {
-						$browse_size = $_REQUEST['fbrowse_size'];
-						$exists = $wpdb->get_var("SELECT COUNT(value) FROM $this->db_table WHERE name='browse_size'");
-						
-						if(empty($exists)) {
-							$sql = "INSERT INTO $this->db_table (name, value) VALUES ('browse_size', '{$_REQUEST['fbrowse_size']}'),('browse_check', '{$_REQUEST['fbrowse_check']}')";
-							$wpdb->query($sql);
-						} else {
-							$sql = "UPDATE $this->db_table SET value='{$_REQUEST['fbrowse_size']}' WHERE name='browse_size'";
-							$wpdb->query($sql);
-							$sql = "UPDATE $this->db_table SET value='{$_REQUEST['fbrowse_check']}' WHERE name='browse_check'";
-							$wpdb->query($sql);
-						}
-						
-					}
+					FlickrSettings::saveSetting('per_page', $_REQUEST['wfm-per_page']);
+					FlickrSettings::saveSetting('new_window', $_REQUEST['wfm-new_window']);
+					FlickrSettings::saveSetting('lightbox_default', $_REQUEST['wfm-lbox_default']);
+					FlickrSettings::saveSetting('lightbox_enable', $_REQUEST['wfm-lbox_enable']);
+					FlickrSettings::saveSetting('browse_check',$_REQUEST['wfm-limit']);
+					FlickrSettings::saveSetting('browse_size',$_REQUEST['wfm-limit-size']);
+					FlickrSettings::saveSetting('flickr_legacy', $_REQUEST['wfm-legacy-support']);
+					FlickrSettings::saveSetting('image_viewer', $_REQUEST['wfm-js-viewer']);
+					FlickrSettings::saveSetting('before_wrap', $_REQUEST['wfm-insert-before']);
+					FlickrSettings::saveSetting('after_wrap', $_REQUEST['wfm-insert-after']);
+					FlickrSettings::saveSetting('upload_level', $_REQUEST['wfm-upload-level']);
 					
 					break;
-					
-			}
-		}
+				
+			endswitch;
+		endif;
 		
-		if(($token = $wpdb->get_var("SELECT value FROM $this->db_table WHERE name='token'"))) {
+		if(($token = FlickrSettings::getSetting('token'))) {
 			$auth_status = $this->call('flickr.auth.checkToken', array('auth_token' => $token), true);
 		}
 		?>
 		
 		<div class="wrap">
-			<h2>Flickr Options</h2>
+		
+			<?php if($_REQUEST['action'] == 'save') : ?>
+					
+				<div id="message" class="updated fade">
+					<p><strong>Options Saved!</strong></p>
+				</div>
+			
+			<?php endif; ?>
+			
+			<h2>Flickr Manager Settings</h2>
+			
 			<?php if(empty($token) || $auth_status['stat'] != 'ok') : ?>
 			
 			<!-- Begin Authentication -->
@@ -215,13 +175,7 @@ class FlickrManager extends FlickrCore {
 			<?php
 			$frob = $this->call('flickr.auth.getFrob', array(), true);
 			$frob = $frob['frob']['_content'];
-			$exists = $wpdb->get_var("SELECT COUNT(value) FROM $this->db_table WHERE name='frob'");
-			if(empty($exists)) {
-				$sql = "INSERT INTO $this->db_table (name,value) VALUES ('frob','$frob')";
-			} else {
-				$sql = "UPDATE $this->db_table SET value='$frob' WHERE name='frob'";
-			}
-			$wpdb->query($sql);
+			FlickrSettings::saveSetting('frob', $frob);
 			?>
 			
 			<div align="center">
@@ -240,7 +194,8 @@ class FlickrManager extends FlickrCore {
 			<?php else : ?>
 			
 			<!-- Display options -->
-			<div align="center">
+			
+			<div style="text-align: center;">
 				<form method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">
 					<input type="hidden" name="action" value="logout" />
 					<p class="submit" style="text-align: center; border-top: none !important; margin-bottom: 20px !important; padding-top: 0px;">
@@ -249,22 +204,18 @@ class FlickrManager extends FlickrCore {
 				</form>
 			</div>
 			
-				<?php
-				$nsid = $wpdb->get_var("SELECT value FROM $this->db_table WHERE name='nsid'");
-				$info = $this->call('flickr.people.getInfo',array('user_id' => $nsid));
-				$exists = $wpdb->get_var("SELECT COUNT(value) FROM $this->db_table WHERE name='is_pro'");
-				if(empty($exists)) {
-					$sql = "INSERT INTO $this->db_table (name,value) VALUES ('is_pro','{$info['person']['ispro']}')";
-				} else {
-					$sql = "UPDATE $this->db_table SET value='{$info['person']['ispro']}' WHERE name='is_pro'";
-				}
-				$wpdb->query($sql);
-				if($info['stat'] == 'ok') :
-				?>
+			<?php
+			$info = $this->call('flickr.people.getInfo',array('user_id' => FlickrSettings::getSetting('nsid')));
+			FlickrSettings::saveSetting('is_pro', $info['person']['ispro']);
+			if($info['stat'] == 'ok') :
+			?>
 				
-				<h3>User Information <?php if($info['person']['ispro'] != 0) echo '<img src="' . $this->getAbsoluteUrl() . '/images/badge_pro.gif" alt="pro" style="vertical-align: middle;" />'; ?></h3>
-		
-				<table width="100%" border="0">
+				<h3>User Information <?php 
+				if($info['person']['ispro'] != 0) 
+					echo '<img src="' . $this->getAbsoluteUrl() . '/images/badge_pro.gif" alt="Pro" style="vertical-align: middle;" />'; 
+				?></h3>
+				
+				<table border="0">
 					<tr>
 						<td width="130px"><b>Username:</b></td>
 						<td><?php echo $info['person']['username']['_content']; ?></td>
@@ -292,79 +243,178 @@ class FlickrManager extends FlickrCore {
 				</table>
 				
 				<p>&nbsp;</p>
-				
-				<h3>Optional Settings</h3>
-				
-				<?php 
-				if(!isset($_REQUEST['fper_page']) || !is_numeric($_REQUEST['fper_page']) || intval($_REQUEST['fper_page']) <= 0) $_REQUEST['fper_page'] = 5; 
-				$exists = $wpdb->get_var("SELECT value FROM $this->db_table WHERE name='per_page'");
-				if(!empty($exists)) $_REQUEST['fper_page'] = $exists;
-				
-				$_REQUEST['fnew_window'] = $wpdb->get_var("SELECT value FROM $this->db_table WHERE name='new_window'");
-				$_REQUEST['flightbox_enable'] = $wpdb->get_var("SELECT value FROM $this->db_table WHERE name='lightbox_enable'");
-				$_REQUEST['fbrowse_size'] = $wpdb->get_var("SELECT value FROM $this->db_table WHERE name='browse_size'");
-				$_REQUEST['fbrowse_check'] = $wpdb->get_var("SELECT value FROM $this->db_table WHERE name='browse_check'");
-				
-				$exists = $wpdb->get_var("SELECT value FROM $this->db_table WHERE name='lightbox_default'");
-				if(!empty($exists)) $_REQUEST['flbox_default'] = $exists;
-				else $_REQUEST['flbox_default'] = "medium";
-				?>
-				
-				<form method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">
-					<input type="hidden" name="action" value="save" />
-					
-					<div>
-					<strong>Miscellaneous</strong><br />
-					<label>Images per page: <input type="text" name="fper_page" value="<?php echo $_REQUEST['fper_page']; ?>" style="padding: 3px; width: 50px;" /></label>
-					<br /><label><input type="checkbox" name="fnew_window" value="true" style="margin: 5px 0px;" <?php if($_REQUEST['fnew_window'] == "true") echo 'checked="checked" '; ?>/> Add target="_blank" to image page links.</label>
-					
-					<br />
-					<label><input type="checkbox" name="fbrowse_check" value="true" style="margin: 5px 0px;" <?php if($_REQUEST['fbrowse_check'] == "true") echo 'checked="checked" '; ?>/> Limit size of images in the browse window to</label> 
-					<select name="fbrowse_size">
-						<option value="square" <?php if($_REQUEST['fbrowse_size'] == "square") echo 'selected="selected"'; ?>>Square</option>
-						<option value="thumbnail" <?php if($_REQUEST['fbrowse_size'] == "thumbnail") echo 'selected="selected"'; ?>>Thumbnail</option>
-					</select>
-					</div>
-					
-					<br />
-					<div>
-					<strong>Lightbox</strong><br />
-					<label><input type="checkbox" name="flightbox_enable" value="true" <?php if($_REQUEST['flightbox_enable'] == "true") echo 'checked="checked" '; ?>/> Enable lightbox support by default</label><br />
-					<label>Default lightbox picture: <select name="flbox_default">
-					<?php
-						$sizes = array("small","medium","large");
-						foreach ($sizes as $size) {
-							echo "<option value=\"$size\"";
-							if($_REQUEST['flbox_default'] == $size) echo ' selected="selected" ';
-							echo ">" . ucfirst($size) . "</option>\n";
-						}
-					?>
-					</select></label>
-					</div>
-					
-					<p class="submit">
-						<input type="submit" name="Submit" value="<?php _e('Submit') ?> &raquo;" style="font-size: 1.5em;" />
-					</p>
-				</form>
-				
-			<?php 
-				endif;
-			endif; 
+			
+			<?php endif; ?>
+			
+			<!-- BEGIN OPTIONS -->
+			<?php
+			
+			// Load Options
+			$settings = FlickrSettings::getSettings();
+			$_REQUEST['wfm-per_page'] = (!empty($_REQUEST['wfm-per_page']) && is_numeric($_REQUEST['wfm-per_page']) && 
+										intval($_REQUEST['wfm-per_page']) > 0) ? intval($_REQUEST['wfm-per_page']) : 5;
+			$_REQUEST['wfm-per_page'] = (!empty($settings['per_page'])) ? $settings['per_page'] : $_REQUEST['wfm-per_page'];
+			$_REQUEST['wfm-new_window'] = $settings['new_window'];
+			
+			$_REQUEST['wfm-limit'] = $settings['browse_check'];
+			$_REQUEST['wfm-limit-size'] = $settings['browse_size'];
+			$_REQUEST['wfm-legacy-support'] = (isset($settings['flickr_legacy'])) ? $settings['flickr_legacy'] : "true";
+			$_REQUEST['wfm-upload-level'] = (!empty($settings['upload_level'])) ? $settings['upload_level'] : "6";
+			
+			$_REQUEST['wfm-lbox_enable'] = $settings['lightbox_enable'];
+			$_REQUEST['wfm-lbox_default'] = (!empty($settings['lightbox_default'])) ? $settings['lightbox_default'] : "medium";
+			$_REQUEST['wfm-js-viewer'] = (!empty($settings['image_viewer'])) ? $settings['image_viewer'] : "medium";
+			
+			$_REQUEST['wfm-insert-before'] = $settings['before_wrap'];
+			$_REQUEST['wfm-insert-after'] = $settings['after_wrap'];
 			?>
 			
-			<p>&nbsp;</p>
-		
-			<div style="text-align:center">
+			<form method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">
+				<input type="hidden" name="action" value="save" />
 				
-				<b>This plugin takes a great deal of time and effort developing, so please if you like the plugin feel free to donate!</b>
+				<h3 style="margin-bottom: 0px;">Miscellaneous</h3>
 				
-				<form action="https://www.paypal.com/cgi-bin/webscr" method="post" style="text-align: center;">
-					<input type="hidden" name="cmd" value="_s-xclick" />
-					<input type="image" src="https://www.paypal.com/en_US/i/btn/x-click-but21.gif" name="submit" alt="Make payments with PayPal - it's fast, free and secure!" style="border: 0px; background: none;" />
-					<img alt="" src="https://www.paypal.com/en_AU/i/scr/pixel.gif" width="1" height="1" />
-					<input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----" />
-				</form>
-			</div>
+				<table class="form-table">
+					<tbody>
+						<tr valign="top">
+							<th scope="row">
+								<label for="wfm-legacy-support">
+									Enable legacy post support
+								</label>
+							</th>
+							<td>
+								<input type="checkbox" name="wfm-legacy-support" id="wfm-legacy-support" value="true" style="margin: 5px 0px;" <?php if($_REQUEST['wfm-legacy-support'] == "true") echo 'checked="checked" '; ?>/>
+								<br />Note: Wordpress 2.5 users can leave this option disabled and use the added media button.
+							</td>
+						</tr>
+						<tr valign="top">
+							<th scope="row">
+								<label for="wfm-per_page">
+									Images per page
+								</label>
+							</th>
+							<td>
+								<input type="text" name="wfm-per_page" id="wfm-per_page" value="<?php echo $_REQUEST['wfm-per_page']; ?>" style="padding: 3px; width: 50px;" />
+							</td>
+						</tr>
+						<tr valign="top">
+							<th scope="row">
+								<label for="wfm-new_window">
+									Open Flickr pages in a new window
+								</label>
+							</th>
+							<td>
+								<input type="checkbox" name="wfm-new_window" id="wfm-new_window" value="true" style="margin: 5px 0px;" <?php if($_REQUEST['wfm-new_window'] == "true") echo 'checked="checked" '; ?>/>
+							</td>
+						</tr>
+						<tr valign="top">
+							<th scope="row">
+								<label for="wfm-limit-size">
+									Limit browse image size to
+								</label>
+							</th>
+							<td>
+								<input type="hidden" name="wfm-limit" id="wfm-limit" value="true" />
+								<select name="wfm-limit-size" id="wfm-limit-size">
+									<option value="square" <?php if($_REQUEST['wfm-limit-size'] == "square") echo 'selected="selected"'; ?>>Square</option>
+									<option value="thumbnail" <?php if($_REQUEST['wfm-limit-size'] == "thumbnail") echo 'selected="selected"'; ?>>Thumbnail</option>
+								</select>
+							</td>
+						</tr>
+						<tr valign="top">
+							<th scope="row">
+								<label for="wfm-upload-level">
+									User upload level
+								</label>
+							</th>
+							<td>
+								<select name="wfm-upload-level" id="wfm-upload-level">
+									<option value="10" <?php if($_REQUEST['wfm-upload-level'] == "10") echo 'selected="selected"'; ?>>Administrator</option>
+									<option value="6" <?php if($_REQUEST['wfm-upload-level'] == "6") echo 'selected="selected"'; ?>>Editor</option>
+									<option value="4" <?php if($_REQUEST['wfm-upload-level'] == "4") echo 'selected="selected"'; ?>>Author</option>
+									<option value="2" <?php if($_REQUEST['wfm-upload-level'] == "2") echo 'selected="selected"'; ?>>Contributer</option>
+								</select>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				
+				<h3 style="margin-bottom: 0px; margin-top: 30px;">Javascript Image Viewer</h3>
+				
+				<table class="form-table">
+					<tbody>
+						<tr valign="top">
+							<th scope="row">
+								<label for="wfm-js-viewer">
+									Image Viewer
+								</label>
+							</th>
+							<td>
+								<select name="wfm-js-viewer" id="wfm-js-viewer">
+									<option value="lightbox" <?php if($_REQUEST['wfm-js-viewer'] == "lightbox") echo 'selected="selected"'; ?>>Lightbox</option>
+									<option value="highslide" <?php if($_REQUEST['wfm-js-viewer'] == "highslide") echo 'selected="selected"'; ?>>Highslide</option>
+								</select>
+							</td>
+						</tr>
+						<tr valign="top">
+							<th scope="row">
+								<label for="wfm-lbox_enable">Enable image viewer by default</label>
+							</th>
+							<td>
+								<input type="checkbox" name="wfm-lbox_enable" id="wfm-lbox_enable" value="true" <?php if($_REQUEST['wfm-lbox_enable'] == "true") echo 'checked="checked" '; ?>/>
+							</td>
+						</tr>
+						<tr valign="top">
+							<th scope="row">
+								<label for="wfm-lbox_default">Default viewer size:</label>
+							</th>
+							<td>
+								<select name="wfm-lbox_default" id="wfm-lbox_default">
+								<?php
+								$sizes = array("small","medium","large");
+								if($settings['is_pro'] == '1') $sizes = array_merge($sizes, array('original'));
+								foreach ($sizes as $size) {
+									echo "<option value=\"$size\"";
+									if($_REQUEST['wfm-lbox_default'] == $size) echo ' selected="selected" ';
+									echo ">" . ucfirst($size) . "</option>\n";
+								}
+								?>
+								</select>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				
+				<h3 style="margin-bottom: 0px; margin-top: 30px;">Custom Wrappings</h3>
+				
+				<table class="form-table">
+					<tbody>
+						<tr valign="top">
+							<th>
+								<label for="wfm-insert-before">Before Image</label>
+							</th>
+							<td>
+								<textarea name="wfm-insert-before" id="wfm-insert-before" style="width: 200px; height: 100px; overflow: auto;"><?php echo $_REQUEST['wfm-insert-before']; ?></textarea>
+							</td>
+							<th>
+								<label for="wfm-insert-after">After Image</label>
+							</th>
+							<td>
+								<textarea name="wfm-insert-after" id="wfm-insert-after" style="width: 200px; height: 100px; overflow: auto;"><?php echo $_REQUEST['wfm-insert-after']; ?></textarea>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				
+				
+				<p class="submit">
+					<input type="submit" name="Submit" value="<?php _e('Submit') ?> &raquo;" style="font-size: 1.5em;" />
+				</p>
+				
+			</form>
+			<!-- END OPTIONS -->
+			
+			<?php endif; ?>
 			
 		</div>
 		
@@ -375,7 +425,7 @@ class FlickrManager extends FlickrCore {
 	
 	function manage_page() {
 		global $wpdb;
-		$token = $wpdb->get_var("SELECT value FROM $this->db_table WHERE name='token'");
+		$token = FlickrSettings::getSetting('token');
 		if(empty($token)) {
 			echo '<div class="wrap"><h3>Error: Please authenticate through <a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$this->plugin_directory/$this->plugin_filename\">Options->Flickr</a></h3></div>\n";
 			return;
@@ -622,25 +672,22 @@ class FlickrManager extends FlickrCore {
 	
 	
 	function filterSets($match) {
-		global $wpdb;
 		$setid = $match[1];
 		$size = $match[2];
 		$lightbox = $match[3];
 		$lightbox = ($lightbox == "true") ? true : false;
-		$token = $wpdb->get_var("SELECT value FROM $this->db_table WHERE name='token'");
+		$token = FlickrSettings::getSetting('token');
 		$params = array('photoset_id' => $setid, 'auth_token' => $token, 'extras' => 'original_format');
 		$photoset = $this->call('flickr.photosets.getPhotos',$params, true);
 		
-		/* echo '<pre>'; var_dump($photoset); echo '</pre>'; */
-		
 		foreach ($photoset['photoset']['photo'] as $photo) {
-			$replace .= "<a href=\"http://www.flickr.com/photos/{$photoset['photoset']['owner']}/{$photo['id']}/\" title=\"{$photo['title']}\" ";
+			$replace .= FlickrSettings::getSetting('before_wrap') . "<a href=\"http://www.flickr.com/photos/{$photoset['photoset']['owner']}/{$photo['id']}/\" title=\"{$photo['title']}\" ";
 			if($lightbox) $replace .= "rel=\"flickr-mgr[$setid]\" ";
 			$replace .= "class=\"flickr-image\" >\n";
 			$replace .= '	<img src="' . $this->getPhotoUrl($photo,$size) . "\" alt=\"{$photo['title']}\" ";
 			if($lightbox) $replace .= 'class="flickr-medium" ';
 			$replace .= "/>\n";
-			$replace .= "</a>\n";
+			$replace .= "</a>\n" . FlickrSettings::getSetting('after_wrap');
 		}
 		return $replace;
 	}
@@ -648,31 +695,48 @@ class FlickrManager extends FlickrCore {
 	
 	
 	function filterCallback($match) {
-		global $wpdb;
 		$pid = $match[1];
 		$size = $match[2];
-		$token = $wpdb->get_var("SELECT value FROM $this->db_table WHERE name='token'");
+		$token = FlickrSettings::getSetting('token');
 		$params = array('photo_id' => $pid, 'auth_token' => $token);
 		$photo = $this->call('flickr.photos.getInfo',$params, true);
 		$url = $this->getPhotoUrl($photo['photo'],$size);
-		return "<div id=\"image-$pid\" class=\"flickr-img\">
-					<a href=\"{$photo['photo']['urls']['url'][0]['_content']}\">
-						<img src=\"$url\" alt=\"{$photo['photo']['title']['_content']}\" />
-					</a>
-				</div>";
+		return FlickrSettings::getSetting('before_wrap') . "<a href=\"{$photo['photo']['urls']['url'][0]['_content']}\">
+					<img src=\"$url\" alt=\"{$photo['photo']['title']['_content']}\" />
+				</a>" . FlickrSettings::getSetting('after_wrap');
 	}
 	
 	
 	
-	function add_headers() {
-	?>
+	function add_headers() { 
+		$image_viewer = FlickrSettings::getSetting('image_viewer');
+		$image_viewer = (!empty($image_viewer)) ? $image_viewer : "lightbox";
 		
-		<link rel="stylesheet" href="<?php echo $this->getAbsoluteUrl(); ?>/lightbox/css/lightbox.css" type="text/css" />
-		<script type="text/javascript" src="<?php echo get_option('siteurl'); ?>/wp-includes/js/prototype.js"></script>
-		<script type="text/javascript" src="<?php echo get_option('siteurl'); ?>/wp-includes/js/scriptaculous/scriptaculous.js?load=effects"></script>
-		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/lightbox/lightbox.php"></script>
+		if($image_viewer == 'lightbox') :
+		?>
 		
-	<?php
+		<!-- WFM INSERT LIGHTBOX FILES -->
+		<link rel="stylesheet" href="<?php echo $this->getAbsoluteUrl(); ?>/css/lightbox.css" type="text/css" />
+		
+		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/prototype.js"></script>
+		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/scriptaculous.js?load=effects,builder"></script>
+		
+		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/lightbox.js"></script>
+		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/wfm-lightbox.php"></script>
+		<!-- WFM END INSERT -->
+		
+		<?php 
+		
+		elseif ($image_viewer == 'highslide') : ?>
+		
+		<!-- WFM INSERT HIGHSLIDE FILES -->
+		<link rel="stylesheet" href="<?php echo $this->getAbsoluteUrl(); ?>/css/highslide.css" type="text/css" />
+		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/highslide.packed.js"></script>
+		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/wfm-hs.php"></script>
+		<!-- WFM END INSERT -->
+		
+		<?php endif;
+		
 	}
 	
 	
@@ -690,10 +754,26 @@ class FlickrManager extends FlickrCore {
 		$filename = strtolower($filename);
 		
 		if($filename != "post.php" && $filename != "page.php" && $filename != "post-new.php" && $filename != "page-new.php") return;
-	?>
+		
+		$settings = FlickrSettings::getSettings();
+		$legacy = (isset($settings['flickr_legacy'])) ? $settings['flickr_legacy'] : 'true';
+		
+		if($legacy == "true") : ?>
 		
 		<link rel="stylesheet" href="<?php echo $this->getAbsoluteUrl(); ?>/css/admin_style.css" type="text/css" />
 		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/flickr-js.php"></script>
+		
+		<?php else : ?>
+	
+		<!-- Flickr Manager legacy support disabled -->
+	
+		<?php endif; ?>
+	
+		<?php if(function_exists('add_meta_box')) : ?>
+		<!-- WFM BEGIN WP2.5 ADDONS -->
+		
+		<!-- WFM END WP2.5 ADDONS -->
+		<?php endif; ?>
 		
 	<?php
 	}
@@ -701,7 +781,11 @@ class FlickrManager extends FlickrCore {
 	
 	
 	function add_flickr_panel() {
-	?>
+		
+		$settings = FlickrSettings::getSettings();
+		$legacy = (isset($settings['flickr_legacy'])) ? $settings['flickr_legacy'] : 'true';
+		
+		if($legacy == "true") : ?>
 
 		<div class="dbx-box postbox" id="flickr-insert-widget">
 		
@@ -726,12 +810,45 @@ class FlickrManager extends FlickrCore {
 		
 		<div style="clear: both;">&nbsp;</div>
 		
-	<?php
+		<?php endif;
 	}
 	
+	
+	
+	/********************************************************************
+	 *********** NEW WORDPRESS 2.5 MEDIA BUTTON IMPLEMENTATION **********
+	 ********************************************************************/
+	function addMediaButton() {
+		global $post_ID, $temp_ID;
+        $uploading_iframe_ID = (int) (0 == $post_ID ? $temp_ID : $post_ID);
+        $media_upload_iframe_src = "media-upload.php?post_id=$uploading_iframe_ID";
+		
+        $flickr_upload_iframe_src = apply_filters('media_flickr_iframe_src', "$media_upload_iframe_src&amp;type=flickr");
+        $flickr_title = 'Add Flickr Photo';
+        
+        echo "<a href=\"{$flickr_upload_iframe_src}&amp;tab=flickr&amp;TB_iframe=true&amp;height=500&amp;width=640\" class=\"thickbox\" title=\"$flickr_title\"><img src=\"{$this->getAbsoluteUrl()}/images/flickr-media.gif\" alt=\"$flickr_title\" /></a>\n";
+    	
+	}
+	
+	function media_upload_flickr() {
+		wp_iframe('media_upload_flickr_form');
+	}
+	
+	function modifyMediaTab($tabs) {
+        return array(
+            'flickr' =>  'Flickr Photos'
+        );
+    }
+    
+    function addMediaCss() { ?>
+    	
+    	<link rel="stylesheet" href="<?php echo $this->getAbsoluteUrl(); ?>/css/media_panel.css" type="text/css" media="screen" />
+    	<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/media-panel.js"></script>
+    
+    <?php }
+    
 }
 
 global $flickr_manager;
 $flickr_manager = new FlickrManager();
-
 ?>

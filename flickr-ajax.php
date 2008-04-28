@@ -1,5 +1,5 @@
 <?php
-	
+ini_set('display_errors',1);
 require_once("../../../wp-config.php");
 require_once("../../../wp-includes/wp-db.php");
 
@@ -13,9 +13,13 @@ switch($_REQUEST['faction']) {
 	case 'upload':
 		displayUpload();
 		break;
+	case 'media-browse':
+		mediaBrowse();
+		break;
+	case 'media-upload' :
+		mediaUpload();
+		break;
 }
-
-
 
 function displayBrowse() {
 	global $wpdb, $flickr_manager;
@@ -119,7 +123,7 @@ function displayBrowse() {
 			}
 			?>
 			<input type="hidden" id="url-<?php echo $photo['id']; ?>" value="<?php echo $flickr_manager->getPhotoUrl($photo,$_REQUEST['photoSize']); ?>" />
-				
+			
 		</div>
 
 		<?php endforeach; ?>
@@ -216,6 +220,15 @@ function displayBrowse() {
 			
 		</select></label>
 		
+		<input type="hidden" name="wfm-insert-before" id="wfm-insert-before" value="<?php 
+			$settings['before_wrap'] = str_replace("\n", "", $settings['before_wrap']);
+			echo rawurlencode($settings['before_wrap']);
+		?>" />
+		<input type="hidden" name="wfm-insert-after" id="wfm-insert-after" value="<?php 
+			$settings['after_wrap'] = str_replace("\n", "", $settings['after_wrap']);
+			echo rawurlencode($settings['after_wrap']);
+		?>" />
+		
 		<div style="width: 100%; height: 1%; clear: both;"></div>
 	</div>
 	
@@ -241,6 +254,14 @@ function displayUpload() {
 	}
 	
 	echo '<iframe id="flickr-uploader" name="flickr-uploader" src="'.$flickr_manager->getAbsoluteUrl().'/upload.php"></iframe>';
+}
+
+function mediaBrowse() {
+	flickrMediaBrowse();
+}
+
+function mediaUpload() {
+	flickrMediaUpload();
 }
 
 ?>

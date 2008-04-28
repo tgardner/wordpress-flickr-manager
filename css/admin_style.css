@@ -85,3 +85,9 @@ div small a {
 	max-height: 300px;
 	overflow: auto;
 }
+
+#wfm-success {
+	border: 1px solid #E6DB55;
+	background-color: #FFFBCC;
+	padding: 1em;
+}

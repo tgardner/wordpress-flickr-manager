@@ -171,11 +171,18 @@ function insertAtCursor(myField, myValue) {
 	}
 }
 
+function isDefined(variable) {
+    return (typeof(variable) == "undefined") ? false : true;
+}
+
 function insertImage(image,owner,id,name) {
 	var imgHTML = "";
 	var target = "";
 	var relation = ' rel="flickr-mgr"';
 	var image_url = document.getElementById("url-" + id).value;
+	var wrapBefore = decodeURIComponent(jQuery("#wfm-insert-before").attr("value"));
+	var wrapAfter = decodeURIComponent(jQuery("#wfm-insert-after").attr("value"));
+	
 	if(document.getElementById("flickr_blank") && document.getElementById("flickr_blank").value == "true") {
 		target = ' target="_blank" ';
 	}
@@ -195,7 +202,17 @@ function insertImage(image,owner,id,name) {
 	if(license) {
 		imgHTML = imgHTML + "<br /><small><a href='" + license.href + "' title='" + license.title + "' rel='license' " + target + ">" + license.innerHTML + "</a> by <a href='http://www.flickr.com/people/"+owner+"/'"+ target +">"+name+"</a></small>";
 	}
+	
+	if(isDefined(wrapBefore) && wrapBefore !== 'undefined') {
+		imgHTML = wrapBefore + imgHTML;
+	}
+	if(isDefined(wrapAfter) && wrapAfter !== 'undefined') {
+		imgHTML = imgHTML + wrapAfter;
+	}
+	
 	imgHTML = imgHTML + "&nbsp;";
+	
+	
 	
 	var i = document.getElementById("content");
 	if(i.style.display != "none") {

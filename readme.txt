@@ -11,7 +11,7 @@ Handles uploading, modifying images on Flickr, and insertion into posts.
 
 == Description ==
 
-Project home is [tgardner.net](http://tgardner.net/ "WordPress Flickr Manager").
+Project home is [tgardner.net](http://tgardner.net/wordpress-flickr-manager/ "WordPress Flickr Manager").
 
 Handles uploading, modifying images on Flickr, and insertion into posts.
 
@@ -47,6 +47,6 @@ Through the 'Manage->Flickr' menu, and follow the on screen instructions.
 
 == Screenshots ==
 
-1. The Flickr Manager Panel that appears on the post insertion screen
-2. The upload panel available from the image insertion panel under the WYSIWYG
-3. The Flickr management page under the 'Manage' menu
+1. The Flickr Manager Media Button browse dialog
+2. The upload panel available from within the media button
+3. The added media button

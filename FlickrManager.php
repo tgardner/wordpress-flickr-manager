@@ -826,8 +826,10 @@ class FlickrManager extends FlickrCore {
         $flickr_upload_iframe_src = apply_filters('media_flickr_iframe_src', "$media_upload_iframe_src&amp;type=flickr");
         $flickr_title = 'Add Flickr Photo';
         
-        echo "<a href=\"{$flickr_upload_iframe_src}&amp;tab=flickr&amp;TB_iframe=true&amp;height=500&amp;width=640\" class=\"thickbox\" title=\"$flickr_title\"><img src=\"{$this->getAbsoluteUrl()}/images/flickr-media.gif\" alt=\"$flickr_title\" /></a>\n";
+        $link_markup = "<a href=\"{$flickr_upload_iframe_src}&amp;tab=flickr&amp;TB_iframe=true&amp;height=500&amp;width=640\" class=\"thickbox\" title=\"$flickr_title\"><img src=\"".$this->getAbsoluteUrl()."/images/flickr-media.gif\" alt=\"$flickr_title\" /></a>\n";
     	
+        echo $link_markup;
+        
 	}
 	
 	function media_upload_flickr() {

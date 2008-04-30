@@ -68,7 +68,7 @@ function prepareWFMImages() {
 				
 				updateFlickrHref(this);
 				
-	            event.stop();
+				event.stop();
 				myLightbox.start(this);
 				
 				var anchors = document.getElementsByTagName('a');

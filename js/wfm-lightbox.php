@@ -69,7 +69,17 @@ function prepareWFMImages() {
 				updateFlickrHref(this);
 				
 				event.stop();
+				
+				if(this.getAttribute("rel") === "flickr-mgr") {
+					myLightbox.imageArray = [];
+					this.setAttribute("rel","lightbox");
+				}
+				
 				myLightbox.start(this);
+				
+				if(this.getAttribute("rel") === "lightbox") {
+					this.setAttribute("rel","flickr-mgr");
+				}
 				
 				var anchors = document.getElementsByTagName('a');
 				for (var j=0; j < myLightbox.imageArray.length; j++) {

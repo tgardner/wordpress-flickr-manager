@@ -1,28 +1,14 @@
 <?php
 ini_set('display_errors', 0);
-require_once("../../../../wp-config.php");
 header('Content-Type: text/javascript');
 header('Cache-Control: no-cache');
 header('Pragma: no-cache');
+require_once("../../../../wp-config.php");
 global $flickr_manager;
 ?>
 
-function addLoadEvent(func) {
-	var oldonload = window.onload;
-	if (typeof window.onload != 'function') {
-		window.onload = func;
-	} else {
-		window.onload = function() {
-			oldonload();
-			func();
-		};
-	}
-}
-
-LightboxOptions.fileLoadingImage = "<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/loading.gif";
-LightboxOptions.fileBottomNavCloseImage = "<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/closelabel.gif";
-
-
+window.LightboxOptions.fileLoadingImage = "<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/loading.gif";
+window.LightboxOptions.fileBottomNavCloseImage = "<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/closelabel.gif";
 
 function updateFlickrHref(anchor) {
 	var image = anchor.getElementsByTagName('img');
@@ -77,24 +63,13 @@ function prepareWFMImages() {
 		
 		if (anchor.getAttribute('href') && (relAttribute.toLowerCase().match('flickr-mgr'))){
 		
-			anchor.onclick = function () {
+			anchor.onclick = function (event) {
 				var save_url = this.getAttribute("href");
 				
 				updateFlickrHref(this);
 				
-				var myLightbox = new Lightbox();
-				myLightbox.overlay = $('overlay');
-				myLightbox.lightbox = $('lightbox');
-		        myLightbox.loading = $('loading');
-		        myLightbox.lightboxImage = $('lightboxImage');
-		        myLightbox.hoverNav = $('hoverNav');
-		        myLightbox.prevLink = $('prevLink');
-		        myLightbox.nextLink = $('nextLink');
-		        myLightbox.imageDataContainer = $('imageDataContainer');
-		        myLightbox.numberDisplay = $('numberDisplay');
-		        myLightbox.outerImageContainer = $('outerImageContainer');
+	            event.stop();
 				myLightbox.start(this);
-				
 				
 				var anchors = document.getElementsByTagName('a');
 				for (var j=0; j < myLightbox.imageArray.length; j++) {
@@ -118,6 +93,15 @@ function prepareWFMImages() {
 	}
 }
 
+var myLightbox = "";
 
-
-addLoadEvent(prepareWFMImages);
+document.observe('dom:loaded', function() {
+	prepareWFMImages();
+	myLightbox = new Lightbox();
+	myLightbox.imageArray = [];
+	myLightbox.activeImage = undefined;
+	
+	var ids = 'overlay lightbox outerImageContainer imageContainer lightboxImage hoverNav prevLink nextLink loading loadingLink ' + 
+			  'imageDataContainer imageData imageDetails caption numberDisplay bottomNav bottomNavClose';   
+	$w(ids).each(function(id){ myLightbox[id] = $(id); });
+});

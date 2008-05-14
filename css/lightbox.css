@@ -59,10 +59,10 @@ font-weight:bold;
 text-decoration: none;
 }
 #nextLinkText{
-display: none;
+display: none !important;
 }
 #prevLinkText{
-display: none;
+display: none !important;
 }
 /*** END : next / previous text links ***/
 /*** START : added padding when navbar is on top ***/

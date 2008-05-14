@@ -42,12 +42,15 @@ function prepareWFMImages() {
 				hs.captionText = this.getAttribute("title");
 				var image = this.getElementsByTagName('img');
 				image = image[0];
+				var testClass = image.getAttribute("class");
+				if(testClass === null) {
+					testClass = image.getAttribute("className");
+				}
 				
-				if(image.getAttribute("class").match("flickr-original")) {
+				if(testClass.match("flickr-original")) {
 					this.setAttribute("href", image.getAttribute("longdesc"));
 				} else {
 					var image_link = image.getAttribute("src");
-					var testClass = image.getAttribute("class");
 					var imageSize = "";
 					if(testClass) {
 						var testResult = testClass.match(/flickr\-small|flickr\-medium|flickr\-large/);

@@ -180,8 +180,8 @@ function insertImage(image,owner,id,name) {
 	var target = "";
 	var relation = ' rel="flickr-mgr"';
 	var image_url = document.getElementById("url-" + id).value;
-	var wrapBefore = decodeURIComponent(jQuery("#wfm-insert-before").attr("value"));
-	var wrapAfter = decodeURIComponent(jQuery("#wfm-insert-after").attr("value"));
+	var wrapBefore = decodeURIComponent(document.getElementById("wfm-insert-before").getAttribute("value"));
+	var wrapAfter = decodeURIComponent(document.getElementById("wfm-insert-after").getAttribute("value"));
 	
 	if(document.getElementById("flickr_blank") && document.getElementById("flickr_blank").value == "true") {
 		target = ' target="_blank" ';

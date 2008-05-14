@@ -3,7 +3,7 @@
 Plugin Name: Flickr Manager
 Plugin URI: http://tgardner.net/
 Description: Handles uploading, modifying images on Flickr, and insertion into posts.
-Version: 2.0.1
+Version: 2.0.2
 Author: Trent Gardner
 Author URI: http://tgardner.net/
 
@@ -717,11 +717,8 @@ class FlickrManager extends FlickrCore {
 		
 		<!-- WFM INSERT LIGHTBOX FILES -->
 		<link rel="stylesheet" href="<?php echo $this->getAbsoluteUrl(); ?>/css/lightbox.css" type="text/css" />
-		
-		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/prototype.js"></script>
-		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/scriptaculous.js?load=effects,builder"></script>
-		
-		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/lightbox.js"></script>
+		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/jquery.js"></script>
+		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/jquery.lightbox.js"></script>
 		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/wfm-lightbox.php"></script>
 		<!-- WFM END INSERT -->
 		

@@ -106,7 +106,6 @@ function flickrMediaBrowse() {
 				$photos = $flickr_manager->call('flickr.photos.search', $params, true);
 			}
 			
-			
 			if(is_array($photos['photos']['photo']) && count($photos['photos']['photo']) > 0) : 
 			
 			// Display Photos

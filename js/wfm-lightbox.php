@@ -7,21 +7,23 @@ require_once("../../../../wp-config.php");
 global $flickr_manager;
 ?>
 
-window.LightboxOptions.fileLoadingImage = "<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/loading.gif";
-window.LightboxOptions.fileBottomNavCloseImage = "<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/closelabel.gif";
-
 function updateFlickrHref(anchor) {
 	var image = anchor.getElementsByTagName('img');
 	image = image[0];
 	
-	if(image.getAttribute("class").match("flickr-original")) {
+	var chkClass = image.getAttribute("class");
+	if (chkClass === null) {
+		chkClass = image.getAttribute("className");
+	}
+	
+	if(chkClass && chkClass.match("flickr-original")) {
 		anchor.setAttribute("href", image.getAttribute("longdesc"));
 	} else {
 		var image_link = image.getAttribute("src");
-		var testClass = image.getAttribute("class");
 		var imageSize = "";
-		if(testClass) {
-			var testResult = testClass.match(/flickr\-small|flickr\-medium|flickr\-large/);
+		
+		if(chkClass) {
+			var testResult = chkClass.match(/flickr\-small|flickr\-medium|flickr\-large/);
 			switch(testResult.toString()) {
 				case "flickr-large":
 					imageSize = "_b";
@@ -53,65 +55,82 @@ function updateFlickrHref(anchor) {
 
 
 function prepareWFMImages() {
-	var anchors = document.getElementsByTagName('a');
 	
-	// loop through all anchor tags
-	for (var i=0; i < anchors.length; i++){
-		var anchor = anchors[i];
+	$('a[@rel*=flickr-mgr]').click(function() {
 		
-		var relAttribute = String(anchor.getAttribute('rel'));
+		if($(this).attr("rel") == "flickr-mgr") {	// Individual Photo
 		
-		if (anchor.getAttribute('href') && (relAttribute.toLowerCase().match('flickr-mgr'))){
-		
-			anchor.onclick = function (event) {
-				var save_url = this.getAttribute("href");
-				
-				updateFlickrHref(this);
-				
-				event.stop();
-				
-				if(this.getAttribute("rel") === "flickr-mgr") {
-					myLightbox.imageArray = [];
-					this.setAttribute("rel","lightbox");
+			var origUrl = $(this).attr("href");
+			updateFlickrHref(this);
+			
+			$(this).lightbox({
+				fixedNavigation:	true,
+				fileLoadingImage:	"<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/loading-3.gif",
+				fileBottomNavCloseImage:	"<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/closelabel.gif",
+				strings : {
+					prevLinkTitle: 'previous image',
+					nextLinkTitle: 'next image',
+					prevLinkText:  '',
+					nextLinkText:  '',
+					closeTitle: 'close image gallery',
+					image: 'Image ',
+					of: ' of '
 				}
-				
-				myLightbox.start(this);
-				
-				if(this.getAttribute("rel") === "lightbox") {
-					this.setAttribute("rel","flickr-mgr");
+			});
+			
+			$(this).attr("rel","");
+			$(this).lightbox.start(this);
+			$(this).attr("rel","flickr-mgr");
+			
+			$(this).attr("href",origUrl);
+			
+		} else {	// Member of photoset
+			var origUrls = [];
+			var setRel = $(this).attr("rel");
+			
+			$("a").each(function(){
+				if(this.href && (this.rel == setRel)){
+					origUrls.push([$(this).attr("href"), $(this).attr("title")]);
+					updateFlickrHref(this);
 				}
-				
-				var anchors = document.getElementsByTagName('a');
-				for (var j=0; j < myLightbox.imageArray.length; j++) {
-					for (var i=0; i < anchors.length; i++) {
-						var anchor = anchors[i];
-						if(anchor.href == myLightbox.imageArray[j][0]) {
-							var saveUrl = anchor.getAttribute("href");
-							updateFlickrHref(anchor);
-							myLightbox.imageArray[j][0] = anchor.getAttribute("href");
-							anchor.setAttribute("href", saveUrl);
-						}
+			});
+			origUrls.reverse();
+			
+			$(this).lightbox({
+				fixedNavigation:	true,
+				fileLoadingImage:	"<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/loading-3.gif",
+				fileBottomNavCloseImage:	"<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/closelabel.gif",
+				strings : {
+					prevLinkTitle: 'previous image',
+					nextLinkTitle: 'next image',
+					prevLinkText:  '',
+					nextLinkText:  '',
+					closeTitle: 'close image gallery',
+					image: 'Image ',
+					of: ' of '
+				}
+			});
+			
+			$(this).lightbox.start(this);
+			
+			// Delay changing the URL's back because Internet Explorer doesn't wait for execution to finish
+			setTimeout(function() {
+				$("a").each(function(){
+					if(this.href && (this.rel == setRel)){
+						var url = origUrls.pop();
+						$(this).attr("href",url[0]);
 					}
-				}
-				
-				
-				this.setAttribute("href", save_url);
-				return false;
-			};
+				});
+			}, 100);
+			
 		}
+			
 		
-	}
+		return false;
+	});
+	
 }
 
-var myLightbox = "";
-
-document.observe('dom:loaded', function() {
+$(document).ready(function() {
 	prepareWFMImages();
-	myLightbox = new Lightbox();
-	myLightbox.imageArray = [];
-	myLightbox.activeImage = undefined;
-	
-	var ids = 'overlay lightbox outerImageContainer imageContainer lightboxImage hoverNav prevLink nextLink loading loadingLink ' + 
-			  'imageDataContainer imageData imageDetails caption numberDisplay bottomNav bottomNavClose';   
-	$w(ids).each(function(id){ myLightbox[id] = $(id); });
 });

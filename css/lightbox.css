@@ -78,6 +78,7 @@ display: none;
 	background-color: #fff;
 	margin: 0 auto;
 	line-height: 1.4em;
+	overflow:hidden;
 	}
 
 #imageData{

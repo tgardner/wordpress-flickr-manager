@@ -66,23 +66,18 @@ function prepareWFMImages() {
 			$(this).lightbox({
 				fixedNavigation:	true,
 				fileLoadingImage:	"<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/loading-3.gif",
-				fileBottomNavCloseImage:	"<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/closelabel.gif",
-				strings : {
-					prevLinkTitle: 'previous image',
-					nextLinkTitle: 'next image',
-					prevLinkText:  '',
-					nextLinkText:  '',
-					closeTitle: 'close image gallery',
-					image: 'Image ',
-					of: ' of '
-				}
+				fileBottomNavCloseImage:	"<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/closelabel.gif"
 			});
 			
 			$(this).attr("rel","");
 			$(this).lightbox.start(this);
-			$(this).attr("rel","flickr-mgr");
 			
-			$(this).attr("href",origUrl);
+			var anchor = this;
+			
+			setTimeout(function() {
+				$(anchor).attr("rel","flickr-mgr");
+				$(anchor).attr("href",origUrl);
+			}, 100);
 			
 		} else {	// Member of photoset
 			var origUrls = [];
@@ -99,16 +94,7 @@ function prepareWFMImages() {
 			$(this).lightbox({
 				fixedNavigation:	true,
 				fileLoadingImage:	"<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/loading-3.gif",
-				fileBottomNavCloseImage:	"<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/closelabel.gif",
-				strings : {
-					prevLinkTitle: 'previous image',
-					nextLinkTitle: 'next image',
-					prevLinkText:  '',
-					nextLinkText:  '',
-					closeTitle: 'close image gallery',
-					image: 'Image ',
-					of: ' of '
-				}
+				fileBottomNavCloseImage:	"<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/closelabel.gif"
 			});
 			
 			$(this).lightbox.start(this);

@@ -176,9 +176,9 @@ var prepareImages = function() {
 		
 		top.send_to_editor(imgHTML);
 		
-		/*if(jQuery("#wfm-close").is(":checked")) {
+		if(jQuery("#wfm-close").is(":checked")) {
 			top.tb_remove();
-		}*/
+		}
 		
 	});
 	

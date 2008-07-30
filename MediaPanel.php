@@ -44,9 +44,9 @@ function flickrMediaBrowse() {
 		}
 		?>
 		
-		<!--<div id="wfm-close-block" class="right">
+		<div id="wfm-close-block" class="right">
 			<label><input type="checkbox" name="wfm-close" id="wfm-close" value="true" checked="checked" /> Close on insert</label>
-		</div>-->
+		</div>
 		
 		<h3 id="wfm-media-header">Browse Flickr</h3>
 				

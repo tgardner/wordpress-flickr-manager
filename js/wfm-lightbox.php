@@ -56,55 +56,55 @@ function updateFlickrHref(anchor) {
 
 function prepareWFMImages() {
 	
-	$('a[@rel*=flickr-mgr]').click(function() {
+	jQuery('a[@rel*=flickr-mgr]').click(function() {
 		
-		if($(this).attr("rel") == "flickr-mgr") {	// Individual Photo
+		if(jQuery(this).attr("rel") == "flickr-mgr") {	// Individual Photo
 		
-			var origUrl = $(this).attr("href");
+			var origUrl = jQuery(this).attr("href");
 			updateFlickrHref(this);
 			
-			$(this).lightbox({
+			jQuery(this).lightbox({
 				fixedNavigation:	true,
 				fileLoadingImage:	"<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/loading-3.gif",
 				fileBottomNavCloseImage:	"<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/closelabel.gif"
 			});
 			
-			$(this).attr("rel","");
-			$(this).lightbox.start(this);
+			jQuery(this).attr("rel","");
+			jQuery(this).lightbox.start(this);
 			
 			var anchor = this;
 			
 			setTimeout(function() {
-				$(anchor).attr("rel","flickr-mgr");
-				$(anchor).attr("href",origUrl);
+				jQuery(anchor).attr("rel","flickr-mgr");
+				jQuery(anchor).attr("href",origUrl);
 			}, 100);
 			
 		} else {	// Member of photoset
 			var origUrls = [];
-			var setRel = $(this).attr("rel");
+			var setRel = jQuery(this).attr("rel");
 			
-			$("a").each(function(){
+			jQuery("a").each(function(){
 				if(this.href && (this.rel == setRel)){
-					origUrls.push([$(this).attr("href"), $(this).attr("title")]);
+					origUrls.push([jQuery(this).attr("href"), jQuery(this).attr("title")]);
 					updateFlickrHref(this);
 				}
 			});
 			origUrls.reverse();
 			
-			$(this).lightbox({
+			jQuery(this).lightbox({
 				fixedNavigation:	true,
 				fileLoadingImage:	"<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/loading-3.gif",
 				fileBottomNavCloseImage:	"<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/closelabel.gif"
 			});
 			
-			$(this).lightbox.start(this);
+			jQuery(this).lightbox.start(this);
 			
 			// Delay changing the URL's back because Internet Explorer doesn't wait for execution to finish
 			setTimeout(function() {
-				$("a").each(function(){
+				jQuery("a").each(function(){
 					if(this.href && (this.rel == setRel)){
 						var url = origUrls.pop();
-						$(this).attr("href",url[0]);
+						jQuery(this).attr("href",url[0]);
 					}
 				});
 			}, 100);
@@ -117,6 +117,8 @@ function prepareWFMImages() {
 	
 }
 
-$(document).ready(function() {
+// Thanks go to Michael Wender for the jQuery no conflict update
+jQuery.noConflict();
+jQuery(document).ready(function() {
 	prepareWFMImages();
 });

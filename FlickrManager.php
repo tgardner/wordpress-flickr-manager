@@ -3,7 +3,7 @@
 Plugin Name: Flickr Manager
 Plugin URI: http://tgardner.net/
 Description: Handles uploading, modifying images on Flickr, and insertion into posts.
-Version: 2.0.2
+Version: 2.0.3
 Author: Trent Gardner
 Author URI: http://tgardner.net/
 
@@ -57,6 +57,7 @@ class FlickrManager extends FlickrCore {
 		register_activation_hook( __FILE__, array(&$this, 'install') );
 		
 		add_action('admin_menu', array(&$this, 'add_menus'));
+		add_action('init', array(&$this,'add_scripts'));
 		add_action('wp_head', array(&$this, 'add_headers'));
 		add_action('admin_head', array(&$this, 'add_admin_headers'));
 		add_action('edit_page_form', array(&$this, 'add_flickr_panel'));
@@ -69,7 +70,7 @@ class FlickrManager extends FlickrCore {
 		 */
 		add_action('media_buttons', array($this, 'addMediaButton'), 20);
 		add_action('media_upload_flickr', array($this, 'media_upload_flickr'));
-        add_action('admin_head_media_upload_flickr_form', 'media_admin_css');
+        if(function_exists('media_admin_css')) add_action('admin_head_media_upload_flickr_form', 'media_admin_css');
         add_action('admin_head_media_upload_flickr_form', array($this, 'addMediaCss'));
 		  
 	}
@@ -708,32 +709,46 @@ class FlickrManager extends FlickrCore {
 	
 	
 	
-	function add_headers() { 
+	function add_scripts(){
 		$image_viewer = FlickrSettings::getSetting('image_viewer');
-		$image_viewer = (!empty($image_viewer)) ? $image_viewer : "lightbox";
+		$image_viewer = (!empty($image_viewer)) ? $image_viewer : 'lightbox';
 		
-		if($image_viewer == 'lightbox') :
-		?>
-		
-		<!-- WFM INSERT LIGHTBOX FILES -->
-		<link rel="stylesheet" href="<?php echo $this->getAbsoluteUrl(); ?>/css/lightbox.css" type="text/css" />
-		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/jquery.js"></script>
-		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/jquery.lightbox.js"></script>
-		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/wfm-lightbox.php"></script>
-		<!-- WFM END INSERT -->
-		
-		<?php 
-		
-		elseif ($image_viewer == 'highslide') : ?>
-		
-		<!-- WFM INSERT HIGHSLIDE FILES -->
-		<link rel="stylesheet" href="<?php echo $this->getAbsoluteUrl(); ?>/css/highslide.css" type="text/css" />
-		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/highslide.packed.js"></script>
-		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/wfm-hs.php"></script>
-		<!-- WFM END INSERT -->
-		
-		<?php endif;
-		
+		switch($image_viewer){
+			case 'highslide':	
+				wp_enqueue_script('highslide',$this->getAbsoluteUrl(). '/js/highslide.packed.js', array('jquery'));
+				wp_enqueue_script('wfm-hs',$this->getAbsoluteUrl(). '/js/wfm-hs.php');			
+			break;			
+			default:		
+				wp_enqueue_script('jquery-lightbox',$this->getAbsoluteUrl(). '/js/jquery.lightbox.js', array('jquery'));
+				wp_enqueue_script('wfm-lightbox',$this->getAbsoluteUrl(). '/js/wfm-lightbox.php');					
+			break;
+		}
+		$GLOBALS['image_viewer'] = $image_viewer;
+	}
+	
+	
+	
+	function add_headers() { 
+		switch($GLOBALS['image_viewer']){
+			case 'highslide':
+			?>
+
+<!-- WFM INSERT HIGHSLIDE FILES -->
+<link rel="stylesheet" href="<?php echo $this->getAbsoluteUrl(); ?>/css/highslide.css" type="text/css" />
+<!-- WFM END INSERT -->
+
+			<?php			
+			break;
+			default:
+			?>
+
+<!-- WFM INSERT LIGHTBOX FILES -->
+<link rel="stylesheet" href="<?php echo $this->getAbsoluteUrl(); ?>/css/lightbox.css" type="text/css" />
+<!-- WFM END INSERT -->
+
+			<?php
+			break;
+		}
 	}
 	
 	
@@ -759,17 +774,7 @@ class FlickrManager extends FlickrCore {
 		
 		<link rel="stylesheet" href="<?php echo $this->getAbsoluteUrl(); ?>/css/admin_style.css" type="text/css" />
 		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/flickr-js.php"></script>
-		
-		<?php else : ?>
 	
-		<!-- Flickr Manager legacy support disabled -->
-	
-		<?php endif; ?>
-	
-		<?php if(function_exists('add_meta_box')) : ?>
-		<!-- WFM BEGIN WP2.5 ADDONS -->
-		
-		<!-- WFM END WP2.5 ADDONS -->
 		<?php endif; ?>
 		
 	<?php

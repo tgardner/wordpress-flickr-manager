@@ -23,7 +23,7 @@ function media_upload_flickr_form() {
  */
 function flickrMediaBrowse() {
 	global $type, $tab, $flickr_manager;
-	ini_set('display_errors', 1);
+	ini_set('display_errors', 0);
 	?>
 	
 	<input type="hidden" id="wfm-ajax-url" value="<?php echo $flickr_manager->getAbsoluteUrl(); ?>" />
@@ -44,9 +44,9 @@ function flickrMediaBrowse() {
 		}
 		?>
 		
-		<div id="wfm-close-block" class="right">
+		<!--<div id="wfm-close-block" class="right">
 			<label><input type="checkbox" name="wfm-close" id="wfm-close" value="true" checked="checked" /> Close on insert</label>
-		</div>
+		</div>-->
 		
 		<h3 id="wfm-media-header">Browse Flickr</h3>
 				

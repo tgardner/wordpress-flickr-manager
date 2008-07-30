@@ -69,6 +69,19 @@ var insertTabs = function() {
 
 
 var prepareNavigation = function() {
+	
+	var newNav = jQuery("#wfm-navigation").html();
+	if(jQuery("#wfm-navigation:first").children().filter(':first').attr("id") == "wfm-navigation") {
+		var newNav = jQuery("#wfm-navigation:first").children().filter(':first').html();
+	}
+	jQuery("#wfm-dashboard").children().filter("#wfm-navigation:first").html(newNav);
+	
+	newNav = jQuery("#wfm-browse-content").html();
+	if(jQuery("#wfm-browse-content:first").children().filter(':first').attr("id") == "wfm-browse-content") {
+		var newNav = jQuery("#wfm-browse-content:first").children().filter(':first').html();
+	}
+	jQuery("#flickr-form").children().filter("#wfm-browse-content:first").html(newNav);
+	
 	jQuery("#wfm-photoset").change(function() {
 		flickrRequest();
 	});
@@ -162,9 +175,10 @@ var prepareImages = function() {
 		}
 		
 		top.send_to_editor(imgHTML);
-		if(jQuery("#wfm-close").is(":checked")) {
+		
+		/*if(jQuery("#wfm-close").is(":checked")) {
 			top.tb_remove();
-		}
+		}*/
 		
 	});
 	

@@ -9,6 +9,8 @@
 
 #wfm-browse-content {
 	overflow: auto;
+	min-height: 280px;
+	height: auto !important;
 	height: 280px;
 	width: 550px;
 	margin: 0px auto;

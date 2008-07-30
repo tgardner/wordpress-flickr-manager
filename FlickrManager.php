@@ -70,7 +70,6 @@ class FlickrManager extends FlickrCore {
 		 */
 		add_action('media_buttons', array($this, 'addMediaButton'), 20);
 		add_action('media_upload_flickr', array($this, 'media_upload_flickr'));
-        if(function_exists('media_admin_css')) add_action('admin_head_media_upload_flickr_form', 'media_admin_css');
         add_action('admin_head_media_upload_flickr_form', array($this, 'addMediaCss'));
 		  
 	}
@@ -844,7 +843,10 @@ class FlickrManager extends FlickrCore {
         );
     }
     
-    function addMediaCss() { ?>
+    function addMediaCss() { 
+    	
+    	wp_admin_css('css/media');
+    	?>
     	
     	<link rel="stylesheet" href="<?php echo $this->getAbsoluteUrl(); ?>/css/media_panel.css" type="text/css" media="screen" />
     	<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/media-panel.js"></script>

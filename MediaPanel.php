@@ -3,7 +3,7 @@
  * Wordpress 2.5 Flickr media button panel setup
  */
 function media_upload_flickr_form() {
-	global $wpdb, $type, $tab, $post_mime_types, $flickr_manager;
+	global $type, $tab, $post_mime_types, $flickr_manager;
 	
 	add_filter('media_upload_tabs', array($flickr_manager, 'modifyMediaTab'));
 	?>
@@ -22,14 +22,14 @@ function media_upload_flickr_form() {
  * Flickr media browse panel
  */
 function flickrMediaBrowse() {
-	global $type, $tab, $flickr_manager;
+	global $type, $tab, $flickr_manager, $flickr_settings;
 	ini_set('display_errors', 0);
 	?>
 	
 	<input type="hidden" id="wfm-ajax-url" value="<?php echo $flickr_manager->getAbsoluteUrl(); ?>" />
 	<form id="flickr-form" class="media-upload-form type-form validate" action="<?php echo $_SERVER['PHP_SELF']; ?>">
 		<?php
-		$settings = FlickrSettings::getSettings();
+		$settings = $flickr_settings->getSettings();
 		
 		if(!empty($settings['token'])) {
 			$params = array('auth_token' => $settings['token']);
@@ -117,7 +117,7 @@ function flickrMediaBrowse() {
 				<div class="flickr-img" id="flickr-<?php echo $photo['id']; ?>">
 				
 					<img src="<?php echo $flickr_manager->getPhotoUrl($photo,$size); ?>" alt="<?php echo htmlspecialchars($photo['title']); ?>" <?php 
-						if(FlickrSettings::getSetting('is_pro') == '1') echo 'longdesc="' . $flickr_manager->getPhotoUrl($photo,$size) . '"';
+						if($flickr_settings->getSetting('is_pro') == '1') echo 'longdesc="' . $flickr_manager->getPhotoUrl($photo, 'original') . '"';
 					?> />
 					
 					<?php 
@@ -222,7 +222,7 @@ function flickrMediaBrowse() {
 			
 			<p><?php 
 			$sizes = array("square", 'thumbnail', 'small', 'medium', 'large'); 
-			if($settings['is_pro'] == "true") $sizes = array_merge($sizes, array('original'));
+			if($settings['is_pro'] == '1') $sizes = array_merge($sizes, array('original'));
 			?><label>Image Size: <select name="wfm-size" id="wfm-size">
 			
 				<?php
@@ -256,9 +256,9 @@ function flickrMediaBrowse() {
 
 
 function flickrMediaUpload() {
-	global $flickr_manager;
+	global $flickr_manager, $flickr_settings;
 	
-	$token = FlickrSettings::getSetting("token");
+	$token = $flickr_settings->getSetting("token");
 	if(!empty($token)) {
 		$params = array('auth_token' => $token);
 		$auth_status = $flickr_manager->call('flickr.auth.checkToken',$params, true);
@@ -280,42 +280,27 @@ function flickrMediaUpload() {
 }
 
 
-
 class FlickrSettings {
 	
-	function getSettings() {
-		global $wpdb, $flickr_manager;
-		
-		$sql = "SELECT name,value FROM $flickr_manager->db_table";
-		$results = $wpdb->get_results($sql);
-		
-		$settings = array();
-		foreach ($results as $result) {
-			$settings = array_merge($settings, array($result->name => $result->value));
-		}
-		
-		return $settings;
-		
-	}
+	var $settings;
 	
-	function getId($name) {
-		global $wpdb, $flickr_manager;
-		return $wpdb->get_var("SELECT uid FROM $flickr_manager->db_table WHERE name='$name'");
+	function getSettings() {
+		global $flickr_manager;
+		if(empty($this->settings)) $this->settings = get_option($flickr_manager->plugin_option);
+		return $this->settings;
 	}
 	
 	function getSetting($name) {
-		global $wpdb, $flickr_manager;
-		return $wpdb->get_var("SELECT value FROM $flickr_manager->db_table WHERE name='$name'");
+		global $flickr_manager;
+		if(empty($this->settings)) $this->getSettings();
+		return $this->settings[$name];
 	}
 	
 	function saveSetting($name, $value) {
-		global $wpdb, $flickr_manager;
-		$uid = FlickrSettings::getId($name);
-		if(!empty($uid)) {
-			$wpdb->query("REPLACE INTO $flickr_manager->db_table (uid,name,value) VALUES ('$uid', '$name', '$value')");
-		} else {
-			$wpdb->query("INSERT INTO $flickr_manager->db_table (name,value) VALUES ('$name', '$value')");
-		}
+		global $flickr_manager;
+		if(empty($this->settings)) $this->getSettings();
+		$this->settings[$name] = $value;
+		update_option($flickr_manager->plugin_option, $this->settings);
 	}
 	
 }

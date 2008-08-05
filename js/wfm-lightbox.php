@@ -56,55 +56,55 @@ function updateFlickrHref(anchor) {
 
 function prepareWFMImages() {
 	
-	jQuery('a[@rel*=flickr-mgr]').click(function() {
+	wfmJS('a[@rel*=flickr-mgr]').click(function() {
 		
-		if(jQuery(this).attr("rel") == "flickr-mgr") {	// Individual Photo
+		if(wfmJS(this).attr("rel") == "flickr-mgr") {	// Individual Photo
 		
-			var origUrl = jQuery(this).attr("href");
+			var origUrl = wfmJS(this).attr("href");
 			updateFlickrHref(this);
 			
-			jQuery(this).lightbox({
+			wfmJS(this).lightbox({
 				fixedNavigation:	true,
 				fileLoadingImage:	"<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/loading-3.gif",
 				fileBottomNavCloseImage:	"<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/closelabel.gif"
 			});
 			
-			jQuery(this).attr("rel","");
-			jQuery(this).lightbox.start(this);
+			wfmJS(this).attr("rel","");
+			wfmJS(this).lightbox.start(this);
 			
 			var anchor = this;
 			
 			setTimeout(function() {
-				jQuery(anchor).attr("rel","flickr-mgr");
-				jQuery(anchor).attr("href",origUrl);
+				wfmJS(anchor).attr("rel","flickr-mgr");
+				wfmJS(anchor).attr("href",origUrl);
 			}, 100);
 			
 		} else {	// Member of photoset
 			var origUrls = [];
-			var setRel = jQuery(this).attr("rel");
+			var setRel = wfmJS(this).attr("rel");
 			
-			jQuery("a").each(function(){
+			wfmJS("a").each(function(){
 				if(this.href && (this.rel == setRel)){
-					origUrls.push([jQuery(this).attr("href"), jQuery(this).attr("title")]);
+					origUrls.push([wfmJS(this).attr("href"), wfmJS(this).attr("title")]);
 					updateFlickrHref(this);
 				}
 			});
 			origUrls.reverse();
 			
-			jQuery(this).lightbox({
+			wfmJS(this).lightbox({
 				fixedNavigation:	true,
 				fileLoadingImage:	"<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/loading-3.gif",
 				fileBottomNavCloseImage:	"<?php echo $flickr_manager->getAbsoluteUrl(); ?>/images/closelabel.gif"
 			});
 			
-			jQuery(this).lightbox.start(this);
+			wfmJS(this).lightbox.start(this);
 			
 			// Delay changing the URL's back because Internet Explorer doesn't wait for execution to finish
 			setTimeout(function() {
-				jQuery("a").each(function(){
+				wfmJS("a").each(function(){
 					if(this.href && (this.rel == setRel)){
 						var url = origUrls.pop();
-						jQuery(this).attr("href",url[0]);
+						wfmJS(this).attr("href",url[0]);
 					}
 				});
 			}, 100);
@@ -118,7 +118,7 @@ function prepareWFMImages() {
 }
 
 // Thanks go to Michael Wender for the jQuery no conflict update
-jQuery.noConflict();
-jQuery(document).ready(function() {
+var wfmJS = jQuery.noConflict();
+wfmJS(document).ready(function() {
 	prepareWFMImages();
 });

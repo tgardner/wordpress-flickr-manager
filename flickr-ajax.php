@@ -22,8 +22,8 @@ switch($_REQUEST['faction']) {
 }
 
 function displayBrowse() {
-	global $wpdb, $flickr_manager;
-	$token = $wpdb->get_var("SELECT value FROM $flickr_manager->db_table WHERE name='token'");
+	global $flickr_manager, $flickr_settings;
+	$token = $flickr_settings->getSetting('token');
 	
 	if(!empty($token)) {
 		$params = array('auth_token' => $token);
@@ -37,17 +37,17 @@ function displayBrowse() {
 		return;
 	}
 	
-	$_REQUEST['flightbox'] = $wpdb->get_var("SELECT value FROM $flickr_manager->db_table WHERE name='lightbox_enable'");
+	$_REQUEST['flightbox'] = $flickr_settings->getSetting('lightbox_enable');
 	
-	$is_pro = $wpdb->get_var("SELECT value FROM $flickr_manager->db_table WHERE name='is_pro'");
+	$is_pro = $flickr_settings->getSetting('is_pro');
 	
 	$page = (isset($_REQUEST['fpage']) && !empty($_REQUEST['fpage'])) ? $_REQUEST['fpage'] : '1';
 	
-	$exists = $wpdb->get_var("SELECT value FROM $flickr_manager->db_table WHERE name='per_page'");
+	$exists = $flickr_settings->getSetting('per_page');
 	if(!empty($exists)) $_REQUEST['fper_page'] = $exists;
 	$per_page = (isset($_REQUEST['fper_page'])) ? $_REQUEST['fper_page'] : '5';
 	
-	$nsid = $wpdb->get_var("SELECT value FROM $flickr_manager->db_table WHERE name='nsid'");
+	$nsid = $flickr_settings->getSetting('nsid');
 	$fscope = $_REQUEST['fscope'];
 	$params = array('extras' => 'original_format,license,owner_name'); 
 	
@@ -63,8 +63,8 @@ function displayBrowse() {
 	}
 	
 	$size = (isset($_REQUEST['photoSize']) && !empty($_REQUEST['photoSize'])) ? $_REQUEST['photoSize'] : "thumbnail";
-	if(($browse_check = $wpdb->get_var("SELECT value FROM $flickr_manager->db_table WHERE name='browse_check'")) == "true") {
-		$size = $wpdb->get_var("SELECT value FROM $flickr_manager->db_table WHERE name='browse_size'");
+	if(($browse_check = $flickr_settings->getSetting('browse_check')) == "true") {
+		$size = $flickr_settings->getSetting('browse_size');
 	}
 	
 	if(isset($_REQUEST['filter']) && !empty($_REQUEST['filter'])) {
@@ -92,7 +92,7 @@ function displayBrowse() {
 	
 	$pages = $photos['photos']['pages'];
 	
-	$exists = $wpdb->get_var("SELECT value FROM $flickr_manager->db_table WHERE name='lightbox_default'");
+	$exists = $flickr_settings->getSetting('lightbox_default');
 	$lightbox_default = ($exists) ? $exists : "medium";
 	if(empty($_REQUEST['photoSize'])) $_REQUEST['photoSize'] = "thumbnail";
 	?>
@@ -193,7 +193,7 @@ function displayBrowse() {
 		<input type="hidden" name="faction" id="flickr-action" value="<?php echo $_REQUEST['faction']; ?>" />
 		<input type="hidden" name="fpage" id="flickr-page" value="<?php echo $_REQUEST['fpage']; ?>" />
 		<input type="hidden" name="fold_filter" id="flickr-old-filter" value="<?php echo $_REQUEST['filter']; ?>" />
-		<input type="hidden" name="flickr_blank" id="flickr_blank" value="<?php echo $wpdb->get_var("SELECT value FROM $flickr_manager->db_table WHERE name='new_window'"); ?>" />
+		<input type="hidden" name="flickr_blank" id="flickr_blank" value="<?php echo $flickr_settings->getSetting('new_window'); ?>" />
 		<input type="submit" class="button" name="button" value="Filter" onclick="return performFilter('flickr-ajax')"/>
 		
 		<?php if($page < $pages) :?>
@@ -238,8 +238,8 @@ function displayBrowse() {
 
 
 function displayUpload() {
-	global $wpdb, $flickr_manager;
-	$token = $wpdb->get_var("SELECT value FROM $flickr_manager->db_table WHERE name='token'");
+	global $flickr_manager, $flickr_settings;
+	$token = $flickr_settings->getSetting('token');
 	
 	if(!empty($token)) {
 		$params = array('auth_token' => $token);

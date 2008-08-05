@@ -3,7 +3,7 @@
 Plugin Name: Flickr Manager
 Plugin URI: http://tgardner.net/
 Description: Handles uploading, modifying images on Flickr, and insertion into posts.
-Version: 2.0.3
+Version: 2.0.4
 Author: Trent Gardner
 Author URI: http://tgardner.net/
 
@@ -39,6 +39,7 @@ class FlickrManager extends FlickrCore {
 	var $db_table;
 	var $plugin_directory;
 	var $plugin_filename;
+	var $plugin_option = 'wfm-settings';
 	
 	
 	
@@ -79,20 +80,20 @@ class FlickrManager extends FlickrCore {
 	function install() {
 		global $wpdb;
 		
-		if($wpdb->get_var("SHOW TABLES LIKE '$this->db_table'") != $this->db_table) {
-			/* Create Table */
+		if($wpdb->get_var("SHOW TABLES LIKE '$this->db_table'") == $this->db_table) {
+			$results = $wpdb->get_results("select * from $this->db_table");
+			$settings = array();
+			foreach ($results as $setting) {
+				$settings[$setting->name] = $setting->value;
+			}
 			
-			$sql = "CREATE TABLE $this->db_table (
-					uid mediumint(9) NOT NULL AUTO_INCREMENT,
-					name VARCHAR(55) NOT NULL,
-					value VARCHAR(55),
-					UNIQUE KEY id (uid)
-					);";
+			if(get_option($this->plugin_option)) {
+				update_option($this->plugin_option, $settings);
+			} else {
+				add_option($this->plugin_option, $settings);
+			}
 			
-			require_once(ABSPATH . 'wp-admin/upgrade-functions.php');
-			dbDelta($sql);
-		
-			add_option("flickr_db_version", $this->db_version);
+			$wpdb->query("drop table $this->db_table");
 		}
 	}
 	
@@ -109,49 +110,49 @@ class FlickrManager extends FlickrCore {
 	
 	
 	function options_page() {
-		global $wpdb;
+		global $flickr_settings;
 		
 		if(!empty($_REQUEST['action'])) : 
 			switch ($_REQUEST['action']) :
 				
 				case 'token':
-					if($frob = FlickrSettings::getSetting('frob')) {
+					if($frob = $flickr_settings->getSetting('frob')) {
 						$token = $this->call('flickr.auth.getToken', array('frob' => $frob), true);
 						if($token['stat'] == 'ok') {
-							FlickrSettings::saveSetting('token', $token['auth']['token']['_content']);
-							FlickrSettings::saveSetting('nsid', $token['auth']['user']['nsid']);
-							FlickrSettings::saveSetting('username', $token['auth']['user']['username']);
+							$flickr_settings->saveSetting('token', $token['auth']['token']['_content']);
+							$flickr_settings->saveSetting('nsid', $token['auth']['user']['nsid']);
+							$flickr_settings->saveSetting('username', $token['auth']['user']['username']);
 						}
 					}
 					break;
 				
 				case 'logout':
-					$sql = "DELETE FROM $this->db_table";
-					$wpdb->query($sql);
+					update_option($this->plugin_option, array());
+					
 					break;
 				
 				case 'save':
 					$_REQUEST['wfm-per_page'] = (!empty($_REQUEST['wfm-per_page']) && is_numeric($_REQUEST['wfm-per_page']) && 
 												intval($_REQUEST['wfm-per_page']) > 0) ? intval($_REQUEST['wfm-per_page']) : 5;
 					
-					FlickrSettings::saveSetting('per_page', $_REQUEST['wfm-per_page']);
-					FlickrSettings::saveSetting('new_window', $_REQUEST['wfm-new_window']);
-					FlickrSettings::saveSetting('lightbox_default', $_REQUEST['wfm-lbox_default']);
-					FlickrSettings::saveSetting('lightbox_enable', $_REQUEST['wfm-lbox_enable']);
-					FlickrSettings::saveSetting('browse_check',$_REQUEST['wfm-limit']);
-					FlickrSettings::saveSetting('browse_size',$_REQUEST['wfm-limit-size']);
-					FlickrSettings::saveSetting('flickr_legacy', $_REQUEST['wfm-legacy-support']);
-					FlickrSettings::saveSetting('image_viewer', $_REQUEST['wfm-js-viewer']);
-					FlickrSettings::saveSetting('before_wrap', $_REQUEST['wfm-insert-before']);
-					FlickrSettings::saveSetting('after_wrap', $_REQUEST['wfm-insert-after']);
-					FlickrSettings::saveSetting('upload_level', $_REQUEST['wfm-upload-level']);
+					$flickr_settings->saveSetting('per_page', $_REQUEST['wfm-per_page']);
+					$flickr_settings->saveSetting('new_window', $_REQUEST['wfm-new_window']);
+					$flickr_settings->saveSetting('lightbox_default', $_REQUEST['wfm-lbox_default']);
+					$flickr_settings->saveSetting('lightbox_enable', $_REQUEST['wfm-lbox_enable']);
+					$flickr_settings->saveSetting('browse_check',$_REQUEST['wfm-limit']);
+					$flickr_settings->saveSetting('browse_size',$_REQUEST['wfm-limit-size']);
+					$flickr_settings->saveSetting('flickr_legacy', $_REQUEST['wfm-legacy-support']);
+					$flickr_settings->saveSetting('image_viewer', $_REQUEST['wfm-js-viewer']);
+					$flickr_settings->saveSetting('before_wrap', $_REQUEST['wfm-insert-before']);
+					$flickr_settings->saveSetting('after_wrap', $_REQUEST['wfm-insert-after']);
+					$flickr_settings->saveSetting('upload_level', $_REQUEST['wfm-upload-level']);
 					
 					break;
 				
 			endswitch;
 		endif;
 		
-		if(($token = FlickrSettings::getSetting('token'))) {
+		if(($token = $flickr_settings->getSetting('token'))) {
 			$auth_status = $this->call('flickr.auth.checkToken', array('auth_token' => $token), true);
 		}
 		?>
@@ -175,7 +176,7 @@ class FlickrManager extends FlickrCore {
 			<?php
 			$frob = $this->call('flickr.auth.getFrob', array(), true);
 			$frob = $frob['frob']['_content'];
-			FlickrSettings::saveSetting('frob', $frob);
+			$flickr_settings->saveSetting('frob', $frob);
 			?>
 			
 			<div align="center">
@@ -205,8 +206,8 @@ class FlickrManager extends FlickrCore {
 			</div>
 			
 			<?php
-			$info = $this->call('flickr.people.getInfo',array('user_id' => FlickrSettings::getSetting('nsid')));
-			FlickrSettings::saveSetting('is_pro', $info['person']['ispro']);
+			$info = $this->call('flickr.people.getInfo',array('user_id' => $flickr_settings->getSetting('nsid')));
+			$flickr_settings->saveSetting('is_pro', $info['person']['ispro']);
 			if($info['stat'] == 'ok') :
 			?>
 				
@@ -250,7 +251,7 @@ class FlickrManager extends FlickrCore {
 			<?php
 			
 			// Load Options
-			$settings = FlickrSettings::getSettings();
+			$settings = $flickr_settings->getSettings();
 			$_REQUEST['wfm-per_page'] = (!empty($_REQUEST['wfm-per_page']) && is_numeric($_REQUEST['wfm-per_page']) && 
 										intval($_REQUEST['wfm-per_page']) > 0) ? intval($_REQUEST['wfm-per_page']) : 5;
 			$_REQUEST['wfm-per_page'] = (!empty($settings['per_page'])) ? $settings['per_page'] : $_REQUEST['wfm-per_page'];
@@ -258,7 +259,6 @@ class FlickrManager extends FlickrCore {
 			
 			$_REQUEST['wfm-limit'] = $settings['browse_check'];
 			$_REQUEST['wfm-limit-size'] = $settings['browse_size'];
-			$_REQUEST['wfm-legacy-support'] = (isset($settings['flickr_legacy'])) ? $settings['flickr_legacy'] : "true";
 			$_REQUEST['wfm-upload-level'] = (!empty($settings['upload_level'])) ? $settings['upload_level'] : "6";
 			
 			$_REQUEST['wfm-lbox_enable'] = $settings['lightbox_enable'];
@@ -424,8 +424,8 @@ class FlickrManager extends FlickrCore {
 	
 	
 	function manage_page() {
-		global $wpdb;
-		$token = FlickrSettings::getSetting('token');
+		global $flickr_settings;
+		$token = $flickr_settings->getSetting('token');
 		if(empty($token)) {
 			echo '<div class="wrap"><h3>Error: Please authenticate through <a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$this->plugin_directory/$this->plugin_filename\">Options->Flickr</a></h3></div>\n";
 			return;
@@ -578,7 +578,7 @@ class FlickrManager extends FlickrCore {
 					default:
 						$page = (isset($_REQUEST['fpage'])) ? $_REQUEST['fpage'] : '1';
 						$per_page = (isset($_REQUEST['fper_page'])) ? $_REQUEST['fper_page'] : '10';
-						$nsid = $wpdb->get_var("SELECT value FROM $this->db_table WHERE name='nsid'");
+						$nsid = $flickr_settings->getSetting('nsid');
 						$params = array('user_id' => $nsid, 'per_page' => $per_page, 'page' => $page, 'auth_token' => $token);
 						$photos = $this->call('flickr.photos.search', $params, true);
 						$pages = $photos['photos']['pages'];
@@ -672,22 +672,23 @@ class FlickrManager extends FlickrCore {
 	
 	
 	function filterSets($match) {
+		global $flickr_settings;
 		$setid = $match[1];
 		$size = $match[2];
 		$lightbox = $match[3];
 		$lightbox = ($lightbox == "true") ? true : false;
-		$token = FlickrSettings::getSetting('token');
+		$token = $flickr_settings->getSetting('token');
 		$params = array('photoset_id' => $setid, 'auth_token' => $token, 'extras' => 'original_format');
 		$photoset = $this->call('flickr.photosets.getPhotos',$params, true);
 		
 		foreach ($photoset['photoset']['photo'] as $photo) {
-			$replace .= FlickrSettings::getSetting('before_wrap') . "<a href=\"http://www.flickr.com/photos/{$photoset['photoset']['owner']}/{$photo['id']}/\" title=\"{$photo['title']}\" ";
+			$replace .= $flickr_settings->getSetting('before_wrap') . "<a href=\"http://www.flickr.com/photos/{$photoset['photoset']['owner']}/{$photo['id']}/\" title=\"{$photo['title']}\" ";
 			if($lightbox) $replace .= "rel=\"flickr-mgr[$setid]\" ";
 			$replace .= "class=\"flickr-image\" >\n";
 			$replace .= '	<img src="' . $this->getPhotoUrl($photo,$size) . "\" alt=\"{$photo['title']}\" ";
 			if($lightbox) $replace .= 'class="flickr-medium" ';
 			$replace .= "/>\n";
-			$replace .= "</a>\n" . FlickrSettings::getSetting('after_wrap');
+			$replace .= "</a>\n" . $flickr_settings->getSetting('after_wrap');
 		}
 		return $replace;
 	}
@@ -695,21 +696,23 @@ class FlickrManager extends FlickrCore {
 	
 	
 	function filterCallback($match) {
+		global $flickr_settings;
 		$pid = $match[1];
 		$size = $match[2];
-		$token = FlickrSettings::getSetting('token');
+		$token = $flickr_settings->getSetting('token');
 		$params = array('photo_id' => $pid, 'auth_token' => $token);
 		$photo = $this->call('flickr.photos.getInfo',$params, true);
 		$url = $this->getPhotoUrl($photo['photo'],$size);
-		return FlickrSettings::getSetting('before_wrap') . "<a href=\"{$photo['photo']['urls']['url'][0]['_content']}\">
+		return $flickr_settings->getSetting('before_wrap') . "<a href=\"{$photo['photo']['urls']['url'][0]['_content']}\">
 					<img src=\"$url\" alt=\"{$photo['photo']['title']['_content']}\" />
-				</a>" . FlickrSettings::getSetting('after_wrap');
+				</a>" . $flickr_settings->getSetting('after_wrap');
 	}
 	
 	
 	
-	function add_scripts(){
-		$image_viewer = FlickrSettings::getSetting('image_viewer');
+	function add_scripts() {
+		global $flickr_settings;
+		$image_viewer = $flickr_settings->getSetting('image_viewer');
 		$image_viewer = (!empty($image_viewer)) ? $image_viewer : 'lightbox';
 		
 		switch($image_viewer){
@@ -759,6 +762,8 @@ class FlickrManager extends FlickrCore {
 	
 	
 	function add_admin_headers() {
+		global $flickr_settings;
+		
 		$filename = explode("/", $_SERVER['REQUEST_URI']);
 		$filename = $filename[count($filename) - 1];
 		if($end = strpos($filename,"?")) $filename = substr($filename,0,$end);
@@ -766,7 +771,7 @@ class FlickrManager extends FlickrCore {
 		
 		if($filename != "post.php" && $filename != "page.php" && $filename != "post-new.php" && $filename != "page-new.php") return;
 		
-		$settings = FlickrSettings::getSettings();
+		$settings = $flickr_settings->getSettings();
 		$legacy = (isset($settings['flickr_legacy'])) ? $settings['flickr_legacy'] : 'true';
 		
 		if($legacy == "true") : ?>
@@ -782,9 +787,9 @@ class FlickrManager extends FlickrCore {
 	
 	
 	function add_flickr_panel() {
+		global $flickr_settings;
 		
-		$settings = FlickrSettings::getSettings();
-		$legacy = (isset($settings['flickr_legacy'])) ? $settings['flickr_legacy'] : 'true';
+		$legacy = $flickr_settings->getSetting('flickr_legacy');
 		
 		if($legacy == "true") : ?>
 
@@ -855,6 +860,7 @@ class FlickrManager extends FlickrCore {
     
 }
 
-global $flickr_manager;
+global $flickr_manager, $flickr_settings;
 $flickr_manager = new FlickrManager();
+$flickr_settings = new FlickrSettings();
 ?>

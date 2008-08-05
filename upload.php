@@ -3,16 +3,16 @@ ini_set('display_errors',1);
 require_once("../../../wp-config.php");
 require_once("../../../wp-includes/wp-db.php");
 require_once("../../../wp-includes/pluggable.php");
-global $flickr_manager;
+global $flickr_manager, $flickr_settings;
 
 get_currentuserinfo();
-$upload_level = FlickrSettings::getSetting("upload_level");
+$upload_level = $flickr_settings->getSetting("upload_level");
 if(intval($userdata->user_level) < intval($upload_level)) {
 	die("You do not have permission to upload photos to this stream, you may adjust this in the settings page!");	
 }
 
 if(isset($_FILES['uploadPhoto'])) {
-	$token = $wpdb->get_var("SELECT value FROM $flickr_manager->db_table WHERE name='token'");
+	$token = $flickr_settings->getSetting('token');
 
 	/* Perform file upload */
 	$file = $_FILES['uploadPhoto'];

@@ -26,7 +26,7 @@ jQuery(document).ready(function() {
 	});
 	
 	jQuery("select[@name='wfm-size']").change(function () {
-		flickrRequest();
+		flickrRequest('&wfm-page=' + jQuery("#wfm-page").attr("value"));
 	});
 	
 	prepareNavigation();

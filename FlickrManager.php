@@ -35,7 +35,6 @@ include_once(dirname(__FILE__) . "/MediaPanel.php");
 
 class FlickrManager extends FlickrCore {
 	
-	var $db_version;
 	var $db_table;
 	var $plugin_directory;
 	var $plugin_filename;
@@ -47,7 +46,6 @@ class FlickrManager extends FlickrCore {
 		global $wpdb, $wp_version;
 		
 		$this->db_table = $wpdb->prefix . "flickr";
-		$this->db_version = '1.0';
 		
 		$filename = explode("/", __FILE__);
 		if(count($filename) <= 1) $filename = explode("\\", __FILE__);
@@ -94,6 +92,8 @@ class FlickrManager extends FlickrCore {
 			}
 			
 			$wpdb->query("drop table $this->db_table");
+		} elseif (!get_option($this->plugin_option)) {
+			add_option($this->plugin_option, array());
 		}
 	}
 	

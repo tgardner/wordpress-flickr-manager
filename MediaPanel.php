@@ -242,9 +242,10 @@ function flickrMediaBrowse() {
 				$settings['before_wrap'] = str_replace("\n", "", $settings['before_wrap']);
 				echo rawurlencode($settings['before_wrap']);
 			?>" />
-			<input type="hidden" name="wfm-insert-after" id="wfm-insert-before" value="<?php 
-				$settings['before_wrap'] = str_replace("\n", "", $settings['before_wrap']);
-				echo rawurlencode($settings['before_wrap']);
+			
+			<input type="hidden" name="wfm-insert-after" id="wfm-insert-after" value="<?php 
+				$settings['after_wrap'] = str_replace("\n", "", $settings['after_wrap']);
+				echo rawurlencode($settings['after_wrap']);
 			?>" />
 			
 		</div>

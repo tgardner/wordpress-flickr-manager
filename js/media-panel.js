@@ -174,10 +174,16 @@ var prepareImages = function() {
 			imgHTML = imgHTML + wrapAfter;
 		}
 		
-		top.send_to_editor(imgHTML);
-		
 		if(jQuery("#wfm-close").is(":checked")) {
-			top.tb_remove();
+			top.send_to_editor(imgHTML);
+		} else {
+			var win = window.opener ? window.opener : window.dialogArguments;
+			if ( !win ) win = top;
+			tinyMCE = win.tinyMCE;
+			if ( typeof tinyMCE != 'undefined' && tinyMCE.getInstanceById('content') ) {
+				tinyMCE.selectedInstance.getWin().focus();
+				tinyMCE.execCommand('mceInsertContent', false, imgHTML);
+			} else if (win.edInsertContent) win.edInsertContent(win.edCanvas, imgHTML);
 		}
 		
 	});

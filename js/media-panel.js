@@ -111,9 +111,16 @@ var prepareNavigation = function() {
 		
 		var setHTML = "[imgset:" + id + "," + size + "," + lightbox + "]";
 		
-		top.send_to_editor(setHTML);
 		if(jQuery("#wfm-close").is(":checked")) {
-			top.tb_remove();
+			top.send_to_editor(setHTML);
+		} else {
+			var win = window.opener ? window.opener : window.dialogArguments;
+			if ( !win ) win = top;
+			tinyMCE = win.tinyMCE;
+			if ( typeof tinyMCE != 'undefined' && tinyMCE.getInstanceById('content') ) {
+				tinyMCE.selectedInstance.getWin().focus();
+				tinyMCE.execCommand('mceInsertContent', false, setHTML);
+			} else if (win.edInsertContent) win.edInsertContent(win.edCanvas, setHTML);
 		}
 		
 		return false;

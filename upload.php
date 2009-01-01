@@ -52,28 +52,28 @@ if(isset($_FILES['uploadPhoto'])) {
 			<?php if($upload_success) : ?>
 			
 				<div id="wfm-success">
-					<strong>Image successfully uploaded</strong>
+					<strong><?php _e('Image successfully uploaded', 'flickr-manager'); ?></strong>
 				</div>
 			
 			<?php endif; ?>
-			<h3>Upload Photo</h3>
+			<h3><?php _e('Upload Photo', 'flickr-manager'); ?></h3>
 			
 			<table>
 				<tbody>
 					<tr>
-						<td><label for="uploadPhoto">Upload Photo:</label></td>
+						<td><label for="uploadPhoto"><?php _e('Upload Photo', 'flickr-manager'); ?>:</label></td>
 						<td><input type="file" name="uploadPhoto" id="uploadPhoto" /></td>
 					</tr>
 					<tr>
-						<td><label for="photoTitle">Title:</label></td>
+						<td><label for="photoTitle"><?php _e('Title', 'flickr-manager'); ?>:</label></td>
 						<td><input type="text" name="photoTitle" id="flickrTitle" /></td>
 					</tr>
 					<tr>
-						<td><label for="photoTags">Tags:</label></td>
-						<td><input type="text" name="photoTags" id="flickrTags" /> <sup>*Space separated list</sup></td>
+						<td><label for="photoTags"><?php _e('Tags', 'flickr-manager'); ?>:</label></td>
+						<td><input type="text" name="photoTags" id="flickrTags" /> <sup>*<?php _e('Space separated list', 'flickr-manager'); ?></sup></td>
 					</tr>
 					<tr>
-						<td><label for="photoDesc">Description:</label></td>
+						<td><label for="photoDesc"><?php _e('Description', 'flickr-manager'); ?>:</label></td>
 						<td><textarea name="photoDesc" id="flickrDesc" rows="4"></textarea></td>
 					</tr>
 				</tbody>

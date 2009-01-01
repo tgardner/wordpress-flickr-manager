@@ -3,7 +3,7 @@
 Plugin Name: Flickr Manager
 Plugin URI: http://tgardner.net/
 Description: Handles uploading, modifying images on Flickr, and insertion into posts.
-Version: 2.0.4
+Version: 2.1
 Author: Trent Gardner
 Author URI: http://tgardner.net/
 
@@ -24,10 +24,8 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */ 
 
-if(version_compare(PHP_VERSION, '4.4.0') < 0) {
-	echo "<b>ERROR: You're currently running " . PHP_VERSION . " and you must have at least PHP 4.4.x in order to use Flickr Manager!</b>";
-	return;
-} 
+if(version_compare(PHP_VERSION, '4.4.0') < 0) 
+	die("You're currently running " . PHP_VERSION . " and you must have at least PHP 4.4.x in order to use Flickr Manager!");
 
 if(class_exists('FlickrManager')) return;
 require_once(dirname(__FILE__) . "/FlickrCore.php");
@@ -39,20 +37,18 @@ class FlickrManager extends FlickrCore {
 	var $plugin_directory;
 	var $plugin_filename;
 	var $plugin_option = 'wfm-settings';
+	var $plugin_domain = 'flickr-manager';
 	
 	
 	
 	function FlickrManager() {
-		global $wpdb, $wp_version;
+		global $wpdb;
 		
 		$this->db_table = $wpdb->prefix . "flickr";
 		
-		$filename = explode("/", __FILE__);
-		if(count($filename) <= 1) $filename = explode("\\", __FILE__);
-		$this->plugin_directory = $filename[count($filename) - 2];
-		$this->plugin_filename = $filename[count($filename) - 1];
+		$this->plugin_directory = dirname(plugin_basename(__FILE__));
+		$this->plugin_filename = basename(__FILE__);
 		
-		// Thanks greg for this fix.
 		register_activation_hook( __FILE__, array(&$this, 'install') );
 		
 		add_action('admin_menu', array(&$this, 'add_menus'));
@@ -70,7 +66,11 @@ class FlickrManager extends FlickrCore {
 		add_action('media_buttons', array($this, 'addMediaButton'), 20);
 		add_action('media_upload_flickr', array($this, 'media_upload_flickr'));
         add_action('admin_head_media_upload_flickr_form', array($this, 'addMediaCss'));
-		  
+		 
+        /*
+         * Load locale settings
+         */
+        load_plugin_textdomain($this->plugin_domain, PLUGINDIR . '/' . $this->plugin_directory . '/lang');
 	}
 	
 	
@@ -127,7 +127,9 @@ class FlickrManager extends FlickrCore {
 					break;
 				
 				case 'logout':
+					
 					update_option($this->plugin_option, array());
+					$flickr_settings = new FlickrSettings();
 					
 					break;
 				
@@ -162,12 +164,12 @@ class FlickrManager extends FlickrCore {
 			<?php if($_REQUEST['action'] == 'save') : ?>
 					
 				<div id="message" class="updated fade">
-					<p><strong>Options Saved!</strong></p>
+					<p><strong><?php _e('Options Saved!', 'flickr-manager') ?></strong></p>
 				</div>
 			
 			<?php endif; ?>
 			
-			<h2>Flickr Manager Settings</h2>
+			<h2>Flickr Manager <?php _e('Settings', 'flickr-manager') ?></h2>
 			
 			<?php if(empty($token) || $auth_status['stat'] != 'ok') : ?>
 			
@@ -180,65 +182,83 @@ class FlickrManager extends FlickrCore {
 			?>
 			
 			<div align="center">
-				<h3>Step 1:</h3>
+				<h3><?php _e('Step', 'flickr-manager') ?> 1:</h3>
 				<form>
-					<input type="button" value="Authenticate" onclick="window.open('<?php echo $this->getAuthUrl($frob,'delete'); ?>')" style="background: url( images/fade-butt.png ); border: 3px double #999; border-left-color: #ccc; border-top-color: #ccc; color: #333; padding: 0.25em; font-size: 1.5em;" />
+					<input type="button" value="<?php _e('Authenticate', 'flickr-manager') ?>" onclick="window.open('<?php echo $this->getAuthUrl($frob,'delete'); ?>')" style="background: url( images/fade-butt.png ); border: 3px double #999; border-left-color: #ccc; border-top-color: #ccc; color: #333; padding: 0.25em; font-size: 1.5em;" />
 				</form>
 				
-				<h3>Step 2:</h3>
+				<h3><?php _e('Step', 'flickr-manager') ?> 2:</h3>
 				<form method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">
 					<input type="hidden" name="action" value="token" />
-					<input type="submit" name="Submit" value="<?php _e('Finish &raquo;') ?>" style="background: url( images/fade-butt.png ); border: 3px double #999; border-left-color: #ccc; border-top-color: #ccc; color: #333; padding: 0.25em; font-size: 1.5em;" />
+					<input type="submit" name="Submit" value="<?php _e('Finish &raquo;', 'flickr-manager') ?>" style="background: url( images/fade-butt.png ); border: 3px double #999; border-left-color: #ccc; border-top-color: #ccc; color: #333; padding: 0.25em; font-size: 1.5em;" />
 				</form>
 			</div>
 			
 			<?php else : ?>
 			
 			<!-- Display options -->
-			
 			<div style="text-align: center;">
 				<form method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">
 					<input type="hidden" name="action" value="logout" />
 					<p class="submit" style="text-align: center; border-top: none !important; margin-bottom: 20px !important; padding-top: 0px;">
-						<input type="submit" name="Submit" value="<?php _e('Logout &raquo;') ?>" class="button submit" style="font-size: 1.4em;" />
+						<input type="submit" name="Submit" value="<?php _e('Logout &raquo;', 'flickr-manager') ?>" class="button submit" style="font-size: 1.4em;" />
 					</p>
 				</form>
 			</div>
 			
 			<?php
 			$info = $this->call('flickr.people.getInfo',array('user_id' => $flickr_settings->getSetting('nsid')));
+			
 			$flickr_settings->saveSetting('is_pro', $info['person']['ispro']);
 			if($info['stat'] == 'ok') :
+			
+				if(intval($info['person']['iconserver']) > 0) 
+					$photo_url = "http://farm{$info['person']['iconfarm']}.static.flickr.com/{$info['person']['iconserver']}/buddyicons/{$info['person']['nsid']}.jpg";
+				else $photo_url = 'http://www.flickr.com/images/buddyicon.jpg';
 			?>
 				
-				<h3>User Information <?php 
+				<h3>
+				<?php 
+				_e('User Information', 'flickr-manager');
+				 
 				if($info['person']['ispro'] != 0) 
-					echo '<img src="' . $this->getAbsoluteUrl() . '/images/badge_pro.gif" alt="Pro" style="vertical-align: middle;" />'; 
-				?></h3>
+					echo ' <img src="' . $this->getAbsoluteUrl() . '/images/badge_pro.gif" alt="Pro" style="vertical-align: middle;" />'; 
+				?>
+				</h3>
 				
-				<table border="0">
+				<?php echo "<img src=\"$photo_url\" alt=\"You\" />"; ?>
+				
+				<table border="0" class="text-left">
 					<tr>
-						<td width="130px"><b>Username:</b></td>
+						<th width="130px" scope="row"><?php _e('Username', 'flickr-manager') ?>:</th>
 						<td><?php echo $info['person']['username']['_content']; ?></td>
 					</tr>
 					<tr>
-						<td><b>User ID:</b></td>
+						<th scope="row"><?php _e('User ID', 'flickr-manager') ?>:</th>
 						<td><?php echo $info['person']['nsid']; ?></td>
 					</tr>
 					<tr>
-						<td><b>Real Name:</b></td>
+						<th scope="row"><?php _e('Real Name', 'flickr-manager') ?>:</th>
 						<td><?php echo $info['person']['realname']['_content']; ?></td>
 					</tr>
 					<tr>
-						<td><b>Photo URL:</b></td>
-						<td><a href="<?php echo $info['person']['photosurl']['_content']; ?>"><?php echo $info['person']['photosurl']['_content']; ?></a></td>
+						<th scope="row"><?php _e('Photo URL', 'flickr-manager') ?>:</th>
+						<td>
+							<a href="<?php echo $info['person']['photosurl']['_content']; ?>">
+								<?php echo $info['person']['photosurl']['_content']; ?>
+							</a>
+						</td>
 					</tr>
 					<tr>
-						<td><b>Profile URL:</b></td>
-						<td><a href="<?php echo $info['person']['profileurl']['_content']; ?>"><?php echo $info['person']['profileurl']['_content']; ?></a></td>
+						<th scope="row"><?php _e('Profile URL', 'flickr-manager') ?>:</th>
+						<td>
+							<a href="<?php echo $info['person']['profileurl']['_content']; ?>">
+								<?php echo $info['person']['profileurl']['_content']; ?>
+							</a>
+						</td>
 					</tr>
 					<tr>
-						<td><b># Photos:</b></td>
+						<th scope="row"><?php _e('# Photos', 'flickr-manager') ?>:</th>
 						<td><?php echo $info['person']['photos']['count']['_content']; ?></td>
 					</tr>
 				</table>
@@ -272,25 +292,25 @@ class FlickrManager extends FlickrCore {
 			<form method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">
 				<input type="hidden" name="action" value="save" />
 				
-				<h3 style="margin-bottom: 0px;">Miscellaneous</h3>
+				<h3 style="margin-bottom: 0px;"><?php _e('Miscellaneous', 'flickr-manager'); ?></h3>
 				
 				<table class="form-table">
 					<tbody>
 						<tr valign="top">
 							<th scope="row">
 								<label for="wfm-legacy-support">
-									Enable legacy post support
+									<?php _e('Enable legacy panel', 'flickr-manager') ?>
 								</label>
 							</th>
 							<td>
-								<input type="checkbox" name="wfm-legacy-support" id="wfm-legacy-support" value="true" style="margin: 5px 0px;" <?php if($_REQUEST['wfm-legacy-support'] == "true") echo 'checked="checked" '; ?>/>
-								<br />Note: Wordpress 2.5 users can leave this option disabled and use the added media button.
+								<input type="checkbox" name="wfm-legacy-support" id="wfm-legacy-support" value="true" style="margin: 5px 0px;" <?php if($settings['flickr_legacy'] == "true") echo 'checked="checked" '; ?>/>
+								<br /><?php _e('Note: Wordpress &gt;=2.5 users can leave this option disabled and use the added media button.', 'flickr-manager') ?>
 							</td>
 						</tr>
 						<tr valign="top">
 							<th scope="row">
 								<label for="wfm-per_page">
-									Images per page
+									<?php _e('Images per page', 'flickr-manager') ?>
 								</label>
 							</th>
 							<td>
@@ -300,7 +320,7 @@ class FlickrManager extends FlickrCore {
 						<tr valign="top">
 							<th scope="row">
 								<label for="wfm-new_window">
-									Open Flickr pages in a new window
+									<?php _e('Open Flickr pages in a new window', 'flickr-manager') ?>
 								</label>
 							</th>
 							<td>
@@ -310,7 +330,7 @@ class FlickrManager extends FlickrCore {
 						<tr valign="top">
 							<th scope="row">
 								<label for="wfm-limit-size">
-									Limit browse image size to
+									<?php _e('Limit browse image size to', 'flickr-manager') ?>
 								</label>
 							</th>
 							<td>
@@ -324,7 +344,7 @@ class FlickrManager extends FlickrCore {
 						<tr valign="top">
 							<th scope="row">
 								<label for="wfm-upload-level">
-									User upload level
+									<?php _e('User upload level', 'flickr-manager') ?>
 								</label>
 							</th>
 							<td>
@@ -339,14 +359,14 @@ class FlickrManager extends FlickrCore {
 					</tbody>
 				</table>
 				
-				<h3 style="margin-bottom: 0px; margin-top: 30px;">Javascript Image Viewer</h3>
+				<h3 style="margin-bottom: 0px; margin-top: 30px;">Javascript <?php _e('Image Viewer', 'flickr-manager'); ?></h3>
 				
 				<table class="form-table">
 					<tbody>
 						<tr valign="top">
 							<th scope="row">
 								<label for="wfm-js-viewer">
-									Image Viewer
+									<?php _e('Image Viewer', 'flickr-manager'); ?>
 								</label>
 							</th>
 							<td>
@@ -358,7 +378,7 @@ class FlickrManager extends FlickrCore {
 						</tr>
 						<tr valign="top">
 							<th scope="row">
-								<label for="wfm-lbox_enable">Enable image viewer by default</label>
+								<label for="wfm-lbox_enable"><?php _e('Enable image viewer by default', 'flickr-manager') ?></label>
 							</th>
 							<td>
 								<input type="checkbox" name="wfm-lbox_enable" id="wfm-lbox_enable" value="true" <?php if($_REQUEST['wfm-lbox_enable'] == "true") echo 'checked="checked" '; ?>/>
@@ -366,7 +386,7 @@ class FlickrManager extends FlickrCore {
 						</tr>
 						<tr valign="top">
 							<th scope="row">
-								<label for="wfm-lbox_default">Default viewer size:</label>
+								<label for="wfm-lbox_default"><?php _e('Default image viewer size', 'flickr-manager') ?></label>
 							</th>
 							<td>
 								<select name="wfm-lbox_default" id="wfm-lbox_default">
@@ -385,19 +405,19 @@ class FlickrManager extends FlickrCore {
 					</tbody>
 				</table>
 				
-				<h3 style="margin-bottom: 0px; margin-top: 30px;">Custom Wrappings</h3>
+				<h3 style="margin-bottom: 0px; margin-top: 30px;"><?php _e('Custom Wrappings', 'flickr-manager') ?></h3>
 				
 				<table class="form-table">
 					<tbody>
 						<tr valign="top">
 							<th>
-								<label for="wfm-insert-before">Before Image</label>
+								<label for="wfm-insert-before"><?php _e('Before Image', 'flickr-manager') ?></label>
 							</th>
 							<td>
 								<textarea name="wfm-insert-before" id="wfm-insert-before" style="width: 200px; height: 100px; overflow: auto;"><?php echo $_REQUEST['wfm-insert-before']; ?></textarea>
 							</td>
 							<th>
-								<label for="wfm-insert-after">After Image</label>
+								<label for="wfm-insert-after"><?php _e('After Image', 'flickr-manager') ?></label>
 							</th>
 							<td>
 								<textarea name="wfm-insert-after" id="wfm-insert-after" style="width: 200px; height: 100px; overflow: auto;"><?php echo $_REQUEST['wfm-insert-after']; ?></textarea>
@@ -408,7 +428,7 @@ class FlickrManager extends FlickrCore {
 				
 				
 				<p class="submit">
-					<input type="submit" name="Submit" value="<?php _e('Submit') ?> &raquo;" style="font-size: 1.5em;" />
+					<input type="submit" name="Submit" value="<?php _e('Submit', 'flickr-manager') ?> &raquo;" style="font-size: 1.5em;" />
 				</p>
 				
 			</form>
@@ -515,7 +535,7 @@ class FlickrManager extends FlickrCore {
 					<label>Upload Photo:
 						<input type="file" name="uploadPhoto" id="uploadPhoto" />
 					</label>
-					<input type="submit" name="Submit" value="<?php _e('Upload &raquo;') ?>" />
+					<input type="submit" name="Submit" value="<?php _e('Upload &raquo;', 'flickr-manager') ?>" />
 					<input type="hidden" name="action" value="upload" />
 				</p>
 			</form>
@@ -536,8 +556,7 @@ class FlickrManager extends FlickrCore {
 						
 						<div align="center">
 							<img src="<?php echo $this->getPhotoUrl($photo['photo'],"medium"); ?>" alt="<?php echo $photo['photo']['title']['_content']; ?>" /><br />
-						
-						
+							
 							<form method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>" style="width: 650px;">
 								<table>
 									<tr>
@@ -762,12 +781,17 @@ class FlickrManager extends FlickrCore {
 	
 	
 	function add_admin_headers() {
+		?>
+		<style type="text/css">
+			table.text-left th {
+				text-align: left;
+			}
+		</style>
+		<?php 
+		
 		global $flickr_settings;
 		
-		$filename = explode("/", $_SERVER['REQUEST_URI']);
-		$filename = $filename[count($filename) - 1];
-		if($end = strpos($filename,"?")) $filename = substr($filename,0,$end);
-		$filename = strtolower($filename);
+		$filename = array_shift(explode('?', basename($_SERVER['REQUEST_URI'])));
 		
 		if($filename != "post.php" && $filename != "page.php" && $filename != "post-new.php" && $filename != "page-new.php") return;
 		
@@ -789,9 +813,7 @@ class FlickrManager extends FlickrCore {
 	function add_flickr_panel() {
 		global $flickr_settings;
 		
-		$legacy = $flickr_settings->getSetting('flickr_legacy');
-		
-		if($legacy == "true") : ?>
+		if($flickr_settings->getSetting('flickr_legacy') == "true") : ?>
 
 		<div class="dbx-box postbox" id="flickr-insert-widget">
 		
@@ -800,8 +822,8 @@ class FlickrManager extends FlickrCore {
 			<div id="flickr-content" class="dbx-content inside">
 			
 				<div id="flickr-menu">
-					<a href="#?faction=upload" title="Upload Photo">Upload Photo</a>
-					<a href="#?faction=browse" id="fbrowse-photos" title="Browse Photos">Browse Photos</a>
+					<a href="#?faction=upload" title="<?php _e('Upload Photo', 'flickr-manager') ?>"><?php _e('Upload Photo', 'flickr-manager') ?></a>
+					<a href="#?faction=browse" id="fbrowse-photos" title="<?php _e('Browse Photos', 'flickr-manager') ?>"><?php _e('Browse Photos', 'flickr-manager') ?></a>
 					<div id="scope-block">
 					<label><input type="radio" name="fscope" id="flickr-personal" value="Personal" checked="checked" onchange="executeLink(document.getElementById('fbrowse-photos'),'flickr-ajax');" /> Personal</label>
 					<label><input type="radio" name="fscope" id="flickr-public" value="Public" onchange="executeLink(document.getElementById('fbrowse-photos'),'flickr-ajax');" /> Public</label>

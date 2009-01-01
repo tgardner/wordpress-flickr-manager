@@ -35,20 +35,20 @@ function flickrMediaBrowse() {
 			$params = array('auth_token' => $settings['token']);
 			$auth_status = $flickr_manager->call('flickr.auth.checkToken',$params, true);
 			if($auth_status['stat'] != 'ok') {
-				echo '<h3>Error: Please authenticate through <a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$flickr_manager->plugin_directory/$flickr_manager->plugin_filename\">Options->Flickr</a></h3>";
+				echo '<h3>'. __('Error: Please authenticate through ', 'flickr-manager') .'<a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$flickr_manager->plugin_directory/$flickr_manager->plugin_filename\">Options->Flickr</a></h3>";
 				return;
 			}
 		} else {
-			echo '<h3>Error: Please authenticate through <a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$flickr_manager->plugin_directory/$flickr_manager->plugin_filename\">Options->Flickr</a></h3>";
+			echo '<h3>'. __('Error: Please authenticate through ', 'flickr-manager') .'<a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$flickr_manager->plugin_directory/$flickr_manager->plugin_filename\">Options->Flickr</a></h3>";
 			return;
 		}
 		?>
 		
 		<div id="wfm-close-block" class="right">
-			<label><input type="checkbox" name="wfm-close" id="wfm-close" value="true" checked="checked" /> Close on insert</label>
+			<label><input type="checkbox" name="wfm-close" id="wfm-close" value="true" checked="checked" /> <?php _e('Close on insert', 'flickr-manager'); ?></label>
 		</div>
 		
-		<h3 id="wfm-media-header">Browse Flickr</h3>
+		<h3 id="wfm-media-header"><?php _e('Browse Flickr', 'flickr-manager'); ?></h3>
 				
 		<div id="wfm-browse-content">
 			
@@ -70,7 +70,8 @@ function flickrMediaBrowse() {
 							'page' 		=> $_REQUEST['wfm-page']);
 			
 			if(!empty($_REQUEST['wfm-filter'])) {
-				$params = array_merge($params,array('tags' => $_REQUEST['wfm-filter'],'tag_mode' => 'all'));
+				$params = array_merge($params,array('tags' => implode(",", explode(" ", $_REQUEST['wfm-filter'])),'tag_mode' => 'all'));
+				//$params = array_merge($params,array('text' => $_REQUEST['wfm-filter']));
 			} elseif($_REQUEST['wfm-scope'] == "Public") {
 				$params = array_merge($params,array('text' => " "));
 			}
@@ -140,7 +141,7 @@ function flickrMediaBrowse() {
 			else : ?>
 			
 				<div class="error">
-					<h3>No photos found</h3>
+					<h3><?php _e('No photos found', 'flickr-manager'); ?></h3>
 				</div>
 			
 			<?php endif; ?>
@@ -149,42 +150,16 @@ function flickrMediaBrowse() {
 		<div id="wfm-dashboard">
 			
 			<span id="wfm-scope-block">
-					<label><input type="radio" name="wfm-scope" id="flickr-personal" value="Personal" checked="checked" /> Personal</label>
-					<label><input type="radio" name="wfm-scope" id="flickr-public" value="Public" /> Public</label>
+					<label><input type="radio" name="wfm-scope" id="flickr-personal" value="Personal" checked="checked" /> <?php _e('Personal', 'flickr-manager'); ?></label>
+					<label><input type="radio" name="wfm-scope" id="flickr-public" value="Public" /> <?php _e('Public', 'flickr-manager'); ?></label>
 			</span>
 		
 			<div id="wfm-navigation">
-				<div id="wfm-set-block" class="left">
-			
-				<?php if($_REQUEST['wfm-scope'] == "Personal") : ?>
-				
-				<select name="wfm-photoset" id="wfm-photoset">
-					<option value="" <?php if(empty($_REQUEST['wfm-photoset'])) echo 'selected="selected"'; ?>></option>
-							
-					<?php	
-					$photosets = $flickr_manager->call('flickr.photosets.getList', array('user_id' => $settings['nsid']), true);
-					foreach ($photosets['photosets']['photoset'] as $photoset) :
-					?>
-					
-					<option value="<?php echo $photoset['id']; ?>" <?php if($_REQUEST['wfm-photoset'] == $photoset['id']) echo 'selected="selected"'; ?>><?php echo $photoset['title']['_content']; ?></option>
-				
-					<?php endforeach; ?>
-				
-				</select> 
-				
-					<?php if(!empty($_REQUEST['wfm-photoset'])) : ?>
-					<a href="#" id="wfm-entire-set" title="Insert Set">+</a>
-					<?php endif; ?>
-					
-				<?php endif; ?>
-				
-				</div>
-				
 			
 				<?php if($_REQUEST['wfm-page'] > 1) :?>
 		
-				<a href="#?&amp;wfm-page=1" title="&laquo; First Page" >&laquo;</a>&nbsp;
-				<a href="#?&amp;wfm-page=<?php echo $_REQUEST['wfm-page'] - 1; ?>" title="&lsaquo; Previous Page">&lsaquo;</a>&nbsp;
+				<a href="#?&amp;wfm-page=1" title="&laquo; <?php _e('First Page', 'flickr-manager'); ?>" >&laquo;</a>&nbsp;
+				<a href="#?&amp;wfm-page=<?php echo $_REQUEST['wfm-page'] - 1; ?>" title="&lsaquo; <?php _e('Previous Page', 'flickr-manager'); ?>">&lsaquo;</a>&nbsp;
 				
 				<?php endif; ?>
 				
@@ -197,56 +172,71 @@ function flickrMediaBrowse() {
 				
 				<?php if($_REQUEST['wfm-page'] < $photos['photos']['pages']) :?>
 				
-				&nbsp;<a href="#?&amp;wfm-page=<?php echo $_REQUEST['wfm-page'] + 1; ?>" title="Next Page &rsaquo;">&rsaquo;</a>
-				&nbsp;<a href="#?&amp;wfm-page=<?php echo $photos['photos']['pages']; ?>" title="Last Page &raquo;">&raquo;</a>
+				&nbsp;<a href="#?&amp;wfm-page=<?php echo $_REQUEST['wfm-page'] + 1; ?>" title="<?php _e('Next Page', 'flickr-manager'); ?> &rsaquo;">&rsaquo;</a>
+				&nbsp;<a href="#?&amp;wfm-page=<?php echo $photos['photos']['pages']; ?>" title="<?php _e('Last Page', 'flickr-manager'); ?> &raquo;">&raquo;</a>
 				
 				<?php endif; ?>
 			</div>
 			
-			<h3>Options</h3>
-			<div class="right">
-				<label>Insert with JS viewer: <input type="checkbox" id="wfm-lightbox" name="wfm-lightbox" value="true" <?php if($_REQUEST['wfm-lightbox'] == "true") echo 'checked="checked"'; ?>/></label>
-				<div id="wfm-lbsize-block"><label>JS viewer size: <select name="wfm-lbsize" id="wfm-lbsize">
-				<?php
-				$lightbox_sizes = array("small","medium","large");
-				$lightbox_default = (empty($settings['lightbox_default'])) ? "medium" : $settings['lightbox_default'];
-				if($settings['is_pro'] == '1') $lightbox_sizes = array_merge($lightbox_sizes, array("original"));
-				foreach ($lightbox_sizes as $lightbox_size) {
-					echo "<option value=\"flickr-$lightbox_size\"";
-					if($lightbox_default == $lightbox_size) echo ' selected="selected"';
-					echo ">" . ucfirst($lightbox_size) . "</option>\n";
-				}
-				?>
-				</select></label></div>
-			</div>
-			
-			<p><?php 
-			$sizes = array("square", 'thumbnail', 'small', 'medium', 'large'); 
-			if($settings['is_pro'] == '1') $sizes = array_merge($sizes, array('original'));
-			?><label>Image Size: <select name="wfm-size" id="wfm-size">
-			
-				<?php
-				foreach ($sizes as $v) {
-					echo '<option value="' . strtolower($v) . '" ';
-					if($v == $_REQUEST['wfm-size']) echo 'selected="selected" ';
-					echo '>' . ucfirst($v) . "</option>\n";
-				}
-				?>
+			<div id="wfm-options" style="clear: both;">
+				<fieldset class="jsViewer">
+					<legend> <?php _e('Javascript Viewer', 'flickr-manager'); ?> </legend>
+					<label><?php _e('Enable', 'flickr-manager'); ?>: <input type="checkbox" id="wfm-lightbox" name="wfm-lightbox" value="true" <?php if($_REQUEST['wfm-lightbox'] == "true") echo 'checked="checked"'; ?>/></label>
+					<label> <?php _e('Size', 'flickr-manager'); ?>: <select name="wfm-lbsize" id="wfm-lbsize">
+					<?php
+					$lightbox_sizes = array("small","medium","large");
+					$lightbox_default = (empty($settings['lightbox_default'])) ? "medium" : $settings['lightbox_default'];
+					if($settings['is_pro'] == '1') $lightbox_sizes = array_merge($lightbox_sizes, array("original"));
+					foreach ($lightbox_sizes as $lightbox_size) {
+						echo "<option value=\"flickr-$lightbox_size\"";
+						if($lightbox_default == $lightbox_size) echo ' selected="selected"';
+						echo ">" . ucfirst($lightbox_size) . "</option>\n";
+					}
+					?>
+					</select></label>
+					
+					<div style="margin: 5px 0;">
+						<label><?php _e('Set', 'flickr-manager'); ?>: <input type="checkbox" name="wfm-insert-set" id="wfm-insert-set" value="true" <?php if($_REQUEST['wfm-insert-set'] == "true") echo 'checked="checked"'; ?> /></label> 
+						<label id="wfm-set-name-label"><?php _e('Name', 'flickr-manager'); ?>: <input type="text" name="wfm-set-name" id="wfm-set-name" value="<?php echo $_REQUEST['wfm-set-name']; ?>" style="width: 70px; padding: 2px;" /></label>
+					</div>
+				</fieldset>
 				
-			</select></label></p>
-			
-			<label><input type="checkbox" name="wfm-insert-set" id="wfm-insert-set" value="true" <?php if($_REQUEST['wfm-insert-set'] == "true") echo 'checked="checked"'; ?> /> Insert into a set </label>
-			<label id="wfm-set-name-label">with the name: <input type="text" name="wfm-set-name" id="wfm-set-name" value="<?php echo $_REQUEST['wfm-set-name']; ?>" style="width: 70px; padding: 2px;" /></label>
-			
-			<input type="hidden" name="wfm-insert-before" id="wfm-insert-before" value="<?php 
-				$settings['before_wrap'] = str_replace("\n", "", $settings['before_wrap']);
-				echo rawurlencode($settings['before_wrap']);
-			?>" />
-			
-			<input type="hidden" name="wfm-insert-after" id="wfm-insert-after" value="<?php 
-				$settings['after_wrap'] = str_replace("\n", "", $settings['after_wrap']);
-				echo rawurlencode($settings['after_wrap']);
-			?>" />
+				<fieldset id="wfm-imageset" class="jsViewer" style="float: left; height: auto;">
+					<legend> <?php _e('Image Set', 'flickr-manager'); ?> </legend>
+					
+					<div id="wfm-set-block" >
+					
+						<select name="wfm-photoset" id="wfm-photoset">
+							<option value="" <?php if(empty($_REQUEST['wfm-photoset'])) echo 'selected="selected"'; ?>></option>
+									
+							<?php	
+							$photosets = $flickr_manager->call('flickr.photosets.getList', array('user_id' => $settings['nsid']), true);
+							foreach ($photosets['photosets']['photoset'] as $photoset) :
+							?>
+							
+							<option value="<?php echo $photoset['id']; ?>" <?php if($_REQUEST['wfm-photoset'] == $photoset['id']) echo 'selected="selected"'; ?>><?php echo $photoset['title']['_content']; ?></option>
+						
+							<?php endforeach; ?>
+						
+						</select> 
+					
+						<a href="#" id="wfm-entire-set" title="<?php _e('Insert Set', 'flickr-manager'); ?>">+</a>
+					
+					</div>
+				</fieldset>
+				
+				<input type="hidden" name="wfm-insert-before" id="wfm-insert-before" value="<?php 
+					$settings['before_wrap'] = str_replace("\n", "", $settings['before_wrap']);
+					echo rawurlencode($settings['before_wrap']);
+				?>" />
+				
+				<input type="hidden" name="wfm-insert-after" id="wfm-insert-after" value="<?php 
+					$settings['after_wrap'] = str_replace("\n", "", $settings['after_wrap']);
+					echo rawurlencode($settings['after_wrap']);
+				?>" />
+				
+				<input type="hidden" name="wfm-auth_token" id="wfm-auth_token" value=<?php echo $flickr_settings->getSetting("token"); ?> />
+			</div>
 			
 		</div>
 		

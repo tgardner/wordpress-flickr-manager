@@ -1,0 +1,226 @@
+# Wordpress Flickr Manager - I18N Template
+# This file is put in the public domain.
+# Trent Gardner <trent.gardner@gmail.com>, 2009.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/wordpress-flickr-manager\n"
+"POT-Creation-Date: 2009-01-01 11:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: FlickrManager.php:167
+msgid "Options Saved!"
+msgstr ""
+
+#: FlickrManager.php:172
+msgid "Settings"
+msgstr ""
+
+#: FlickrManager.php:185 FlickrManager.php:190
+msgid "Step"
+msgstr ""
+
+#: FlickrManager.php:187
+msgid "Authenticate"
+msgstr ""
+
+#: FlickrManager.php:193
+msgid "Finish &raquo;"
+msgstr ""
+
+#: FlickrManager.php:204
+msgid "Logout &raquo;"
+msgstr ""
+
+#: FlickrManager.php:222
+msgid "User Information"
+msgstr ""
+
+#: FlickrManager.php:233
+msgid "Username"
+msgstr ""
+
+#: FlickrManager.php:237
+msgid "User ID"
+msgstr ""
+
+#: FlickrManager.php:241
+msgid "Real Name"
+msgstr ""
+
+#: FlickrManager.php:245
+msgid "Photo URL"
+msgstr ""
+
+#: FlickrManager.php:253
+msgid "Profile URL"
+msgstr ""
+
+#: FlickrManager.php:261
+msgid "# Photos"
+msgstr ""
+
+#: FlickrManager.php:295
+msgid "Miscellaneous"
+msgstr ""
+
+#: FlickrManager.php:302
+msgid "Enable legacy panel"
+msgstr ""
+
+#: FlickrManager.php:307
+msgid ""
+"Note: Wordpress &gt;=2.5 users can leave this option disabled and use the "
+"added media button."
+msgstr ""
+
+#: FlickrManager.php:313
+msgid "Images per page"
+msgstr ""
+
+#: FlickrManager.php:323
+msgid "Open Flickr pages in a new window"
+msgstr ""
+
+#: FlickrManager.php:333
+msgid "Limit browse image size to"
+msgstr ""
+
+#: FlickrManager.php:347
+msgid "User upload level"
+msgstr ""
+
+#: FlickrManager.php:362 FlickrManager.php:369
+msgid "Image Viewer"
+msgstr ""
+
+#: FlickrManager.php:381
+msgid "Enable image viewer by default"
+msgstr ""
+
+#: FlickrManager.php:389
+msgid "Default image viewer size"
+msgstr ""
+
+#: FlickrManager.php:408
+msgid "Custom Wrappings"
+msgstr ""
+
+#: FlickrManager.php:414
+msgid "Before Image"
+msgstr ""
+
+#: FlickrManager.php:420
+msgid "After Image"
+msgstr ""
+
+#: FlickrManager.php:431
+msgid "Submit"
+msgstr ""
+
+#: FlickrManager.php:538 upload.php:82
+msgid "Upload &raquo;"
+msgstr ""
+
+#: FlickrManager.php:825 upload.php:59 upload.php:64
+msgid "Upload Photo"
+msgstr ""
+
+#: FlickrManager.php:826
+msgid "Browse Photos"
+msgstr ""
+
+#: MediaPanel.php:38 MediaPanel.php:42
+msgid "Error: Please authenticate through "
+msgstr ""
+
+#: MediaPanel.php:48
+msgid "Close on insert"
+msgstr ""
+
+#: MediaPanel.php:51
+msgid "Browse Flickr"
+msgstr ""
+
+#: MediaPanel.php:144
+msgid "No photos found"
+msgstr ""
+
+#: MediaPanel.php:153
+msgid "Personal"
+msgstr ""
+
+#: MediaPanel.php:154
+msgid "Public"
+msgstr ""
+
+#: MediaPanel.php:161
+msgid "First Page"
+msgstr ""
+
+#: MediaPanel.php:162
+msgid "Previous Page"
+msgstr ""
+
+#: MediaPanel.php:175
+msgid "Next Page"
+msgstr ""
+
+#: MediaPanel.php:176
+msgid "Last Page"
+msgstr ""
+
+#: MediaPanel.php:183
+msgid "Javascript Viewer"
+msgstr ""
+
+#: MediaPanel.php:184
+msgid "Enable"
+msgstr ""
+
+#: MediaPanel.php:185
+msgid "Size"
+msgstr ""
+
+#: MediaPanel.php:199
+msgid "Set"
+msgstr ""
+
+#: MediaPanel.php:200
+msgid "Name"
+msgstr ""
+
+#: MediaPanel.php:205
+msgid "Image Set"
+msgstr ""
+
+#: MediaPanel.php:223
+msgid "Insert Set"
+msgstr ""
+
+#: upload.php:55
+msgid "Image successfully uploaded"
+msgstr ""
+
+#: upload.php:68
+msgid "Title"
+msgstr ""
+
+#: upload.php:72
+msgid "Tags"
+msgstr ""
+
+#: upload.php:73
+msgid "Space separated list"
+msgstr ""
+
+#: upload.php:76
+msgid "Description"
+msgstr ""

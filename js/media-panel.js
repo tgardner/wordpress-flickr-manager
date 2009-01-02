@@ -24,12 +24,10 @@ jQuery(document).ready(function() {
 		
 		var size = jQuery("select[@name='wfm-size']").val();
 		var id = jQuery("select[@name='wfm-photoset']").val();
-		var lightbox = "";
+		var lightbox = "false";
 		
 		if(jQuery("#wfm-lightbox").is(":checked")) {
 			lightbox = "true";
-		} else {
-			lightbox = "false";
 		}
 		
 		var setHTML = "[imgset:" + id + "," + size + "," + lightbox + "]";

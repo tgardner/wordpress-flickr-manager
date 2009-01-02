@@ -205,7 +205,7 @@ var prepareImages = function() {
 							if(size.label == link.html()) {
 								var rel = ' rel="flickr-mgr" ';
 								if(jQuery("#wfm-insert-set").is(":checked")) {
-									var rel = ' rel="flickr-mgr[' + jQuery("#wfm-set-name").val() + ']" ';
+									rel = ' rel="flickr-mgr[' + jQuery("#wfm-set-name").val() + ']" ';
 								}
 								
 								var imgHTML = "";

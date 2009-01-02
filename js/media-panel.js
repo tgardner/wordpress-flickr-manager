@@ -202,12 +202,17 @@ var prepareImages = function() {
 					link.attr("href", size.source);
 					
 					link.click(function() {
+						
 						jQuery.each(photo_sizes, function(i,size){
 							if(size.label == link.html()) {
+								var rel = ' rel="flickr-mgr" ';
+								if(jQuery("#wfm-insert-set").is(":checked")) {
+									var rel = ' rel="flickr-mgr[' + jQuery("#wfm-set-name").val() + ']" ';
+								}
 								
 								var imgHTML = "";
 								if(jQuery("#wfm-lightbox").is(":checked")) {
-									imgHTML = '<a href="http://www.flickr.com/photos/' + owner.split("|")[0] + "/" + id + '/" title="' + title + '"' + target + 'class="flickr-image">';
+									imgHTML = '<a href="http://www.flickr.com/photos/' + owner.split("|")[0] + "/" + id + '/" title="' + title + '"' + target + 'class="flickr-image"' + rel + '>';
 									imgHTML = imgHTML + '<img src="' + link.attr("href") + '" alt="' + title + '" class="' + fsize + '" ' + longdesc + ' /></a>';
 								} else {
 									imgHTML = '<a href="http://www.flickr.com/photos/' + owner.split("|")[0] + "/" + id + '/" title="' + title + '"' + target + 'class="flickr-image">';

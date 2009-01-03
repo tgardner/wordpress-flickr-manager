@@ -1,0 +1,228 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: flickr manager\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/wordpress-flickr-manager\n"
+"POT-Creation-Date: 2009-01-01 11:00+0000\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Alejandro Urrutia <alejandro@theindependentproject.com>\n"
+"Language-Team: theindependentproject.com <alejandro@theindependentproject.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Spanish\n"
+"X-Poedit-Country: URUGUAY\n"
+
+#: FlickrManager.php:167
+msgid "Options Saved!"
+msgstr "¡Opciones salvadas!"
+
+#: FlickrManager.php:172
+msgid "Settings"
+msgstr "Configuración"
+
+#: FlickrManager.php:185
+#: FlickrManager.php:190
+msgid "Step"
+msgstr "Paso"
+
+#: FlickrManager.php:187
+msgid "Authenticate"
+msgstr "Identificarse"
+
+#: FlickrManager.php:193
+msgid "Finish &raquo;"
+msgstr "Terminar &raquo;"
+
+#: FlickrManager.php:204
+msgid "Logout &raquo;"
+msgstr "Desconectarse &raquo;"
+
+#: FlickrManager.php:222
+msgid "User Information"
+msgstr "Información de usuario"
+
+#: FlickrManager.php:233
+msgid "Username"
+msgstr "Usuario"
+
+#: FlickrManager.php:237
+msgid "User ID"
+msgstr "ID de usuario"
+
+#: FlickrManager.php:241
+msgid "Real Name"
+msgstr "Nombre Real"
+
+#: FlickrManager.php:245
+msgid "Photo URL"
+msgstr "URL de la foto"
+
+#: FlickrManager.php:253
+msgid "Profile URL"
+msgstr "URL del perfil"
+
+#: FlickrManager.php:261
+msgid "# Photos"
+msgstr "# de fotos"
+
+#: FlickrManager.php:295
+msgid "Miscellaneous"
+msgstr "Miscelánea"
+
+#: FlickrManager.php:302
+msgid "Enable legacy panel"
+msgstr "Habilitar panel legal"
+
+#: FlickrManager.php:307
+msgid "Note: Wordpress &gt;=2.5 users can leave this option disabled and use the added media button."
+msgstr "Nota: usuarios de Wordpress &gt;=2.5 pueden dejar ésta opción deshabilitada y usar el botón de agregar medios."
+
+#: FlickrManager.php:313
+msgid "Images per page"
+msgstr "Imágenes por página"
+
+#: FlickrManager.php:323
+msgid "Open Flickr pages in a new window"
+msgstr "Abrir páginas de Flickr en una nueva ventana"
+
+#: FlickrManager.php:333
+msgid "Limit browse image size to"
+msgstr "Limitar el tamaño de navegación de imagen a"
+
+#: FlickrManager.php:347
+msgid "User upload level"
+msgstr "Nivel de usuario para subir"
+
+#: FlickrManager.php:362
+#: FlickrManager.php:369
+msgid "Image Viewer"
+msgstr "Visor de Imagen"
+
+#: FlickrManager.php:381
+msgid "Enable image viewer by default"
+msgstr "habilitar visor de imagen por defecto"
+
+#: FlickrManager.php:389
+msgid "Default image viewer size"
+msgstr "tamaño por defecto del visor de imagen"
+
+#: FlickrManager.php:408
+msgid "Custom Wrappings"
+msgstr "Envoltorios personalizados"
+
+#: FlickrManager.php:414
+msgid "Before Image"
+msgstr "Antes de la Imagen"
+
+#: FlickrManager.php:420
+msgid "After Image"
+msgstr "Después de la Imagen"
+
+#: FlickrManager.php:431
+msgid "Submit"
+msgstr "Enviar"
+
+#: FlickrManager.php:538
+#: upload.php:82
+msgid "Upload &raquo;"
+msgstr "Subir &raquo;"
+
+#: FlickrManager.php:825
+#: upload.php:59
+#: upload.php:64
+msgid "Upload Photo"
+msgstr "Subir Foto"
+
+#: FlickrManager.php:826
+msgid "Browse Photos"
+msgstr "Navegar Fotos"
+
+#: MediaPanel.php:38
+#: MediaPanel.php:42
+msgid "Error: Please authenticate through "
+msgstr "Error: Por favor, autenticar a través de"
+
+#: MediaPanel.php:48
+msgid "Close on insert"
+msgstr "Cerrar al insertar"
+
+#: MediaPanel.php:51
+msgid "Browse Flickr"
+msgstr "Navegar en Flickr"
+
+#: MediaPanel.php:144
+msgid "No photos found"
+msgstr "No se han encontrado fotos"
+
+#: MediaPanel.php:153
+msgid "Personal"
+msgstr "Personal"
+
+#: MediaPanel.php:154
+msgid "Public"
+msgstr "Publica"
+
+#: MediaPanel.php:161
+msgid "First Page"
+msgstr "Primera Página"
+
+#: MediaPanel.php:162
+msgid "Previous Page"
+msgstr "Página Anterior"
+
+#: MediaPanel.php:175
+msgid "Next Page"
+msgstr "Página Siguiente"
+
+#: MediaPanel.php:176
+msgid "Last Page"
+msgstr "Última página"
+
+#: MediaPanel.php:183
+msgid "Javascript Viewer"
+msgstr "Visor de Javascript"
+
+#: MediaPanel.php:184
+msgid "Enable"
+msgstr "Habilitar"
+
+#: MediaPanel.php:185
+msgid "Size"
+msgstr "tamaño"
+
+#: MediaPanel.php:199
+msgid "Set"
+msgstr "Set"
+
+#: MediaPanel.php:200
+msgid "Name"
+msgstr "Nombre"
+
+#: MediaPanel.php:205
+msgid "Image Set"
+msgstr "Set de Imágenes"
+
+#: MediaPanel.php:223
+msgid "Insert Set"
+msgstr "Insertar Set"
+
+#: upload.php:55
+msgid "Image successfully uploaded"
+msgstr "Imagen subida exitosamente"
+
+#: upload.php:68
+msgid "Title"
+msgstr "Título"
+
+#: upload.php:72
+msgid "Tags"
+msgstr "Etiquetas"
+
+#: upload.php:73
+msgid "Space separated list"
+msgstr "Lista separada por espacios"
+
+#: upload.php:76
+msgid "Description"
+msgstr "Descripción"
+

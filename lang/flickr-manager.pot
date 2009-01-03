@@ -1,4 +1,4 @@
-# Wordpress Flickr Manager - I18N Template
+# Flickr Manager language template
 # This file is put in the public domain.
 # Trent Gardner <trent.gardner@gmail.com>, 2009.
 #
@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/wordpress-flickr-manager\n"
-"POT-Creation-Date: 2009-01-01 11:00+0000\n"
+"POT-Creation-Date: 2009-01-03 05:09+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -125,20 +125,110 @@ msgstr ""
 msgid "Submit"
 msgstr ""
 
+#: FlickrManager.php:450 FlickrManager.php:455 MediaPanel.php:38
+#: MediaPanel.php:42
+msgid "Error: Please authenticate through "
+msgstr ""
+
+#: FlickrManager.php:529
+msgid "Image Management"
+msgstr ""
+
+#: FlickrManager.php:532 FlickrManager.php:535 FlickrManager.php:825
+#: upload.php:59 upload.php:64
+msgid "Upload Photo"
+msgstr ""
+
 #: FlickrManager.php:538 upload.php:82
 msgid "Upload &raquo;"
 msgstr ""
 
-#: FlickrManager.php:825 upload.php:59 upload.php:64
-msgid "Upload Photo"
+#: FlickrManager.php:552
+msgid "Modify Photo"
+msgstr ""
+
+#: FlickrManager.php:553
+msgid "&laquo; Back"
+msgstr ""
+
+#: FlickrManager.php:563 FlickrManager.php:616 upload.php:68
+msgid "Title"
+msgstr ""
+
+#: FlickrManager.php:567
+msgid "Permissions"
+msgstr ""
+
+#: FlickrManager.php:569 MediaPanel.php:154
+msgid "Public"
+msgstr ""
+
+#: FlickrManager.php:570
+msgid "Friends"
+msgstr ""
+
+#: FlickrManager.php:571
+msgid "Family"
+msgstr ""
+
+#: FlickrManager.php:575 upload.php:72
+msgid "Tags"
+msgstr ""
+
+#: FlickrManager.php:583 upload.php:76
+msgid "Description"
+msgstr ""
+
+#: FlickrManager.php:606
+msgid "Manage Photos"
+msgstr ""
+
+#: FlickrManager.php:607
+msgid "Add images to your posts with"
+msgstr ""
+
+#: FlickrManager.php:615
+msgid "Thumbnail"
+msgstr ""
+
+#: FlickrManager.php:617
+msgid "Action"
+msgstr ""
+
+#: FlickrManager.php:633
+msgid "View"
+msgstr ""
+
+#: FlickrManager.php:634
+msgid "Modify"
+msgstr ""
+
+#: FlickrManager.php:635
+msgid "Are you sure you want to delete this?"
+msgstr ""
+
+#: FlickrManager.php:635
+msgid "Delete"
+msgstr ""
+
+#: FlickrManager.php:647
+msgid "&laquo; Previous"
+msgstr ""
+
+#: FlickrManager.php:666
+msgid "Next &raquo;"
 msgstr ""
 
 #: FlickrManager.php:826
 msgid "Browse Photos"
 msgstr ""
 
-#: MediaPanel.php:38 MediaPanel.php:42
-msgid "Error: Please authenticate through "
+#: FlickrManager.php:855
+msgid "Add Flickr Photo"
+msgstr ""
+
+#: FlickrManager.php:869
+msgid "Flickr Photos"
 msgstr ""
 
 #: MediaPanel.php:48
@@ -155,10 +245,6 @@ msgstr ""
 
 #: MediaPanel.php:153
 msgid "Personal"
-msgstr ""
-
-#: MediaPanel.php:154
-msgid "Public"
 msgstr ""
 
 #: MediaPanel.php:161
@@ -209,18 +295,6 @@ msgstr ""
 msgid "Image successfully uploaded"
 msgstr ""
 
-#: upload.php:68
-msgid "Title"
-msgstr ""
-
-#: upload.php:72
-msgid "Tags"
-msgstr ""
-
 #: upload.php:73
 msgid "Space separated list"
-msgstr ""
-
-#: upload.php:76
-msgid "Description"
 msgstr ""

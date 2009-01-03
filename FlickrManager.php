@@ -447,12 +447,12 @@ class FlickrManager extends FlickrCore {
 		global $flickr_settings;
 		$token = $flickr_settings->getSetting('token');
 		if(empty($token)) {
-			echo '<div class="wrap"><h3>Error: Please authenticate through <a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$this->plugin_directory/$this->plugin_filename\">Options->Flickr</a></h3></div>\n";
+			echo '<div class="wrap"><h3>' . __('Error: Please authenticate through ', 'flickr-manager') . '<a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$this->plugin_directory/$this->plugin_filename\">Options->Flickr</a></h3></div>\n";
 			return;
 		} else {
 			$auth_status = $this->call('flickr.auth.checkToken', array('auth_token' => $token), true);
 			if($auth_status['stat'] != 'ok') {
-				echo '<div class="wrap"><h3>Error: Please authenticate through <a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$this->plugin_directory/$this->plugin_filename\">Options->Flickr</a></h3></div>\n";
+				echo '<div class="wrap"><h3>' . __('Error: Please authenticate through ', 'flickr-manager') . '<a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$this->plugin_directory/$this->plugin_filename\">Options->Flickr</a></h3></div>\n";
 				return;
 			}
 		}
@@ -526,13 +526,13 @@ class FlickrManager extends FlickrCore {
 		
 		<div class="wrap">
 	
-			<h2>Image Management</h2>
+			<h2><?php _e('Image Management', 'flickr-manager'); ?></h2>
 			
 			<form enctype="multipart/form-data" method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>" style="padding: 0px 20px;">
-				<h3>Upload Photo</h3>
+				<h3><?php _e('Upload Photo', 'flickr-manager'); ?></h3>
 				
 				<p class="submit" style="text-align: left;">
-					<label>Upload Photo:
+					<label><?php _e('Upload Photo', 'flickr-manager'); ?>:
 						<input type="file" name="uploadPhoto" id="uploadPhoto" />
 					</label>
 					<input type="submit" name="Submit" value="<?php _e('Upload &raquo;', 'flickr-manager') ?>" />
@@ -549,8 +549,8 @@ class FlickrManager extends FlickrCore {
 						$photo = $this->call('flickr.photos.getInfo',$params, true);
 						?>
 						
-						<h3>Modify Photo</h3>
-						<a href="<?php echo "{$_SERVER['PHP_SELF']}?page={$_REQUEST['page']}"; ?>" >&laquo; Back</a><br /><br />
+						<h3><?php _e('Modify Photo', 'flickr-manager'); ?></h3>
+						<a href="<?php echo "{$_SERVER['PHP_SELF']}?page={$_REQUEST['page']}"; ?>" ><?php _e('&laquo; Back', 'flickr-manager'); ?></a><br /><br />
 						
 						<!-- Begin modification of inidividual photo -->
 						
@@ -560,19 +560,19 @@ class FlickrManager extends FlickrCore {
 							<form method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>" style="width: 650px;">
 								<table>
 									<tr>
-										<td width="130px"><label for="ftitle">Title:</label></td>
+										<td width="130px"><label for="ftitle"><?php _e('Title', 'flickr-manager'); ?>:</label></td>
 										<td><input type="text" name="ftitle" id="ftitle" value="<?php echo $photo['photo']['title']['_content']; ?>" style="width:300px;" /></td>
 									</tr>
 									<tr>
-										<td>Permissions:</td>
+										<td><?php _e('Permissions', 'flickr-manager'); ?>:</td>
 										<td>
-										<label><input name="public" type="checkbox" id="public" value="1" <?php if($photo['photo']['visibility']['ispublic'] == '1') echo 'checked="checked" '; ?>/> Public</label>
-										<label><input name="friend" type="checkbox" id="friend" value="1" <?php if($photo['photo']['visibility']['isfriend'] == '1') echo 'checked="checked" '; ?>/> Friends</label>
-										<label><input name="family" type="checkbox" id="family" value="1" <?php if($photo['photo']['visibility']['isfamily'] == '1') echo 'checked="checked" '; ?>/> Family</label>
+										<label><input name="public" type="checkbox" id="public" value="1" <?php if($photo['photo']['visibility']['ispublic'] == '1') echo 'checked="checked" '; ?>/> <?php _e('Public', 'flickr-manager'); ?></label>
+										<label><input name="friend" type="checkbox" id="friend" value="1" <?php if($photo['photo']['visibility']['isfriend'] == '1') echo 'checked="checked" '; ?>/> <?php _e('Friends', 'flickr-manager'); ?></label>
+										<label><input name="family" type="checkbox" id="family" value="1" <?php if($photo['photo']['visibility']['isfamily'] == '1') echo 'checked="checked" '; ?>/> <?php _e('Family', 'flickr-manager'); ?></label>
 										</td>
 									</tr>
 									<tr>
-										<td><label for="tags">Tags:</label></td>
+										<td><label for="tags"><?php _e('Tags', 'flickr-manager'); ?>:</label></td>
 										<td><input type="text" name="tags" id="tags" value="<?php 
 										foreach($photo['photo']['tags']['tag'] as $tag) {
 											echo "{$tag['raw']} ";
@@ -580,7 +580,7 @@ class FlickrManager extends FlickrCore {
 										?>" style="width:500px;" /></td>
 									</tr>
 									<tr>
-										<td valign="top"><label for="description">Description:</label></td>
+										<td valign="top"><label for="description"><?php _e('Description', 'flickr-manager'); ?>:</label></td>
 										<td><textarea name="description" id="description" style="width:500px; height:100px;"><?php echo $photo['photo']['description']['_content']; ?></textarea></td>
 									</tr>
 								</table>
@@ -603,8 +603,8 @@ class FlickrManager extends FlickrCore {
 						$pages = $photos['photos']['pages'];
 						?>
 						
-						<h3>Manage Photos:</h3>
-						<p><b>Add images to your posts with [img:&lt;flickr-id&gt;,&lt;size&gt;]</b></p>
+						<h3><?php _e('Manage Photos', 'flickr-manager'); ?>:</h3>
+						<p><b><?php _e('Add images to your posts with', 'flickr-manager'); ?> [img:&lt;flickr-id&gt;,&lt;size&gt;]</b></p>
 						<!-- Default management section -->
 						
 						<div style="text-align: center;">
@@ -612,9 +612,9 @@ class FlickrManager extends FlickrCore {
 							<thead>
 								<tr>
 									<th width="130px" style="text-align: center;">ID</th>
-									<th width="100px" style="text-align: center;">Thumbnail</th>
-									<th width="200px" style="text-align: center;">Title</th>
-									<th width="170px" style="text-align: center;">Action</th>
+									<th width="100px" style="text-align: center;"><?php _e('Thumbnail', 'flickr-manager'); ?></th>
+									<th width="200px" style="text-align: center;"><?php _e('Title', 'flickr-manager'); ?></th>
+									<th width="170px" style="text-align: center;"><?php _e('Action', 'flickr-manager'); ?></th>
 								</tr>
 							</thead>
 							
@@ -630,9 +630,9 @@ class FlickrManager extends FlickrCore {
 								<td align="center"><?php echo $photo['id']; ?></td>
 								<td align="center"><img src="<?php echo $this->getPhotoUrl($photo,"square"); ?>" alt="<?php echo $photo['title']; ?>" /></td>
 								<td align="center"><?php echo $photo['title']; ?></td>
-								<td align="center"><a href="http://www.flickr.com/photos/<?php echo "$nsid/{$photo['id']}/"; ?>" target="_blank">View</a> / 
-								<a href="<?php echo "{$_SERVER['PHP_SELF']}?page={$_REQUEST['page']}&amp;action=edit&amp;pid={$photo['id']}"; ?>">Modify</a> / 
-								<a href="<?php echo "{$_SERVER['PHP_SELF']}?page={$_REQUEST['page']}&amp;action=delete&amp;pid={$photo['id']}"; ?>" onclick="return confirm('Are you sure you want to delete this?');">Delete</a>
+								<td align="center"><a href="http://www.flickr.com/photos/<?php echo "$nsid/{$photo['id']}/"; ?>" target="_blank"><?php _e('View', 'flickr-manager'); ?></a> / 
+								<a href="<?php echo "{$_SERVER['PHP_SELF']}?page={$_REQUEST['page']}&amp;action=edit&amp;pid={$photo['id']}"; ?>"><?php _e('Modify', 'flickr-manager'); ?></a> / 
+								<a href="<?php echo "{$_SERVER['PHP_SELF']}?page={$_REQUEST['page']}&amp;action=delete&amp;pid={$photo['id']}"; ?>" onclick="return confirm('<?php _e('Are you sure you want to delete this?', 'flickr-manager'); ?>');"><?php _e('Delete', 'flickr-manager'); ?></a>
 								</td>
 							</tr>
 							
@@ -644,7 +644,7 @@ class FlickrManager extends FlickrCore {
 						
 						<?php if (intval($page) > 1) : ?>
 				
-							<a href="<?php echo "{$_SERVER['PHP_SELF']}?page={$_REQUEST['page']}&amp;fpage=".(intval($page) - 1)."&amp;fper_page=$per_page"; ?>">&laquo; Previous</a>
+							<a href="<?php echo "{$_SERVER['PHP_SELF']}?page={$_REQUEST['page']}&amp;fpage=".(intval($page) - 1)."&amp;fper_page=$per_page"; ?>"><?php _e('&laquo; Previous', 'flickr-manager'); ?></a>
 							
 						<?php endif; ?>
 						
@@ -663,7 +663,7 @@ class FlickrManager extends FlickrCore {
 						
 						<?php if (intval($page) < $pages) : ?>
 						
-							<a href="<?php echo "{$_SERVER['PHP_SELF']}?page={$_REQUEST['page']}&amp;fpage=".(intval($page) + 1)."&amp;fper_page=$per_page"; ?>">Next &raquo;</a>
+							<a href="<?php echo "{$_SERVER['PHP_SELF']}?page={$_REQUEST['page']}&amp;fpage=".(intval($page) + 1)."&amp;fper_page=$per_page"; ?>"><?php _e('Next &raquo;', 'flickr-manager'); ?></a>
 							
 						<?php endif; ?>
 						
@@ -852,7 +852,7 @@ class FlickrManager extends FlickrCore {
         $media_upload_iframe_src = "media-upload.php?post_id=$uploading_iframe_ID";
 		
         $flickr_upload_iframe_src = apply_filters('media_flickr_iframe_src', "$media_upload_iframe_src&amp;type=flickr");
-        $flickr_title = 'Add Flickr Photo';
+        $flickr_title = __('Add Flickr Photo', 'flickr-manager');
         
         $link_markup = "<a href=\"{$flickr_upload_iframe_src}&amp;tab=flickr&amp;TB_iframe=true&amp;height=500&amp;width=640\" class=\"thickbox\" title=\"$flickr_title\"><img src=\"".$this->getAbsoluteUrl()."/images/flickr-media.gif\" alt=\"$flickr_title\" /></a>\n";
     	
@@ -866,7 +866,7 @@ class FlickrManager extends FlickrCore {
 	
 	function modifyMediaTab($tabs) {
         return array(
-            'flickr' =>  'Flickr Photos'
+            'flickr' =>  __('Flickr Photos', 'flickr-manager')
         );
     }
     

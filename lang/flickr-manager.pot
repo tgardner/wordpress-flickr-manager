@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/wordpress-flickr-manager\n"
-"POT-Creation-Date: 2009-01-03 05:09+0000\n"
+"POT-Creation-Date: 2009-01-04 12:09+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,7 +20,7 @@ msgid "Options Saved!"
 msgstr ""
 
 #: FlickrManager.php:172
-msgid "Settings"
+msgid "Flickr Manager Settings"
 msgstr ""
 
 #: FlickrManager.php:185 FlickrManager.php:190
@@ -97,7 +97,11 @@ msgstr ""
 msgid "User upload level"
 msgstr ""
 
-#: FlickrManager.php:362 FlickrManager.php:369
+#: FlickrManager.php:362
+msgid "Javascript Image Viewer"
+msgstr ""
+
+#: FlickrManager.php:369
 msgid "Image Viewer"
 msgstr ""
 

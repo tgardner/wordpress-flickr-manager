@@ -169,7 +169,7 @@ class FlickrManager extends FlickrCore {
 			
 			<?php endif; ?>
 			
-			<h2>Flickr Manager <?php _e('Settings', 'flickr-manager') ?></h2>
+			<h2><?php _e('Flickr Manager Settings', 'flickr-manager') ?></h2>
 			
 			<?php if(empty($token) || $auth_status['stat'] != 'ok') : ?>
 			
@@ -359,7 +359,7 @@ class FlickrManager extends FlickrCore {
 					</tbody>
 				</table>
 				
-				<h3 style="margin-bottom: 0px; margin-top: 30px;">Javascript <?php _e('Image Viewer', 'flickr-manager'); ?></h3>
+				<h3 style="margin-bottom: 0px; margin-top: 30px;"><?php _e('Javascript Image Viewer', 'flickr-manager'); ?></h3>
 				
 				<table class="form-table">
 					<tbody>

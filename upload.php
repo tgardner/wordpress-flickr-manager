@@ -1,5 +1,4 @@
 <?php
-ini_set('display_errors',1);
 require_once("../../../wp-config.php");
 require_once("../../../wp-includes/wp-db.php");
 require_once("../../../wp-includes/pluggable.php");
@@ -37,13 +36,22 @@ if(isset($_FILES['uploadPhoto'])) {
 	}
 }
 ?>
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//dtd xhtml 1.0 strict//EN" "http://www.w3.org/TR/xhtml1/dtd/xhtml1-strict.dtd">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"> 
 
 <head>
 	<link rel='stylesheet' href='<?php echo get_option('siteurl'); ?>/wp-admin/css/global.css' type='text/css' />
 	<link rel='stylesheet' href='<?php echo get_option('siteurl'); ?>/wp-admin/wp-admin.css' type='text/css' />
 	<link rel="stylesheet" href="<?php echo $flickr_manager->getAbsoluteUrl(); ?>/css/admin_style.css" type="text/css" />
 	<link rel="stylesheet" href="<?php echo get_option('siteurl'); ?>/wp-admin/css/colors-fresh.css?version=2.5" type="text/css" />
+	
+	<style type="text/css">
+		html {
+			background: #fff; 
+			margin: 0px;
+			padding: 0px;
+		}
+	</style>
 </head>
 
 <body class="wp-admin">
@@ -78,10 +86,10 @@ if(isset($_FILES['uploadPhoto'])) {
 					</tr>
 				</tbody>
 			</table>
-			<p class="submit" style="text-align: right;">
+			<div style="width: auto;">
 				<input type="submit" name="Submit" class="button submit" value="<?php _e('Upload &raquo;') ?>" />
 				<input type="hidden" name="faction" id="flickr-action" value="<?php echo $_REQUEST['faction']; ?>" />
-			</p>
+			</div>
 			
 		</form>
 	</div>

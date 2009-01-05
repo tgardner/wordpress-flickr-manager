@@ -65,12 +65,12 @@ class FlickrManager extends FlickrCore {
 		 */
 		add_action('media_buttons', array($this, 'addMediaButton'), 20);
 		add_action('media_upload_flickr', array($this, 'media_upload_flickr'));
-        add_action('admin_head_media_upload_flickr_form', array($this, 'addMediaCss'));
-		 
-        /*
-         * Load locale settings
-         */
-        load_plugin_textdomain($this->plugin_domain, PLUGINDIR . '/' . $this->plugin_directory . '/lang');
+		add_action('admin_head_media_upload_flickr_form', array($this, 'addMediaCss'));
+			 
+		/*
+		 * Load locale settings
+		 */
+		load_plugin_textdomain($this->plugin_domain, PLUGINDIR . '/' . $this->plugin_directory . '/lang');
 	}
 	
 	
@@ -336,8 +336,8 @@ class FlickrManager extends FlickrCore {
 							<td>
 								<input type="hidden" name="wfm-limit" id="wfm-limit" value="true" />
 								<select name="wfm-limit-size" id="wfm-limit-size">
-									<option value="square" <?php if($_REQUEST['wfm-limit-size'] == "square") echo 'selected="selected"'; ?>>Square</option>
-									<option value="thumbnail" <?php if($_REQUEST['wfm-limit-size'] == "thumbnail") echo 'selected="selected"'; ?>>Thumbnail</option>
+									<option value="square" <?php if($_REQUEST['wfm-limit-size'] == "square") echo 'selected="selected"'; ?>><?php _e('Square', 'flickr-manager'); ?></option>
+									<option value="thumbnail" <?php if($_REQUEST['wfm-limit-size'] == "thumbnail") echo 'selected="selected"'; ?>><?php _e('Thumbnail', 'flickr-manager'); ?></option>
 								</select>
 							</td>
 						</tr>
@@ -349,10 +349,10 @@ class FlickrManager extends FlickrCore {
 							</th>
 							<td>
 								<select name="wfm-upload-level" id="wfm-upload-level">
-									<option value="10" <?php if($_REQUEST['wfm-upload-level'] == "10") echo 'selected="selected"'; ?>>Administrator</option>
-									<option value="6" <?php if($_REQUEST['wfm-upload-level'] == "6") echo 'selected="selected"'; ?>>Editor</option>
-									<option value="4" <?php if($_REQUEST['wfm-upload-level'] == "4") echo 'selected="selected"'; ?>>Author</option>
-									<option value="2" <?php if($_REQUEST['wfm-upload-level'] == "2") echo 'selected="selected"'; ?>>Contributer</option>
+									<option value="10" <?php if($_REQUEST['wfm-upload-level'] == "10") echo 'selected="selected"'; ?>><?php _e('Administrator', 'flickr-manager'); ?></option>
+									<option value="6" <?php if($_REQUEST['wfm-upload-level'] == "6") echo 'selected="selected"'; ?>><?php _e('Editor', 'flickr-manager'); ?></option>
+									<option value="4" <?php if($_REQUEST['wfm-upload-level'] == "4") echo 'selected="selected"'; ?>><?php _e('Author', 'flickr-manager'); ?></option>
+									<option value="2" <?php if($_REQUEST['wfm-upload-level'] == "2") echo 'selected="selected"'; ?>><?php _e('Contributer', 'flickr-manager'); ?></option>
 								</select>
 							</td>
 						</tr>
@@ -391,10 +391,15 @@ class FlickrManager extends FlickrCore {
 							<td>
 								<select name="wfm-lbox_default" id="wfm-lbox_default">
 								<?php
-								$sizes = array("small","medium","large");
-								if($settings['is_pro'] == '1') $sizes = array_merge($sizes, array('original'));
-								foreach ($sizes as $size) {
-									echo "<option value=\"$size\"";
+								$sizes = array(	"small" => __('Small', 'flickr-manager'), 
+										"medium" => __('Medium', 'flickr-manager'), 
+										"large" => __('Large', 'flickr-manager')
+										);
+										
+								if($settings['is_pro'] == '1') $sizes = array_merge($sizes, array('original' => __("Original", 'flickr-manager')));
+								
+								foreach ($sizes as $k => $size) {
+									echo "<option value=\"$k\"";
 									if($_REQUEST['wfm-lbox_default'] == $size) echo ' selected="selected" ';
 									echo ">" . ucfirst($size) . "</option>\n";
 								}
@@ -848,15 +853,15 @@ class FlickrManager extends FlickrCore {
 	 ********************************************************************/
 	function addMediaButton() {
 		global $post_ID, $temp_ID;
-        $uploading_iframe_ID = (int) (0 == $post_ID ? $temp_ID : $post_ID);
-        $media_upload_iframe_src = "media-upload.php?post_id=$uploading_iframe_ID";
-		
-        $flickr_upload_iframe_src = apply_filters('media_flickr_iframe_src', "$media_upload_iframe_src&amp;type=flickr");
-        $flickr_title = __('Add Flickr Photo', 'flickr-manager');
-        
-        $link_markup = "<a href=\"{$flickr_upload_iframe_src}&amp;tab=flickr&amp;TB_iframe=true&amp;height=500&amp;width=640\" class=\"thickbox\" title=\"$flickr_title\"><img src=\"".$this->getAbsoluteUrl()."/images/flickr-media.gif\" alt=\"$flickr_title\" /></a>\n";
-    	
-        echo $link_markup;
+		$uploading_iframe_ID = (int) (0 == $post_ID ? $temp_ID : $post_ID);
+		$media_upload_iframe_src = "media-upload.php?post_id=$uploading_iframe_ID";
+
+		$flickr_upload_iframe_src = apply_filters('media_flickr_iframe_src', "$media_upload_iframe_src&amp;type=flickr");
+		$flickr_title = __('Add Flickr Photo', 'flickr-manager');
+
+		$link_markup = "<a href=\"{$flickr_upload_iframe_src}&amp;tab=flickr&amp;TB_iframe=true&amp;height=500&amp;width=640\" class=\"thickbox\" title=\"$flickr_title\"><img src=\"".$this->getAbsoluteUrl()."/images/flickr-media.gif\" alt=\"$flickr_title\" /></a>\n";
+
+		echo $link_markup;
         
 	}
 	
@@ -876,7 +881,7 @@ class FlickrManager extends FlickrCore {
     	?>
     	
     	<link rel="stylesheet" href="<?php echo $this->getAbsoluteUrl(); ?>/css/media_panel.css" type="text/css" media="screen" />
-    	<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/media-panel.js"></script>
+    	<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/media-panel.php"></script>
     
     <?php }
     

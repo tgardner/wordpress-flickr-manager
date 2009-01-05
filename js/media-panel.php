@@ -1,3 +1,9 @@
+<?php
+header('Content-Type: text/javascript');
+header('Cache-Control: no-cache');
+header('Pragma: no-cache');
+require_once("../../../../wp-config.php");
+?>
 
 jQuery(document).ready(function() {
 	
@@ -76,7 +82,7 @@ jQuery(document).ready(function() {
 		var url = jQuery(this).addClass("current").attr("href");
 		var loadingImage = jQuery("#wfm-ajax-url").attr("value") + "/images/loading.gif";
 		
-		jQuery("#flickr-form").html(jQuery('<img src="' + loadingImage + '" alt="loading..." />'));
+		jQuery("#flickr-form").html(jQuery('<img src="' + loadingImage + '" alt="<?php _e('Loading...', 'flickr-manager'); ?>" />'));
 		jQuery("#flickr-form").load(url);
 		
 		return false;
@@ -96,7 +102,7 @@ jQuery(document).ready(function() {
 function insertTabs() {
 	var uploadTab = jQuery('<li id="tab-flickr-upload"></li>')
 	
-	var uploadLink = jQuery('<a id="wfm-upload-link">Flickr Upload</a>')
+	var uploadLink = jQuery('<a id="wfm-upload-link"><?php _e('Flickr Upload', 'flickr-manager'); ?></a>')
 	uploadLink.attr("href", jQuery("#wfm-ajax-url").attr("value") + "/flickr-ajax.php?faction=media-upload");
 	
 	uploadTab.append(uploadLink);
@@ -178,7 +184,7 @@ var prepareImages = function() {
 				"left" : e.pageX
 		};
 		
-		var loadingImage = jQuery('<img alt="Loading..." class="loadingImage" />');
+		var loadingImage = jQuery('<img alt="<?php _e('Loading...', 'flickr-manager'); ?>" class="loadingImage" />');
 		loadingImage.attr("src", jQuery("#wfm-ajax-url").attr("value") + "/images/loading.gif");
 		loadingImage.css(listCSS);
 		loadingImage.css("width", "auto");

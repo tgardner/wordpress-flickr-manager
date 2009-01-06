@@ -6,9 +6,8 @@ global $flickr_manager, $flickr_settings;
 
 get_currentuserinfo();
 $upload_level = $flickr_settings->getSetting("upload_level");
-if(intval($userdata->user_level) < intval($upload_level)) {
-	die("You do not have permission to upload photos to this stream, you may adjust this in the settings page!");	
-}
+if(intval($userdata->user_level) < intval($upload_level)) 
+	die(__('You do not have permission to upload photos to this stream, you may adjust this in the settings page!', 'flickr-manager'));
 
 if(isset($_FILES['uploadPhoto'])) {
 	$token = $flickr_settings->getSetting('token');
@@ -87,7 +86,7 @@ if(isset($_FILES['uploadPhoto'])) {
 				</tbody>
 			</table>
 			<div style="width: auto;">
-				<input type="submit" name="Submit" class="button submit" value="<?php _e('Upload &raquo;') ?>" />
+				<input type="submit" name="Submit" class="button submit" value="<?php _e('Upload &raquo;', 'flickr-manager'); ?>" />
 				<input type="hidden" name="faction" id="flickr-action" value="<?php echo $_REQUEST['faction']; ?>" />
 			</div>
 			

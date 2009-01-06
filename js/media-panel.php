@@ -26,29 +26,43 @@ jQuery(document).ready(function() {
 		}
 	});
 	
-	jQuery("#wfm-entire-set").click(function() {
+	jQuery("#wfm-entire-set").click(function(e) {
 		
-		var size = jQuery("select[@name='wfm-size']").val();
-		var id = jQuery("select[@name='wfm-photoset']").val();
-		var lightbox = "false";
+		var wrapper = jQuery('<div class="sizePicker"><a href="#" title="Close" class="closeLink">x</a></div>');
+		var list = jQuery('<ul><li><a href="#">Square</a></li><li><a href="#">Thumbnail</a></li></ul>');
+		list.append(jQuery('<li><a href="#">Small</a></li><li><a href="#">Medium</a></li>'));
+		wrapper.append(list);
 		
-		if(jQuery("#wfm-lightbox").is(":checked")) {
-			lightbox = "true";
-		}
+		var listCSS = {
+				"position" : "absolute",
+				"width" : "100px",
+				"border" : "1px solid #ccc",
+				"background" : "#fff",
+				"top" : e.pageY,
+				"left" : e.pageX
+		};
+		wrapper.css(listCSS);
+		jQuery("body").append(wrapper);
 		
-		var setHTML = "[imgset:" + id + "," + size + "," + lightbox + "]";
+		jQuery('div.sizePicker>a.closeLink').click(function() {
+			jQuery("div.sizePicker,img.loadingImage").remove().end();
+			return false;
+		});
 		
-		if(jQuery("#wfm-close").is(":checked")) {
-			top.send_to_editor(setHTML);
-		} else {
-			var win = window.opener ? window.opener : window.dialogArguments;
-			if ( !win ) win = top;
-			tinyMCE = win.tinyMCE;
-			if ( typeof tinyMCE != 'undefined' && tinyMCE.getInstanceById('content') ) {
-				tinyMCE.selectedInstance.getWin().focus();
-				tinyMCE.execCommand('mceInsertContent', false, setHTML);
-			} else if (win.edInsertContent) win.edInsertContent(win.edCanvas, setHTML);
-		}
+		jQuery('div.sizePicker>ul>li>a').click(function() {
+			
+			var id = jQuery("select[@name='wfm-photoset']").val();
+			var size = jQuery(this).html().toLowerCase();
+			
+			var lightbox = "false";
+			if(jQuery("#wfm-lightbox").is(":checked")) lightbox = "true";
+			
+			var setHTML = "[imgset:" + id + "," + size + "," + lightbox + "]";
+			sendToEditor(setHTML);
+			jQuery("div.sizePicker,img.loadingImage").remove().end();
+			
+			return false;
+		});
 		
 		return false;
 	});
@@ -234,17 +248,7 @@ var prepareImages = function() {
 									imgHTML = imgHTML + wrapAfter;
 								}
 								
-								if(jQuery("#wfm-close").is(":checked")) {
-									top.send_to_editor(imgHTML);
-								} else {
-									var win = window.opener ? window.opener : window.dialogArguments;
-									if ( !win ) win = top;
-									tinyMCE = win.tinyMCE;
-									if ( typeof tinyMCE != 'undefined' && tinyMCE.getInstanceById('content') ) {
-										tinyMCE.selectedInstance.getWin().focus();
-										tinyMCE.execCommand('mceInsertContent', false, imgHTML);
-									} else if (win.edInsertContent) win.edInsertContent(win.edCanvas, imgHTML);
-								}
+								sendToEditor(imgHTML);
 								
 								jQuery("div.sizePicker").remove().end();
 								
@@ -301,6 +305,28 @@ function appendParameters(url) {
 	return url;
 }
 
+function sendToEditor(html) {
+	if(jQuery("#wfm-close").is(":checked")) {
+		top.send_to_editor(html);
+	} else {
+		var win = window.opener ? window.opener : window.dialogArguments;
+		if ( !win ) win = top;
+		tinyMCE = win.tinyMCE;
+		var edCanvas = document.getElementById('content');
+		
+		if ( typeof tinyMCE != 'undefined' && ( ed = tinyMCE.activeEditor ) && !ed.isHidden() ) {
+			ed.focus();
+			if (tinyMCE.isIE)
+				ed.selection.moveToBookmark(tinyMCE.EditorManager.activeEditor.windowManager.bookmark);
+	
+			ed.execCommand('mceInsertContent', false, html);
+		} else if ( typeof edInsertContent == 'function' ) {
+			edInsertContent(edCanvas, html);
+		} else {
+			jQuery( edCanvas ).val( jQuery( edCanvas ).val() + html );
+		}
+	}
+}
 
 /**
  * jQuery MD5 hash algorithm function

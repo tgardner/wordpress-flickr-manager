@@ -168,7 +168,7 @@ function flickrMediaBrowse() {
 				<input type="hidden" name="wfm-size" id="wfm-size" value="<?php echo $_REQUEST['wfm-size']; ?>" />
 				<input type="hidden" name="wfm-filter-old" id="wfm-filter-old" value="<?php echo $_REQUEST['wfm-filter']; ?>" />
 				<input type="hidden" name="wfm-blank" id="wfm-blank" value="<?php echo $settings['new_window']; ?>" />
-				<input type="submit" class="button" name="button" value="Search" id="wfm-filter-submit" />
+				<input type="submit" class="button" name="button" value="<?php _e('Search', 'flickr-manager'); ?>" id="wfm-filter-submit" />
 				
 				<?php if($_REQUEST['wfm-page'] < $photos['photos']['pages']) :?>
 				

@@ -400,7 +400,7 @@ class FlickrManager extends FlickrCore {
 								
 								foreach ($sizes as $k => $size) {
 									echo "<option value=\"$k\"";
-									if($_REQUEST['wfm-lbox_default'] == $size) echo ' selected="selected" ';
+									if($_REQUEST['wfm-lbox_default'] == $k) echo ' selected="selected" ';
 									echo ">" . ucfirst($size) . "</option>\n";
 								}
 								?>

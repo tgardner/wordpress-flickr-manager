@@ -1,10 +1,10 @@
 === WordPress Flickr Manager ===
 Contributors: tgardner
 Donate link: http://tgardner.net/
-Tags: flickr, images, post, admin, ajax, plugin
+Tags: flickr, images
 Requires at least: 2.3
 Tested up to: 2.7
-Stable tag: 2.1
+Stable tag: 2.1.1
 
 Handles uploading, modifying images on Flickr, and insertion into posts.
 

@@ -4,12 +4,6 @@
 .highslide-active-anchor img {
 	visibility: hidden;
 }
-.highslide img {
-	border: 2px solid gray;
-}
-.highslide:hover img {
-	border: 2px solid white;
-}
 
 .highslide-wrapper {
 	background: white;

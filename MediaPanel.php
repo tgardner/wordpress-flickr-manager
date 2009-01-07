@@ -184,13 +184,18 @@ function flickrMediaBrowse() {
 					<label><?php _e('Enable', 'flickr-manager'); ?>: <input type="checkbox" id="wfm-lightbox" name="wfm-lightbox" value="true" <?php if($_REQUEST['wfm-lightbox'] == "true") echo 'checked="checked"'; ?>/></label>
 					<label> <?php _e('Size', 'flickr-manager'); ?>: <select name="wfm-lbsize" id="wfm-lbsize">
 					<?php
-					$lightbox_sizes = array("small","medium","large");
+					$lightbox_sizes = array(	"small" => __('Small', 'flickr-manager'), 
+												"medium" => __('Medium', 'flickr-manager'), 
+												"large" => __('Large', 'flickr-manager')
+											);
+											
 					$lightbox_default = (empty($settings['lightbox_default'])) ? "medium" : $settings['lightbox_default'];
-					if($settings['is_pro'] == '1') $lightbox_sizes = array_merge($lightbox_sizes, array("original"));
-					foreach ($lightbox_sizes as $lightbox_size) {
-						echo "<option value=\"flickr-$lightbox_size\"";
-						if($lightbox_default == $lightbox_size) echo ' selected="selected"';
-						echo ">" . ucfirst($lightbox_size) . "</option>\n";
+					if($settings['is_pro'] == '1') $lightbox_sizes = array_merge($lightbox_sizes, array('original' => __("Original", 'flickr-manager')));
+					
+					foreach ($lightbox_sizes as $k => $size) {
+						echo "<option value=\"$k\"";
+						if($lightbox_default == $k) echo ' selected="selected" ';
+						echo ">" . ucfirst($size) . "</option>\n";
 					}
 					?>
 					</select></label>

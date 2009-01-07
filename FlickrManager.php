@@ -3,7 +3,7 @@
 Plugin Name: Flickr Manager
 Plugin URI: http://tgardner.net/
 Description: Handles uploading, modifying images on Flickr, and insertion into posts.
-Version: 2.1
+Version: 2.1.1
 Author: Trent Gardner
 Author URI: http://tgardner.net/
 
@@ -148,6 +148,7 @@ class FlickrManager extends FlickrCore {
 					$flickr_settings->saveSetting('before_wrap', $_REQUEST['wfm-insert-before']);
 					$flickr_settings->saveSetting('after_wrap', $_REQUEST['wfm-insert-after']);
 					$flickr_settings->saveSetting('upload_level', $_REQUEST['wfm-upload-level']);
+					$flickr_settings->saveSetting('flickr_link', $_REQUEST['wfm-flickr_link']);
 					
 					break;
 				
@@ -287,6 +288,7 @@ class FlickrManager extends FlickrCore {
 			
 			$_REQUEST['wfm-insert-before'] = $settings['before_wrap'];
 			$_REQUEST['wfm-insert-after'] = $settings['after_wrap'];
+			$_REQUEST['wfm-flickr_link'] = $settings['flickr_link'];
 			?>
 			
 			<form method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">
@@ -405,6 +407,14 @@ class FlickrManager extends FlickrCore {
 								}
 								?>
 								</select>
+							</td>
+						</tr>
+						<tr valign="top">
+							<th scope="row">
+								<label for="wfm-flickr_link"><?php _e('Include Flickr link in caption', 'flickr-manager') ?></label>
+							</th>
+							<td>
+								<input type="checkbox" name="wfm-flickr_link" id="wfm-flickr_link" value="true" <?php if($_REQUEST['wfm-flickr_link'] == "true") echo 'checked="checked" '; ?>/>
 							</td>
 						</tr>
 					</tbody>

@@ -313,7 +313,7 @@ function sendToEditor(html) {
 		var win = window.opener ? window.opener : window.dialogArguments;
 		if ( !win ) win = top;
 		tinyMCE = win.tinyMCE;
-		var edCanvas = document.getElementById('content');
+		var edCanvas = win.document.getElementById('content');
 		
 		if ( typeof tinyMCE != 'undefined' && ( ed = tinyMCE.activeEditor ) && !ed.isHidden() ) {
 			ed.focus();

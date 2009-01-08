@@ -101,7 +101,7 @@ function displayBrowse() {
 			
 		<?php foreach ($photos['photos']['photo'] as $photo) : ?>
 
-		<div class="flickr-img" id="flickr-<?php echo $photo['id']; ?>">
+		<div class="flickr-img <?php echo strtolower($fscope); ?>" id="flickr-<?php echo $photo['id']; ?>">
 		
 			<?php 
 			if($fscope == "Personal" && !empty($_REQUEST['fphotoset'])) $photo['owner'] = $owner; 

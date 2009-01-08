@@ -1,10 +1,13 @@
 .flickr-img {
 	float: left;
-	width: 100px;
+	width: 80px;
 	text-align: center;
 	height: 130px;
-	margin: 0px 5px;
-	margin-bottom: 10px;
+	overflow: hidden;
+}
+
+.flickr-img.personal {
+	height: 80px !important;
 }
 
 #wfm-browse-content {
@@ -12,7 +15,6 @@
 	min-height: 280px;
 	height: auto !important;
 	height: 280px;
-	width: 550px;
 	margin: 0px auto;
 }
 
@@ -67,8 +69,8 @@ div.sizePicker ul li {
 }
 
 div.sizePicker ul li:hover {
-	background: #ffccaa;
-	font-weight: bold;	
+	background: #ff9;
+	font-weight: normal;	
 }
 
 div.sizePicker a.closeLink {

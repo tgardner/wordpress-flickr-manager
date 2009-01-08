@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */ 
 
 if(version_compare(PHP_VERSION, '4.4.0') < 0) 
-	die("You're currently running " . PHP_VERSION . " and you must have at least PHP 4.4.x in order to use Flickr Manager!");
+	die(sprintf(__('You are currently running %s and you must have at least PHP 4.4.x in order to use Flickr Manager!', 'flickr-manager'), PHP_VERSION));
 
 if(class_exists('FlickrManager')) return;
 require_once(dirname(__FILE__) . "/FlickrCore.php");
@@ -329,7 +329,7 @@ class FlickrManager extends FlickrCore {
 								<input type="checkbox" name="wfm-new_window" id="wfm-new_window" value="true" style="margin: 5px 0px;" <?php if($_REQUEST['wfm-new_window'] == "true") echo 'checked="checked" '; ?>/>
 							</td>
 						</tr>
-						<tr valign="top">
+						<!-- <tr valign="top">
 							<th scope="row">
 								<label for="wfm-limit-size">
 									<?php _e('Limit browse image size to', 'flickr-manager') ?>
@@ -342,7 +342,7 @@ class FlickrManager extends FlickrCore {
 									<option value="thumbnail" <?php if($_REQUEST['wfm-limit-size'] == "thumbnail") echo 'selected="selected"'; ?>><?php _e('Thumbnail', 'flickr-manager'); ?></option>
 								</select>
 							</td>
-						</tr>
+						</tr> -->
 						<tr valign="top">
 							<th scope="row">
 								<label for="wfm-upload-level">

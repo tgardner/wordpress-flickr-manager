@@ -191,7 +191,7 @@ var prepareImages = function() {
 		
 		var listCSS = {
 				"position" : "absolute",
-				"width" : "100px",
+				"float" : "left",
 				"border" : "1px solid #ccc",
 				"background" : "#fff",
 				"top" : e.pageY,
@@ -216,13 +216,14 @@ var prepareImages = function() {
 				jQuery.each(photo_sizes, function(i,size){
 					var li = jQuery("<li/>");
 					var link = jQuery("<a></a>");
-					link.html(size.label);
+					link.html(size.label + ' (' + size.width + 'x' + size.height + ')');
 					link.attr("href", size.source);
+					link.attr("title", size.label);
 					
 					link.click(function() {
 						
 						jQuery.each(photo_sizes, function(i,size){
-							if(size.label == link.html()) {
+							if(size.label == link.attr("title")) {
 								var rel = ' rel="flickr-mgr" ';
 								if(jQuery("#wfm-insert-set").is(":checked")) {
 									rel = ' rel="flickr-mgr[' + jQuery("#wfm-set-name").val() + ']" ';
@@ -231,10 +232,10 @@ var prepareImages = function() {
 								var imgHTML = "";
 								if(jQuery("#wfm-lightbox").is(":checked")) {
 									imgHTML = '<a href="http://www.flickr.com/photos/' + owner.split("|")[0] + "/" + id + '/" title="' + title + '"' + target + 'class="flickr-image"' + rel + '>';
-									imgHTML = imgHTML + '<img src="' + link.attr("href") + '" alt="' + title + '" class="' + fsize + '" ' + longdesc + ' /></a>';
+									imgHTML = imgHTML + '<img src="' + link.attr('href') + '" alt="' + title + '" class="' + fsize + '" ' + longdesc + ' /></a>';
 								} else {
 									imgHTML = '<a href="http://www.flickr.com/photos/' + owner.split("|")[0] + "/" + id + '/" title="' + title + '"' + target + 'class="flickr-image">';
-									imgHTML = imgHTML + '<img src="' + link.attr("href") + '" alt="' + title + '" /></a>';
+									imgHTML = imgHTML + '<img src="' + link.attr('href') + '" alt="' + title + '" /></a>';
 								}
 								
 								if(license.attr("href")) {

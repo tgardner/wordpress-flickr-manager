@@ -60,9 +60,9 @@ function flickrMediaBrowse() {
 			$_REQUEST['wfm-size'] = (!empty($_REQUEST['wfm-size'])) ? $_REQUEST['wfm-size'] : "thumbnail";
 			$_REQUEST['wfm-scope'] = (!empty($_REQUEST['wfm-scope'])) ? $_REQUEST['wfm-scope'] : "Personal";
 			
-			$size = ($settings['browse_check'] == "true") ? $settings['browse_size'] : $_REQUEST['wfm-size'];
+			//$size = ($settings['browse_check'] == "true") ? $settings['browse_size'] : $_REQUEST['wfm-size'];
+			$size = 'square';
 			$lightbox_default = ($settings['lightbox_default']) ? $settings['lightbox_default'] : "medium";
-			
 			
 			// Request Photos
 			$params = array('extras'	=> 'original_format,license,owner_name',
@@ -115,7 +115,7 @@ function flickrMediaBrowse() {
 					$photo['owner'] = $owner;
 			?>
 			
-				<div class="flickr-img" id="flickr-<?php echo $photo['id']; ?>">
+				<div class="flickr-img <?php echo strtolower($_REQUEST['wfm-scope']); ?>" id="flickr-<?php echo $photo['id']; ?>">
 				
 					<img src="<?php echo $flickr_manager->getPhotoUrl($photo,$size); ?>" alt="<?php echo htmlspecialchars($photo['title']); ?>" <?php 
 						if($flickr_settings->getSetting('is_pro') == '1') echo 'longdesc="' . $flickr_manager->getPhotoUrl($photo, 'original') . '"';

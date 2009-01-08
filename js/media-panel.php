@@ -264,6 +264,11 @@ var prepareImages = function() {
 				
 				jQuery("body").append(wrapper);
 				wrapper.css(listCSS);
+				var minWidth = 135;
+				if(parseInt(wrapper.css('left').match(/\d+/)) + minWidth > jQuery("body").width()) {
+					wrapper.css('width', minWidth);
+					wrapper.css('left', parseInt(wrapper.css('left').match(/\d+/)) - minWidth);
+				}
 				
 				jQuery('div.sizePicker>a.closeLink').click(function() {
 					jQuery("div.sizePicker,img.loadingImage").remove().end();

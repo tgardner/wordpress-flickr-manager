@@ -1,0 +1,381 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: flickr manager\n"
+"Report-Msgid-Bugs-To: http://wordpress.org/tag/wordpress-flickr-manager\n"
+"POT-Creation-Date: 2009-01-07 02:22+0000\n"
+"PO-Revision-Date: \n"
+"Last-Translator: camelwoo <camelwoo@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+
+#: FlickrManager.php:168
+msgid "Options Saved!"
+msgstr "设置已保存！"
+
+#: FlickrManager.php:173
+msgid "Flickr Manager Settings"
+msgstr "Flickr Manager 设置"
+
+#: FlickrManager.php:186
+#: FlickrManager.php:191
+msgid "Step"
+msgstr "步骤"
+
+#: FlickrManager.php:188
+msgid "Authenticate"
+msgstr "认证"
+
+#: FlickrManager.php:194
+msgid "Finish &raquo;"
+msgstr "完成 &raquo;"
+
+#: FlickrManager.php:205
+msgid "Logout &raquo;"
+msgstr "登出 &raquo;"
+
+#: FlickrManager.php:223
+msgid "User Information"
+msgstr "用户信息"
+
+#: FlickrManager.php:234
+msgid "Username"
+msgstr "用户名"
+
+#: FlickrManager.php:238
+msgid "User ID"
+msgstr "用户ID"
+
+#: FlickrManager.php:242
+msgid "Real Name"
+msgstr "真实姓名"
+
+#: FlickrManager.php:246
+msgid "Photo URL"
+msgstr "照片URL"
+
+#: FlickrManager.php:254
+msgid "Profile URL"
+msgstr "个人档案URL"
+
+#: FlickrManager.php:262
+msgid "# Photos"
+msgstr "# 照片"
+
+#: FlickrManager.php:297
+msgid "Miscellaneous"
+msgstr "杂项"
+
+#: FlickrManager.php:304
+msgid "Enable legacy panel"
+msgstr "使用传统面板"
+
+#: FlickrManager.php:309
+msgid "Note: Wordpress &gt;=2.5 users can leave this option disabled and use the added media button."
+msgstr "注意：Wordpress 2.5 及以上版本的用户可以禁用此项，使用“添加媒体”按钮。"
+
+#: FlickrManager.php:315
+msgid "Images per page"
+msgstr "每页照片数量"
+
+#: FlickrManager.php:325
+msgid "Open Flickr pages in a new window"
+msgstr "在新的窗口中打开 Flickr 页面"
+
+#: FlickrManager.php:335
+msgid "Limit browse image size to"
+msgstr "限制浏览照片的尺寸为"
+
+#: FlickrManager.php:341
+msgid "Square"
+msgstr "方块"
+
+#: FlickrManager.php:342
+#: FlickrManager.php:630
+msgid "Thumbnail"
+msgstr "缩略图"
+
+#: FlickrManager.php:349
+msgid "User upload level"
+msgstr "用户上传级别"
+
+#: FlickrManager.php:354
+msgid "Administrator"
+msgstr "管理员"
+
+#: FlickrManager.php:355
+msgid "Editor"
+msgstr "编辑"
+
+#: FlickrManager.php:356
+msgid "Author"
+msgstr "作者"
+
+#: FlickrManager.php:357
+msgid "Contributer"
+msgstr "投搞人"
+
+#: FlickrManager.php:364
+msgid "Javascript Image Viewer"
+msgstr "Javascript 图片浏览器"
+
+#: FlickrManager.php:371
+msgid "Image Viewer"
+msgstr "图片浏览器"
+
+#: FlickrManager.php:383
+msgid "Enable image viewer by default"
+msgstr "默认启用图片浏览器"
+
+#: FlickrManager.php:391
+msgid "Default image viewer size"
+msgstr "图片浏览器的默认尺寸"
+
+#: FlickrManager.php:396
+#: MediaPanel.php:187
+msgid "Small"
+msgstr "小"
+
+#: FlickrManager.php:397
+#: MediaPanel.php:188
+msgid "Medium"
+msgstr "中"
+
+#: FlickrManager.php:398
+#: MediaPanel.php:189
+msgid "Large"
+msgstr "大"
+
+#: FlickrManager.php:401
+#: MediaPanel.php:193
+msgid "Original"
+msgstr "原始大小"
+
+#: FlickrManager.php:414
+msgid "Include Flickr link in caption"
+msgstr "在标题中包含 Flickr 链接"
+
+#: FlickrManager.php:423
+msgid "Custom Wrappings"
+msgstr "自定义包装"
+
+#: FlickrManager.php:429
+msgid "Before Image"
+msgstr "图片之前"
+
+#: FlickrManager.php:435
+msgid "After Image"
+msgstr "图片之后"
+
+#: FlickrManager.php:446
+msgid "Submit"
+msgstr "提交"
+
+#: FlickrManager.php:465
+#: FlickrManager.php:470
+#: MediaPanel.php:38
+#: MediaPanel.php:42
+msgid "Error: Please authenticate through "
+msgstr "错误：请通过认证"
+
+#: FlickrManager.php:544
+msgid "Image Management"
+msgstr "图片管理"
+
+#: FlickrManager.php:547
+#: FlickrManager.php:550
+#: FlickrManager.php:840
+#: upload.php:66
+#: upload.php:71
+msgid "Upload Photo"
+msgstr "上传照片"
+
+#: FlickrManager.php:553
+#: upload.php:89
+msgid "Upload &raquo;"
+msgstr "上传 &raquo;"
+
+#: FlickrManager.php:567
+msgid "Modify Photo"
+msgstr "编辑照片"
+
+#: FlickrManager.php:568
+msgid "&laquo; Back"
+msgstr "&laquo; 返回"
+
+#: FlickrManager.php:578
+#: FlickrManager.php:631
+#: upload.php:75
+msgid "Title"
+msgstr "标题"
+
+#: FlickrManager.php:582
+msgid "Permissions"
+msgstr "权限"
+
+#: FlickrManager.php:584
+#: MediaPanel.php:154
+msgid "Public"
+msgstr "公开"
+
+#: FlickrManager.php:585
+msgid "Friends"
+msgstr "好友"
+
+#: FlickrManager.php:586
+msgid "Family"
+msgstr "家庭"
+
+#: FlickrManager.php:590
+#: upload.php:79
+msgid "Tags"
+msgstr "标签"
+
+#: FlickrManager.php:598
+#: upload.php:83
+msgid "Description"
+msgstr "描述"
+
+#: FlickrManager.php:621
+msgid "Manage Photos"
+msgstr "管理照片"
+
+#: FlickrManager.php:622
+msgid "Add images to your posts with"
+msgstr "在文章中添加图片使用："
+
+#: FlickrManager.php:632
+msgid "Action"
+msgstr "操作"
+
+#: FlickrManager.php:648
+msgid "View"
+msgstr "查看"
+
+#: FlickrManager.php:649
+msgid "Modify"
+msgstr "修改"
+
+#: FlickrManager.php:650
+msgid "Are you sure you want to delete this?"
+msgstr "你确定要删除吗？"
+
+#: FlickrManager.php:650
+msgid "Delete"
+msgstr "删除"
+
+#: FlickrManager.php:662
+msgid "&laquo; Previous"
+msgstr "&laquo; 上一张"
+
+#: FlickrManager.php:681
+msgid "Next &raquo;"
+msgstr "下一张 &raquo;"
+
+#: FlickrManager.php:841
+msgid "Browse Photos"
+msgstr "浏览照片"
+
+#: FlickrManager.php:870
+msgid "Add Flickr Photo"
+msgstr "添加 Flcikr 照片"
+
+#: FlickrManager.php:884
+msgid "Flickr Photos"
+msgstr "Flickr 中的照片"
+
+#: MediaPanel.php:48
+msgid "Close on insert"
+msgstr "插入后关闭此页面"
+
+#: MediaPanel.php:51
+msgid "Browse Flickr"
+msgstr "浏览 Flickr"
+
+#: MediaPanel.php:144
+msgid "No photos found"
+msgstr "没有找到照片"
+
+#: MediaPanel.php:153
+msgid "Personal"
+msgstr "个人的"
+
+#: MediaPanel.php:161
+msgid "First Page"
+msgstr "第一页"
+
+#: MediaPanel.php:162
+msgid "Previous Page"
+msgstr "上一页"
+
+#: MediaPanel.php:171
+msgid "Search"
+msgstr "搜索"
+
+#: MediaPanel.php:175
+msgid "Next Page"
+msgstr "下一页"
+
+#: MediaPanel.php:176
+msgid "Last Page"
+msgstr "最后页"
+
+#: MediaPanel.php:183
+msgid "Javascript Viewer"
+msgstr "Javascript 浏览器"
+
+#: MediaPanel.php:184
+msgid "Enable"
+msgstr "启用"
+
+#: MediaPanel.php:185
+msgid "Size"
+msgstr "尺寸"
+
+#: MediaPanel.php:204
+msgid "Set"
+msgstr "相册"
+
+#: MediaPanel.php:205
+msgid "Name"
+msgstr "名称"
+
+#: MediaPanel.php:210
+msgid "Image Set"
+msgstr "Flickr 相册"
+
+#: MediaPanel.php:228
+msgid "Insert Set"
+msgstr "插入相册"
+
+#: js/media-panel.php:99
+#: js/media-panel.php:201
+msgid "Loading..."
+msgstr "载入..."
+
+#: js/media-panel.php:119
+msgid "Flickr Upload"
+msgstr "上传到 Flickr"
+
+#: js/wfm-hs.php:50
+#: js/wfm-lightbox.php:59
+msgid "View on Flickr"
+msgstr "在 Flickr 中查看"
+
+#: upload.php:10
+msgid "You do not have permission to upload photos to this stream, you may adjust this in the settings page!"
+msgstr "你没有权限上传照片，需要在设置页面调整参数！"
+
+#: upload.php:62
+msgid "Image successfully uploaded"
+msgstr "图片上传成功"
+
+#: upload.php:80
+msgid "Space separated list"
+msgstr "空格分隔的列表"
+
+#~ msgid "Settings"
+#~ msgstr "Configuración"
+

@@ -115,8 +115,7 @@ function addControlbar() {
 	var closeButton = wfmJS('<a href="#" class="close" title="Close" onclick="return hs.close(this);"></a>');
 	controlBar.append(closeButton);
 	
-	jQuery('body').append(controlBar);
-	controlBar.css('display', 'none');
+	jQuery('body').append(jQuery('<div style="display: none;"></div>').append(controlBar));
 }
 
 var wfmJS = jQuery.noConflict();
@@ -131,4 +130,6 @@ wfmJS(document).ready(function() {
 	});
 	
 	prepareWFMImages();
+	
+	wfmJS('div#wfm-controlbar').css('display', 'none');
 });

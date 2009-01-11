@@ -232,7 +232,7 @@ var prepareImages = function() {
 								var imgHTML = "";
 								if(jQuery("#wfm-lightbox").is(":checked")) {
 									imgHTML = '<a href="http://www.flickr.com/photos/' + owner.split("|")[0] + "/" + id + '/" title="' + title + '"' + target + 'class="flickr-image"' + rel + '>';
-									imgHTML = imgHTML + '<img src="' + link.attr('href') + '" alt="' + title + '" class="' + fsize + '" ' + longdesc + ' /></a>';
+									imgHTML = imgHTML + '<img src="' + link.attr('href') + '" alt="' + title + '" class="flickr-' + fsize + '" ' + longdesc + ' /></a>';
 								} else {
 									imgHTML = '<a href="http://www.flickr.com/photos/' + owner.split("|")[0] + "/" + id + '/" title="' + title + '"' + target + 'class="flickr-image">';
 									imgHTML = imgHTML + '<img src="' + link.attr('href') + '" alt="' + title + '" /></a>';
@@ -291,7 +291,7 @@ function flickrRequest(params) {
 	
 	var loadingImage = jQuery("#wfm-ajax-url").attr("value") + "/images/loading.gif";
 	
-	jQuery("#wfm-browse-content").html(jQuery('<img src="' + loadingImage + '" alt="loading..." />'));
+	jQuery("#wfm-browse-content").html(jQuery('<img src="' + loadingImage + '" alt="<?php _e('Loading...', 'flickr-manager'); ?>" />'));
 	
 	jQuery.get( url, function(data){
 		jQuery("#wfm-navigation").html(jQuery('<div>'+data+'</div>').find("#wfm-navigation").html());

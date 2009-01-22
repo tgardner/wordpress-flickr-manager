@@ -1,5 +1,4 @@
 <?php
-ini_set('display_errors',1);
 require_once("../../../wp-config.php");
 require_once("../../../wp-includes/wp-db.php");
 
@@ -12,12 +11,6 @@ switch($_REQUEST['faction']) {
 		break;
 	case 'upload':
 		displayUpload();
-		break;
-	case 'media-browse':
-		mediaBrowse();
-		break;
-	case 'media-upload' :
-		mediaUpload();
 		break;
 }
 
@@ -254,14 +247,6 @@ function displayUpload() {
 	}
 	
 	echo '<iframe id="flickr-uploader" name="flickr-uploader" src="'.$flickr_manager->getAbsoluteUrl().'/upload.php"></iframe>';
-}
-
-function mediaBrowse() {
-	flickrMediaBrowse();
-}
-
-function mediaUpload() {
-	flickrMediaUpload();
 }
 
 ?>

@@ -3,7 +3,7 @@
 Plugin Name: Flickr Manager
 Plugin URI: http://tgardner.net/
 Description: Handles uploading, modifying images on Flickr, and insertion into posts.
-Version: 2.1.2
+Version: 2.2
 Author: Trent Gardner
 Author URI: http://tgardner.net/
 
@@ -28,8 +28,32 @@ if(version_compare(PHP_VERSION, '4.4.0') < 0)
 	die(sprintf(__('You are currently running %s and you must have at least PHP 4.4.x in order to use Flickr Manager!', 'flickr-manager'), PHP_VERSION));
 
 if(class_exists('FlickrManager')) return;
-require_once(dirname(__FILE__) . "/FlickrCore.php");
-include_once(dirname(__FILE__) . "/MediaPanel.php");
+require_once(dirname(__FILE__) . '/FlickrCore.php');
+
+class FlickrSettings {
+	
+	var $settings;
+	
+	function getSettings() {
+		global $flickr_manager;
+		if(empty($this->settings)) $this->settings = get_option($flickr_manager->plugin_option);
+		return $this->settings;
+	}
+	
+	function getSetting($name) {
+		global $flickr_manager;
+		if(empty($this->settings)) $this->getSettings();
+		return $this->settings[$name];
+	}
+	
+	function saveSetting($name, $value) {
+		global $flickr_manager;
+		if(empty($this->settings)) $this->getSettings();
+		$this->settings[$name] = $value;
+		update_option($flickr_manager->plugin_option, $this->settings);
+	}
+	
+}
 
 class FlickrManager extends FlickrCore {
 	
@@ -54,7 +78,7 @@ class FlickrManager extends FlickrCore {
 		add_action('admin_menu', array(&$this, 'add_menus'));
 		add_action('init', array(&$this,'add_scripts'));
 		add_action('wp_head', array(&$this, 'add_headers'));
-		add_action('admin_head', array(&$this, 'add_admin_headers'));
+		add_action('admin_print_styles', array($this, 'add_admin_headers'));
 		add_action('edit_page_form', array(&$this, 'add_flickr_panel'));
 		add_action('edit_form_advanced', array(&$this, 'add_flickr_panel'));
 		
@@ -64,13 +88,22 @@ class FlickrManager extends FlickrCore {
 		 * Wordpress 2.5 - New media button support
 		 */
 		add_action('media_buttons', array($this, 'addMediaButton'), 20);
-		add_action('media_upload_flickr', array($this, 'media_upload_flickr'));
-		add_action('admin_head_media_upload_flickr_form', array($this, 'addMediaCss'));
-			 
+		add_action('media_upload_flickr', array($this, 'wfm_create_iframe'));
+		add_action('media_upload_flickr_public', array($this, 'wfm_create_iframe'));
+		add_action('media_upload_flickr_upload', array($this, 'wfm_create_iframe'));
+		
 		/*
 		 * Load locale settings
 		 */
 		load_plugin_textdomain($this->plugin_domain, PLUGINDIR . '/' . $this->plugin_directory . '/lang');
+		
+		/*
+		 * Create Shortcodes
+		 */
+		add_shortcode('flickr', array(&$this, 'image_shortcode'));
+		add_shortcode('flickrset', array(&$this, 'set_shortcode'));
+		
+		
 	}
 	
 	
@@ -134,30 +167,27 @@ class FlickrManager extends FlickrCore {
 					break;
 				
 				case 'save':
-					$_REQUEST['wfm-per_page'] = (!empty($_REQUEST['wfm-per_page']) && is_numeric($_REQUEST['wfm-per_page']) && 
-												intval($_REQUEST['wfm-per_page']) > 0) ? intval($_REQUEST['wfm-per_page']) : 5;
+					$_REQUEST['wfm-per_page'] = (empty($_REQUEST['wfm-per_page']) || !is_numeric($_REQUEST['wfm-per_page']) || 
+												intval($_REQUEST['wfm-per_page']) < 5) ? 5 : $_REQUEST['wfm-per_page'];
 					
 					$flickr_settings->saveSetting('per_page', $_REQUEST['wfm-per_page']);
 					$flickr_settings->saveSetting('new_window', $_REQUEST['wfm-new_window']);
 					$flickr_settings->saveSetting('lightbox_default', $_REQUEST['wfm-lbox_default']);
 					$flickr_settings->saveSetting('lightbox_enable', $_REQUEST['wfm-lbox_enable']);
-					$flickr_settings->saveSetting('browse_check',$_REQUEST['wfm-limit']);
-					$flickr_settings->saveSetting('browse_size',$_REQUEST['wfm-limit-size']);
-					$flickr_settings->saveSetting('flickr_legacy', $_REQUEST['wfm-legacy-support']);
 					$flickr_settings->saveSetting('image_viewer', $_REQUEST['wfm-js-viewer']);
 					$flickr_settings->saveSetting('before_wrap', $_REQUEST['wfm-insert-before']);
 					$flickr_settings->saveSetting('after_wrap', $_REQUEST['wfm-insert-after']);
 					$flickr_settings->saveSetting('upload_level', $_REQUEST['wfm-upload-level']);
 					$flickr_settings->saveSetting('flickr_link', $_REQUEST['wfm-flickr_link']);
+					$flickr_settings->saveSetting('privacy_filter', $_REQUEST['wfm-privacy']);
 					
 					break;
 				
 			endswitch;
 		endif;
 		
-		if(($token = $flickr_settings->getSetting('token'))) {
+		if(($token = $flickr_settings->getSetting('token')))
 			$auth_status = $this->call('flickr.auth.checkToken', array('auth_token' => $token), true);
-		}
 		?>
 		
 		<div class="wrap">
@@ -170,6 +200,7 @@ class FlickrManager extends FlickrCore {
 			
 			<?php endif; ?>
 			
+			<div id="icon-options-general" class="icon32"><br /></div>
 			<h2><?php _e('Flickr Manager Settings', 'flickr-manager') ?></h2>
 			
 			<?php if(empty($token) || $auth_status['stat'] != 'ok') : ?>
@@ -184,9 +215,7 @@ class FlickrManager extends FlickrCore {
 			
 			<div align="center">
 				<h3><?php _e('Step', 'flickr-manager') ?> 1:</h3>
-				<form>
-					<input type="button" value="<?php _e('Authenticate', 'flickr-manager') ?>" onclick="window.open('<?php echo $this->getAuthUrl($frob,'delete'); ?>')" style="background: url( images/fade-butt.png ); border: 3px double #999; border-left-color: #ccc; border-top-color: #ccc; color: #333; padding: 0.25em; font-size: 1.5em;" />
-				</form>
+				<input type="button" value="<?php _e('Authenticate', 'flickr-manager') ?>" onclick="window.open('<?php echo $this->getAuthUrl($frob, 'delete'); ?>')" style="background: url( images/fade-butt.png ); border: 3px double #999; border-left-color: #ccc; border-top-color: #ccc; color: #333; padding: 0.25em; font-size: 1.5em;" />
 				
 				<h3><?php _e('Step', 'flickr-manager') ?> 2:</h3>
 				<form method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">
@@ -199,51 +228,59 @@ class FlickrManager extends FlickrCore {
 			
 			<!-- Display options -->
 			<div style="text-align: center;">
-				<form method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">
+				<form method="post" action="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>">
 					<input type="hidden" name="action" value="logout" />
-					<p class="submit" style="text-align: center; border-top: none !important; margin-bottom: 20px !important; padding-top: 0px;">
+					<p class="submit">
 						<input type="submit" name="Submit" value="<?php _e('Logout &raquo;', 'flickr-manager') ?>" class="button submit" style="font-size: 1.4em;" />
 					</p>
 				</form>
 			</div>
 			
 			<?php
-			$info = $this->call('flickr.people.getInfo',array('user_id' => $flickr_settings->getSetting('nsid')));
+			$info = $this->call('flickr.people.getInfo', array('user_id' => $flickr_settings->getSetting('nsid')));
 			
-			$flickr_settings->saveSetting('is_pro', $info['person']['ispro']);
 			if($info['stat'] == 'ok') :
-			
+				$flickr_settings->saveSetting('is_pro', $info['person']['ispro']);
+				
 				if(intval($info['person']['iconserver']) > 0) 
 					$photo_url = "http://farm{$info['person']['iconfarm']}.static.flickr.com/{$info['person']['iconserver']}/buddyicons/{$info['person']['nsid']}.jpg";
 				else $photo_url = 'http://www.flickr.com/images/buddyicon.jpg';
 			?>
 				
-				<h3>
-				<?php 
+				<h3><?php 
 				_e('User Information', 'flickr-manager');
 				 
 				if($info['person']['ispro'] != 0) 
 					echo ' <img src="' . $this->getAbsoluteUrl() . '/images/badge_pro.gif" alt="Pro" style="vertical-align: middle;" />'; 
-				?>
-				</h3>
+				?></h3>
 				
-				<?php echo "<img src=\"$photo_url\" alt=\"You\" />"; ?>
-				
-				<table border="0" class="text-left">
+				<table border="0">
 					<tr>
-						<th width="130px" scope="row"><?php _e('Username', 'flickr-manager') ?>:</th>
+						<th></th>
+						<td><?php echo "<img src=\"$photo_url\" alt=\"You\" />"; ?></td>
+					</tr>
+					<tr>
+						<th scope="row" style="width: 130px; text-align: left;"><?php 
+							_e('Username', 'flickr-manager') ?>:
+						</th>
 						<td><?php echo $info['person']['username']['_content']; ?></td>
 					</tr>
 					<tr>
-						<th scope="row"><?php _e('User ID', 'flickr-manager') ?>:</th>
+						<th scope="row" style="width: 130px; text-align: left;"><?php 
+							_e('User ID', 'flickr-manager') ?>:
+						</th>
 						<td><?php echo $info['person']['nsid']; ?></td>
 					</tr>
 					<tr>
-						<th scope="row"><?php _e('Real Name', 'flickr-manager') ?>:</th>
+						<th scope="row" style="width: 130px; text-align: left;"><?php 
+							_e('Real Name', 'flickr-manager') ?>:
+						</th>
 						<td><?php echo $info['person']['realname']['_content']; ?></td>
 					</tr>
 					<tr>
-						<th scope="row"><?php _e('Photo URL', 'flickr-manager') ?>:</th>
+						<th scope="row" style="width: 130px; text-align: left;"><?php 
+							_e('Photo URL', 'flickr-manager') ?>:
+						</th>
 						<td>
 							<a href="<?php echo $info['person']['photosurl']['_content']; ?>">
 								<?php echo $info['person']['photosurl']['_content']; ?>
@@ -251,7 +288,9 @@ class FlickrManager extends FlickrCore {
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><?php _e('Profile URL', 'flickr-manager') ?>:</th>
+						<th scope="row" style="width: 130px; text-align: left;"><?php 
+							_e('Profile URL', 'flickr-manager') ?>:
+						</th>
 						<td>
 							<a href="<?php echo $info['person']['profileurl']['_content']; ?>">
 								<?php echo $info['person']['profileurl']['_content']; ?>
@@ -259,7 +298,9 @@ class FlickrManager extends FlickrCore {
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><?php _e('# Photos', 'flickr-manager') ?>:</th>
+						<th scope="row" style="width: 130px; text-align: left;"><?php 
+							_e('# Photos', 'flickr-manager') ?>:
+						</th>
 						<td><?php echo $info['person']['photos']['count']['_content']; ?></td>
 					</tr>
 				</table>
@@ -273,8 +314,8 @@ class FlickrManager extends FlickrCore {
 			
 			// Load Options
 			$settings = $flickr_settings->getSettings();
-			$_REQUEST['wfm-per_page'] = (!empty($_REQUEST['wfm-per_page']) && is_numeric($_REQUEST['wfm-per_page']) && 
-										intval($_REQUEST['wfm-per_page']) > 0) ? intval($_REQUEST['wfm-per_page']) : 5;
+			$_REQUEST['wfm-per_page'] = (empty($_REQUEST['wfm-per_page']) || !is_numeric($_REQUEST['wfm-per_page']) || 
+										 intval($_REQUEST['wfm-per_page']) < 5) ? 5 : $_REQUEST['wfm-per_page'];
 			$_REQUEST['wfm-per_page'] = (!empty($settings['per_page'])) ? $settings['per_page'] : $_REQUEST['wfm-per_page'];
 			$_REQUEST['wfm-new_window'] = $settings['new_window'];
 			
@@ -289,93 +330,36 @@ class FlickrManager extends FlickrCore {
 			$_REQUEST['wfm-insert-before'] = $settings['before_wrap'];
 			$_REQUEST['wfm-insert-after'] = $settings['after_wrap'];
 			$_REQUEST['wfm-flickr_link'] = $settings['flickr_link'];
+			$_REQUEST['wfm-privacy'] = $settings['privacy_filter'];
 			?>
 			
-			<form method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">
+			<form method="post" action="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>">
 				<input type="hidden" name="action" value="save" />
 				
-				<h3 style="margin-bottom: 0px;"><?php _e('Miscellaneous', 'flickr-manager'); ?></h3>
+				<h3 class="underline"><?php
+				_e('Media Panel Settings', 'flickr-manager'); 
+				?></h3>
 				
 				<table class="form-table">
 					<tbody>
 						<tr valign="top">
 							<th scope="row">
-								<label for="wfm-legacy-support">
-									<?php _e('Enable legacy panel', 'flickr-manager') ?>
+								<label for="wfm-privacy">
+									<?php _e('Hide private photos', 'flickr-manager'); ?>
 								</label>
 							</th>
 							<td>
-								<input type="checkbox" name="wfm-legacy-support" id="wfm-legacy-support" value="true" style="margin: 5px 0px;" <?php if($settings['flickr_legacy'] == "true") echo 'checked="checked" '; ?>/>
-								<br /><?php _e('Note: Wordpress &gt;=2.5 users can leave this option disabled and use the added media button.', 'flickr-manager') ?>
+								<input type="checkbox" name="wfm-privacy" id="wfm-privacy" value="true" <?php if($_REQUEST['wfm-privacy'] == "true") echo 'checked="checked" '; ?>/>
 							</td>
 						</tr>
 						<tr valign="top">
 							<th scope="row">
 								<label for="wfm-per_page">
-									<?php _e('Images per page', 'flickr-manager') ?>
+									<?php _e('Photos per page', 'flickr-manager'); ?>
 								</label>
 							</th>
 							<td>
-								<input type="text" name="wfm-per_page" id="wfm-per_page" value="<?php echo $_REQUEST['wfm-per_page']; ?>" style="padding: 3px; width: 50px;" />
-							</td>
-						</tr>
-						<tr valign="top">
-							<th scope="row">
-								<label for="wfm-new_window">
-									<?php _e('Open Flickr pages in a new window', 'flickr-manager') ?>
-								</label>
-							</th>
-							<td>
-								<input type="checkbox" name="wfm-new_window" id="wfm-new_window" value="true" style="margin: 5px 0px;" <?php if($_REQUEST['wfm-new_window'] == "true") echo 'checked="checked" '; ?>/>
-							</td>
-						</tr>
-						<!-- <tr valign="top">
-							<th scope="row">
-								<label for="wfm-limit-size">
-									<?php _e('Limit browse image size to', 'flickr-manager') ?>
-								</label>
-							</th>
-							<td>
-								<input type="hidden" name="wfm-limit" id="wfm-limit" value="true" />
-								<select name="wfm-limit-size" id="wfm-limit-size">
-									<option value="square" <?php if($_REQUEST['wfm-limit-size'] == "square") echo 'selected="selected"'; ?>><?php _e('Square', 'flickr-manager'); ?></option>
-									<option value="thumbnail" <?php if($_REQUEST['wfm-limit-size'] == "thumbnail") echo 'selected="selected"'; ?>><?php _e('Thumbnail', 'flickr-manager'); ?></option>
-								</select>
-							</td>
-						</tr> -->
-						<tr valign="top">
-							<th scope="row">
-								<label for="wfm-upload-level">
-									<?php _e('User upload level', 'flickr-manager') ?>
-								</label>
-							</th>
-							<td>
-								<select name="wfm-upload-level" id="wfm-upload-level">
-									<option value="10" <?php if($_REQUEST['wfm-upload-level'] == "10") echo 'selected="selected"'; ?>><?php _e('Administrator', 'flickr-manager'); ?></option>
-									<option value="6" <?php if($_REQUEST['wfm-upload-level'] == "6") echo 'selected="selected"'; ?>><?php _e('Editor', 'flickr-manager'); ?></option>
-									<option value="4" <?php if($_REQUEST['wfm-upload-level'] == "4") echo 'selected="selected"'; ?>><?php _e('Author', 'flickr-manager'); ?></option>
-									<option value="2" <?php if($_REQUEST['wfm-upload-level'] == "2") echo 'selected="selected"'; ?>><?php _e('Contributer', 'flickr-manager'); ?></option>
-								</select>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-				
-				<h3 style="margin-bottom: 0px; margin-top: 30px;"><?php _e('Javascript Image Viewer', 'flickr-manager'); ?></h3>
-				
-				<table class="form-table">
-					<tbody>
-						<tr valign="top">
-							<th scope="row">
-								<label for="wfm-js-viewer">
-									<?php _e('Image Viewer', 'flickr-manager'); ?>
-								</label>
-							</th>
-							<td>
-								<select name="wfm-js-viewer" id="wfm-js-viewer">
-									<option value="lightbox" <?php if($_REQUEST['wfm-js-viewer'] == "lightbox") echo 'selected="selected"'; ?>>Lightbox</option>
-									<option value="highslide" <?php if($_REQUEST['wfm-js-viewer'] == "highslide") echo 'selected="selected"'; ?>>Highslide</option>
-								</select>
+								<input type="text" name="wfm-per_page" id="wfm-per_page" value="<?php echo $_REQUEST['wfm-per_page']; ?>" size="4" />
 							</td>
 						</tr>
 						<tr valign="top">
@@ -394,9 +378,8 @@ class FlickrManager extends FlickrCore {
 								<select name="wfm-lbox_default" id="wfm-lbox_default">
 								<?php
 								$sizes = array(	"small" => __('Small', 'flickr-manager'), 
-										"medium" => __('Medium', 'flickr-manager'), 
-										"large" => __('Large', 'flickr-manager')
-										);
+												"medium" => __('Medium', 'flickr-manager'), 
+												"large" => __('Large', 'flickr-manager') );
 										
 								if($settings['is_pro'] == '1') $sizes = array_merge($sizes, array('original' => __("Original", 'flickr-manager')));
 								
@@ -409,6 +392,69 @@ class FlickrManager extends FlickrCore {
 								</select>
 							</td>
 						</tr>
+					</tbody>
+				</table>
+				<br /><br />
+				
+				<h3 class="underline"><?php _e('Global Settings', 'flickr-manager'); ?></h3>
+				
+				<table class="form-table">
+					<tbody>
+						<tr valign="top">
+							<th scope="row">
+								<label for="wfm-upload-level">
+									<?php _e('User upload level', 'flickr-manager'); ?>
+								</label>
+							</th>
+							<td>
+								<select name="wfm-upload-level" id="wfm-upload-level">
+									<?php 
+									$options = array( 10 	=> __('Administrator', 'flickr-manager'),
+													  6		=> __('Editor', 'flickr-manager'),
+													  4		=> __('Author', 'flickr-manager'),
+													  2		=> __('Contributer', 'flickr-manager'));
+													  
+									foreach($options as $k => $v) {
+										echo "<option value=\"$k\" ";
+										if($_REQUEST['wfm-upload-level'] == strval($k))	echo 'selected="selected"';
+										echo '>' . htmlspecialchars($v) . '</option>';
+									}
+									?>
+								</select>
+							</td>
+						</tr>
+						<tr valign="top">
+							<th scope="row">
+								<label for="wfm-new_window">
+									<?php _e('Open Flickr pages in a new window', 'flickr-manager') ?>
+								</label>
+							</th>
+							<td>
+								<input type="checkbox" name="wfm-new_window" id="wfm-new_window" value="true" <?php if($_REQUEST['wfm-new_window'] == "true") echo 'checked="checked" '; ?>/>
+							</td>
+						</tr>
+						<tr valign="top">
+							<th scope="row">
+								<label for="wfm-js-viewer">
+									<?php _e('Image Viewer', 'flickr-manager'); ?>
+								</label>
+							</th>
+							<td>
+								<select name="wfm-js-viewer" id="wfm-js-viewer">
+									<?php 
+									$options = array( 'disabled'	=> __('Disabled', 'flickr-manager'),
+													  'lightbox'	=> 'Lightbox',
+													  'highslide'	=> 'Highslide');
+									
+									foreach($options as $k => $v) {
+										echo "<option value=\"$k\" ";
+										if($_REQUEST['wfm-js-viewer'] == strval($k)) echo 'selected="selected"';
+										echo '>' . htmlspecialchars($v) . '</option>';
+									}
+									?>
+								</select>
+							</td>
+						</tr>
 						<tr valign="top">
 							<th scope="row">
 								<label for="wfm-flickr_link"><?php _e('Include Flickr link in caption', 'flickr-manager') ?></label>
@@ -417,33 +463,40 @@ class FlickrManager extends FlickrCore {
 								<input type="checkbox" name="wfm-flickr_link" id="wfm-flickr_link" value="true" <?php if($_REQUEST['wfm-flickr_link'] == "true") echo 'checked="checked" '; ?>/>
 							</td>
 						</tr>
-					</tbody>
-				</table>
-				
-				<h3 style="margin-bottom: 0px; margin-top: 30px;"><?php _e('Custom Wrappings', 'flickr-manager') ?></h3>
-				
-				<table class="form-table">
-					<tbody>
 						<tr valign="top">
-							<th>
-								<label for="wfm-insert-before"><?php _e('Before Image', 'flickr-manager') ?></label>
+							<th scope="row">
+								<label for="wfm-insert-before">
+									<?php _e('Wrap photos with HTML', 'flickr-manager'); ?>
+								</label>
 							</th>
 							<td>
-								<textarea name="wfm-insert-before" id="wfm-insert-before" style="width: 200px; height: 100px; overflow: auto;"><?php echo $_REQUEST['wfm-insert-before']; ?></textarea>
-							</td>
-							<th>
-								<label for="wfm-insert-after"><?php _e('After Image', 'flickr-manager') ?></label>
-							</th>
-							<td>
-								<textarea name="wfm-insert-after" id="wfm-insert-after" style="width: 200px; height: 100px; overflow: auto;"><?php echo $_REQUEST['wfm-insert-after']; ?></textarea>
+								<table>
+									<tbody>
+										<tr valign="top">
+											<th style="font-size: 13px; padding-bottom: 2px; padding-top: 0px;">
+												<label for="wfm-insert-before"><?php _e('Before Image', 'flickr-manager') ?></label>
+											</th>
+											<th style="font-size: 13px; padding-bottom: 2px; padding-top: 0px;">
+												<label for="wfm-insert-after"><?php _e('After Image', 'flickr-manager') ?></label>
+											</th>
+										</tr>
+										<tr valign="top">
+											<td>
+												<textarea name="wfm-insert-before" rows="5" cols="30" id="wfm-insert-before" style="overflow: auto;"><?php echo $_REQUEST['wfm-insert-before']; ?></textarea>
+											</td>
+											<td>
+												<textarea name="wfm-insert-after" rows="5" cols="30" id="wfm-insert-after" style="overflow: auto;"><?php echo $_REQUEST['wfm-insert-after']; ?></textarea>
+											</td>
+										</tr>
+									</tbody>
+								</table>
 							</td>
 						</tr>
 					</tbody>
 				</table>
 				
-				
 				<p class="submit">
-					<input type="submit" name="Submit" value="<?php _e('Submit', 'flickr-manager') ?> &raquo;" style="font-size: 1.5em;" />
+					<input class="button-primary" type="submit" value="<?php _e('Save Changes', 'flickr-manager') ?>" name="Submit"/>
 				</p>
 				
 			</form>
@@ -462,12 +515,12 @@ class FlickrManager extends FlickrCore {
 		global $flickr_settings;
 		$token = $flickr_settings->getSetting('token');
 		if(empty($token)) {
-			echo '<div class="wrap"><h3>' . __('Error: Please authenticate through ', 'flickr-manager') . '<a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$this->plugin_directory/$this->plugin_filename\">Options->Flickr</a></h3></div>\n";
+			echo '<div class="wrap"><h3>' . __('Error: Please authenticate through ', 'flickr-manager') . '<a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$this->plugin_directory/$this->plugin_filename\">Settings->Flickr</a></h3></div>\n";
 			return;
 		} else {
 			$auth_status = $this->call('flickr.auth.checkToken', array('auth_token' => $token), true);
 			if($auth_status['stat'] != 'ok') {
-				echo '<div class="wrap"><h3>' . __('Error: Please authenticate through ', 'flickr-manager') . '<a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$this->plugin_directory/$this->plugin_filename\">Options->Flickr</a></h3></div>\n";
+				echo '<div class="wrap"><h3>' . __('Error: Please authenticate through ', 'flickr-manager') . '<a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$this->plugin_directory/$this->plugin_filename\">Settings->Flickr</a></h3></div>\n";
 				return;
 			}
 		}
@@ -619,7 +672,7 @@ class FlickrManager extends FlickrCore {
 						?>
 						
 						<h3><?php _e('Manage Photos', 'flickr-manager'); ?>:</h3>
-						<p><b><?php _e('Add images to your posts with', 'flickr-manager'); ?> [img:&lt;flickr-id&gt;,&lt;size&gt;]</b></p>
+						<p><b><?php _e('Add images to your posts with', 'flickr-manager'); ?> [flickr pid="&lt;photo-id&gt;" size="&lt;size&gt;"]</b></p>
 						<!-- Default management section -->
 						
 						<div style="text-align: center;">
@@ -697,6 +750,43 @@ class FlickrManager extends FlickrCore {
 	
 	
 	
+	function image_shortcode($attr) {
+		global $flickr_settings;
+		
+		$token = $flickr_settings->getSetting('token');
+		$params = array('photo_id' => $attr['pid'], 'auth_token' => $token);
+		$photo = $this->call('flickr.photos.getInfo',$params, true);
+		$url = $this->getPhotoUrl($photo['photo'], $attr['size']);
+		return $flickr_settings->getSetting('before_wrap') . "<a href=\"{$photo['photo']['urls']['url'][0]['_content']}\">
+					<img src=\"$url\" alt=\"{$photo['photo']['title']['_content']}\" />
+				</a>" . $flickr_settings->getSetting('after_wrap');
+	}
+	
+	
+	
+	function set_shortcode($attr) {
+		global $flickr_settings;
+		
+		$token = $flickr_settings->getSetting('token');
+		$params = array('photoset_id' => $attr['id'], 'auth_token' => $token, 'extras' => 'original_format');
+		$photoset = $this->call('flickr.photosets.getPhotos',$params, true);
+		
+		$html = '';
+		foreach ($photoset['photoset']['photo'] as $photo) {
+			$html .= $flickr_settings->getSetting('before_wrap') . "<a href=\"http://www.flickr.com/photos/{$photoset['photoset']['owner']}/{$photo['id']}/\" title=\"{$photo['title']}\" ";
+			if($attr['overlay'] == 'true') $html .= "rel=\"flickr-mgr[{$attr['id']}]\" ";
+			$html .= "class=\"flickr-image\" >\n";
+			$html .= '	<img src="' . $this->getPhotoUrl($photo, $attr['thumbnail']) . "\" alt=\"{$photo['title']}\" ";
+			if($attr['overlay'] == 'true') $html .= "class=\"flickr-{$attr['size']}\" ";
+			if($attr['size'] == 'original') $html .= 'longdesc="' . $this->getPhotoUrl($photo, 'original') . '" ';
+			$html .= "/>\n</a>\n" . $flickr_settings->getSetting('after_wrap');;
+		}
+		
+		return $html;
+	}
+	
+	
+	
 	function filterContent($content) {
 		$content = preg_replace_callback("/\[img\:(\d+),(.+)\]/", array(&$this, 'filterCallback'), $content);
 		$content = preg_replace_callback("/\[imgset\:(\d+),(.+),(.+)\]/", array(&$this, 'filterSets'), $content);
@@ -706,46 +796,36 @@ class FlickrManager extends FlickrCore {
 	
 	
 	function filterSets($match) {
-		global $flickr_settings;
-		$setid = $match[1];
-		$size = $match[2];
-		$lightbox = $match[3];
-		$lightbox = ($lightbox == "true") ? true : false;
-		$token = $flickr_settings->getSetting('token');
-		$params = array('photoset_id' => $setid, 'auth_token' => $token, 'extras' => 'original_format');
-		$photoset = $this->call('flickr.photosets.getPhotos',$params, true);
-		
-		foreach ($photoset['photoset']['photo'] as $photo) {
-			$replace .= $flickr_settings->getSetting('before_wrap') . "<a href=\"http://www.flickr.com/photos/{$photoset['photoset']['owner']}/{$photo['id']}/\" title=\"{$photo['title']}\" ";
-			if($lightbox) $replace .= "rel=\"flickr-mgr[$setid]\" ";
-			$replace .= "class=\"flickr-image\" >\n";
-			$replace .= '	<img src="' . $this->getPhotoUrl($photo,$size) . "\" alt=\"{$photo['title']}\" ";
-			if($lightbox) $replace .= 'class="flickr-medium" ';
-			$replace .= "/>\n";
-			$replace .= "</a>\n" . $flickr_settings->getSetting('after_wrap');
-		}
-		return $replace;
+		return do_shortcode("[flickrset id=\"{$match[1]}\" thumbnail=\"{$match[2]}\" overlay=\"{$match[3]}\" size=\"medium\" ]");
 	}
 	
 	
 	
 	function filterCallback($match) {
-		global $flickr_settings;
-		$pid = $match[1];
-		$size = $match[2];
-		$token = $flickr_settings->getSetting('token');
-		$params = array('photo_id' => $pid, 'auth_token' => $token);
-		$photo = $this->call('flickr.photos.getInfo',$params, true);
-		$url = $this->getPhotoUrl($photo['photo'],$size);
-		return $flickr_settings->getSetting('before_wrap') . "<a href=\"{$photo['photo']['urls']['url'][0]['_content']}\">
-					<img src=\"$url\" alt=\"{$photo['photo']['title']['_content']}\" />
-				</a>" . $flickr_settings->getSetting('after_wrap');
+		return do_shortcode("[flickr pid=\"{$match[1]}\" size=\"{$match[2]}\" ]");
 	}
 	
 	
 	
 	function add_scripts() {
 		global $flickr_settings;
+		
+		$filename = array_shift(explode('?', basename($_SERVER['REQUEST_URI'])));
+		if($filename == 'media-upload.php' && strstr($_SERVER['REQUEST_URI'], 'type=flickr')) {
+			wp_enqueue_script('jquery-md5', $this->getAbsoluteUrl() . '/js/jquery.md5.js', array('jquery'));
+			wp_enqueue_script('wfm-media-panel', $this->getAbsoluteUrl() . '/js/media-panel.php', array('jquery'));
+			return;
+		} elseif($filename != "post.php" && $filename != "page.php" && $filename != "post-new.php" && $filename != "page-new.php") {
+			
+		}
+		
+		// Register recent photo's widget
+		if(function_exists('register_sidebar_widget'))
+			register_sidebar_widget('Recent Flickr Photos', array($this, 'widget_recent_flickr'));
+			
+		if(function_exists('register_widget_control'))
+			register_widget_control ( 'Recent Flickr Photos', array($this, 'widget_recent_flickr_control'));
+		
 		$image_viewer = $flickr_settings->getSetting('image_viewer');
 		$image_viewer = (!empty($image_viewer)) ? $image_viewer : 'lightbox';
 		
@@ -754,7 +834,7 @@ class FlickrManager extends FlickrCore {
 				wp_enqueue_script('highslide',$this->getAbsoluteUrl(). '/js/highslide.packed.js', array('jquery'));
 				wp_enqueue_script('wfm-hs',$this->getAbsoluteUrl(). '/js/wfm-hs.php');			
 			break;			
-			default:		
+			case 'lightbox':		
 				wp_enqueue_script('jquery-lightbox',$this->getAbsoluteUrl(). '/js/jquery.lightbox.js', array('jquery'));
 				wp_enqueue_script('wfm-lightbox',$this->getAbsoluteUrl(). '/js/wfm-lightbox.php');					
 			break;
@@ -775,7 +855,7 @@ class FlickrManager extends FlickrCore {
 
 			<?php			
 			break;
-			default:
+			case 'lightbox':
 			?>
 
 <!-- WFM INSERT LIGHTBOX FILES -->
@@ -796,29 +876,23 @@ class FlickrManager extends FlickrCore {
 	
 	
 	function add_admin_headers() {
-		?>
-		<style type="text/css">
-			table.text-left th {
-				text-align: left;
-			}
-		</style>
-		<?php 
-		
-		global $flickr_settings;
+		global $wp_version;
 		
 		$filename = array_shift(explode('?', basename($_SERVER['REQUEST_URI'])));
-		
+		if($filename == 'media-upload.php' && strstr($_SERVER['REQUEST_URI'], 'type=flickr')) {
+			wp_admin_css('css/media');
+	    	?>
+	    	<link rel="stylesheet" href="<?php echo $this->getAbsoluteUrl(); ?>/css/media_panel.css" type="text/css" media="screen" />
+			<?php 
+			return;
+		}
 		if($filename != "post.php" && $filename != "page.php" && $filename != "post-new.php" && $filename != "page-new.php") return;
 		
-		$settings = $flickr_settings->getSettings();
-		$legacy = (isset($settings['flickr_legacy'])) ? $settings['flickr_legacy'] : 'true';
-		
-		if($legacy == "true") : ?>
+		if(version_compare($wp_version, '2.5') > 0) return; 
+		?>
 		
 		<link rel="stylesheet" href="<?php echo $this->getAbsoluteUrl(); ?>/css/admin_style.css" type="text/css" />
 		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/flickr-js.php"></script>
-	
-		<?php endif; ?>
 		
 	<?php
 	}
@@ -826,9 +900,10 @@ class FlickrManager extends FlickrCore {
 	
 	
 	function add_flickr_panel() {
-		global $flickr_settings;
+		global $wp_version;
 		
-		if($flickr_settings->getSetting('flickr_legacy') == "true") : ?>
+		if(version_compare($wp_version, '2.5') > 0) return;
+		?>
 
 		<div class="dbx-box postbox" id="flickr-insert-widget">
 		
@@ -853,7 +928,7 @@ class FlickrManager extends FlickrCore {
 		
 		<div style="clear: both;">&nbsp;</div>
 		
-		<?php endif;
+		<?php
 	}
 	
 	
@@ -875,29 +950,794 @@ class FlickrManager extends FlickrCore {
         
 	}
 	
-	function media_upload_flickr() {
-		wp_iframe('media_upload_flickr_form');
+	function wfm_create_iframe() {
+		wp_iframe(array($this, 'wfm_media_content'));
 	}
 	
 	function modifyMediaTab($tabs) {
         return array(
-            'flickr' =>  __('Flickr Photos', 'flickr-manager')
+            'flickr' =>  __('My Photos', 'flickr-manager'),
+        	'flickr_public' => __('Public Photos', 'flickr-manager'),
+        	'flickr_upload' => __('Flickr Upload', 'flickr-manager')
         );
     }
     
-    function addMediaCss() { 
-    	
-    	wp_admin_css('css/media');
+	function wfm_media_content() {
+		global $flickr_settings, $tab, $type;
+		
+		switch($_REQUEST['faction']) {
+	   		case 'delete';
+	   			$token = $flickr_settings->getSetting('token');
+				$params = array('auth_token' => $token, 'photo_id' => $_REQUEST['photo_id']);
+				$rsp = $this->post('flickr.photos.delete', $params, true);
+				
+				$_REQUEST['faction'] = '';
+	   			$_SERVER['REQUEST_URI'] = substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'],'&faction'));
+	   		break;
+	   	}
+		
+		add_filter('media_upload_tabs', array(&$this, 'modifyMediaTab'));
+		?>
+		
+		<div id="media-upload-header">
+			<?php media_upload_header(); ?>
+		</div>
+		
+	    <?php
+	    
+	    switch ($tab) {
+	    	case 'flickr_upload':
+	    		$this->upload_panel();
+	    		break;
+	    	case 'flickr_public':
+	    		$this->public_browse_panel();
+	    		break;
+	    	default:
+	    		$this->personal_browse_panel();
+	    		break;
+	    }
+	    
+	}
+    
+    function public_browse_panel() {
+    	global $type, $tab, $flickr_settings;
     	?>
     	
-    	<link rel="stylesheet" href="<?php echo $this->getAbsoluteUrl(); ?>/css/media_panel.css" type="text/css" media="screen" />
-    	<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/media-panel.php"></script>
+		<form id="flickr-form" class="media-upload-form type-form validate" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
+			<?php
+			$settings = $flickr_settings->getSettings();
+			if(empty($settings['per_page'])) $settings['per_page'] = '5';
+			if(empty($settings['lightbox_default'])) $settings['lightbox_default'] = 'medium';
+			
+			if(!empty($settings['token'])) {
+				$params = array('auth_token' => $settings['token']);
+				$auth_status = $this->call('flickr.auth.checkToken',$params, true);
+				if($auth_status['stat'] != 'ok') {
+					echo '<h3>'. __('Error: Please authenticate through ', 'flickr-manager') .'<a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$this->plugin_directory/$this->plugin_filename\">Settings->Flickr</a></h3>";
+					return;
+				}
+			} else {
+				echo '<h3>'. __('Error: Please authenticate through ', 'flickr-manager') .'<a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$this->plugin_directory/$this->plugin_filename\">Settings->Flickr</a></h3>";
+				return;
+			}
+			?>
+			
+			<input type="hidden" id="wfm-ajax-url" value="<?php echo $this->getAbsoluteUrl(); ?>" />
+	    	<input type="hidden" name="wfm-auth_token" id="wfm-auth_token" value=<?php echo $flickr_settings->getSetting('token'); ?> />
+			<input type="hidden" name="wfm-blank" id="wfm-blank" value="<?php echo $flickr_settings->getSetting('new_window'); ?>" />
+			<input type="hidden" name="wfm-insert-before" id="wfm-insert-before" value="<?php 
+				$settings['before_wrap'] = str_replace("\n", "", $settings['before_wrap']);
+				echo rawurlencode($settings['before_wrap']);
+			?>" />
+			<input type="hidden" name="wfm-insert-after" id="wfm-insert-after" value="<?php 
+				$settings['after_wrap'] = str_replace("\n", "", $settings['after_wrap']);
+				echo rawurlencode($settings['after_wrap']);
+			?>" />
+			
+			<div id="wfm-close-block" class="right">
+				<label><input type="checkbox" name="wfm-close" id="wfm-close" value="true" checked="checked" /> <?php _e('Close on insert', 'flickr-manager'); ?></label>
+			</div>
+			
+			<h3 id="wfm-media-header"><?php _e('Public Photos', 'flickr-manager'); ?></h3>
+			<div id="wfm-browse-content">
+				<?php
+				// Load Settings
+				$overlay = (empty($_REQUEST['wfm-lightbox'])) ? $settings['lightbox_enable'] : $_REQUEST['wfm-lightbox'];
+				$page = (empty($_REQUEST['wfm-page'])) ? '1' : $_REQUEST['wfm-page'];
+				
+				$params = array('extras'	=> 'license,owner_name',
+								'per_page'	=> $flickr_settings->getSetting('per_page'),
+								'page' 		=> $page,
+								'media'		=> 'photos');
+				
+				if(!empty($_REQUEST['wfm-filter'])) $params = array_merge($params,array('text' => $_REQUEST['wfm-filter'], 'sort' => 'relevance'));
+				
+				$licences = $this->call('flickr.photos.licenses.getInfo',array());
+				$licence_search = implode(',', range(1,count($licences['licenses']['license']) - 1));
+				
+				$params = array_merge($params, array('license' => $licence_search));
+				
+				$photos = $this->call('flickr.photos.search', $params, true);
+				if(is_array($photos['photos']['photo']) && count($photos['photos']['photo']) > 0) : 
+			
+					// Display Photos
+					foreach ($photos['photos']['photo'] as $photo) : 
+					?>
+					
+						<div class="flickr-img" id="flickr-<?php echo $photo['id']; ?>">
+						
+							<img src="<?php echo $this->getPhotoUrl($photo, 'square'); ?>" alt="<?php echo htmlspecialchars($photo['title']); ?>" <?php 
+								if($flickr_settings->getSetting('is_pro') == '1') echo 'longdesc="' . $this->getPhotoUrl($photo, 'original') . '"';
+							?> />
+							
+							<?php 
+							foreach ($licences['licenses']['license'] as $licence) {
+								if($licence['id'] == $photo['license']) {
+									if($licence['url'] == '') $licence['url'] = "http://www.flickr.com/people/{$photo['owner']}/";
+									echo "<br /><small><a href='{$licence['url']}' title='{$licence['name']}' rel='license' id='license-{$photo['id']}' onclick='return false;'><img src='".$this->getAbsoluteUrl()."/images/creative_commons_bw.gif' alt='{$licence['name']}'/></a> by {$photo['ownername']}</small>";
+								}
+							}
+							?>
+							<input type="hidden" id="owner-<?php echo $photo['id']; ?>" value="<?php echo $photo['owner'] . "|". htmlspecialchars($photo['ownername']); ?>" />
+							
+						</div>
+					
+					<?php 
+					endforeach; 
+				
+				else : ?>
+				
+					<div class="error">
+						<h3><?php _e('No photos found', 'flickr-manager'); ?></h3>
+					</div>
+				
+				<?php 
+				endif; ?>
+			</div>
+			<div id="wfm-dashboard">
+				
+				<div id="wfm-navigation" class="right">
+					<?php $this->paginate(floatval($page), $photos['photos']['pages']); ?>
+				</div>
+			
+				<input type="text" name="wfm-filter" id="wfm-filter" value="<?php echo $_REQUEST['wfm-filter']; ?>" />
+				<input type="submit" class="button" name="button" value="<?php _e('Search', 'flickr-manager'); ?>" id="wfm-filter-submit" />
+				
+				<div id="wfm-options">
+					<?php $this->overlay_settings(); ?>
+				</div>
+				
+			</div>
+		</form>
+		<?php
+    }
+
+    function personal_browse_panel() {
+    	global $type, $tab, $flickr_settings;
+    	?>
+    	
+		<form id="flickr-form" class="media-upload-form type-form validate" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
+			<?php
+			$settings = $flickr_settings->getSettings();
+			if(empty($settings['per_page'])) $settings['per_page'] = '5';
+			if(empty($settings['lightbox_default'])) $settings['lightbox_default'] = 'medium';
+			
+			if(!empty($settings['token'])) {
+				$params = array('auth_token' => $settings['token']);
+				$auth_status = $this->call('flickr.auth.checkToken',$params, true);
+				if($auth_status['stat'] != 'ok') {
+					echo '<h3>'. __('Error: Please authenticate through ', 'flickr-manager') .'<a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$this->plugin_directory/$this->plugin_filename\">Settings->Flickr</a></h3>";
+					return;
+				}
+			} else {
+				echo '<h3>'. __('Error: Please authenticate through ', 'flickr-manager') .'<a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$this->plugin_directory/$this->plugin_filename\">Settings->Flickr</a></h3>";
+				return;
+			}
+			?>
+			
+	    	<input type="hidden" id="wfm-ajax-url" value="<?php echo $this->getAbsoluteUrl(); ?>" />
+	    	<input type="hidden" name="wfm-auth_token" id="wfm-auth_token" value=<?php echo $flickr_settings->getSetting('token'); ?> />
+			<input type="hidden" name="wfm-blank" id="wfm-blank" value="<?php echo $flickr_settings->getSetting('new_window'); ?>" />
+			<input type="hidden" name="wfm-insert-before" id="wfm-insert-before" value="<?php 
+				$settings['before_wrap'] = str_replace("\n", "", $settings['before_wrap']);
+				echo rawurlencode($settings['before_wrap']);
+			?>" />
+			<input type="hidden" name="wfm-insert-after" id="wfm-insert-after" value="<?php 
+				$settings['after_wrap'] = str_replace("\n", "", $settings['after_wrap']);
+				echo rawurlencode($settings['after_wrap']);
+			?>" />
+			
+			<div id="wfm-close-block" class="right">
+				<label><input type="checkbox" name="wfm-close" id="wfm-close" value="true" checked="checked" /> <?php _e('Close on insert', 'flickr-manager'); ?></label>
+			</div>
+			
+			<h3 id="wfm-media-header"><?php _e('My Photos', 'flickr-manager'); ?></h3>
+			
+			<div id="wfm-browse-content">
+				<?php
+				// Load Settings
+				$overlay = (empty($_REQUEST['wfm-lightbox'])) ? $settings['lightbox_enable'] : $_REQUEST['wfm-lightbox'];
+				$page = (empty($_REQUEST['wfm-page'])) ? '1' : $_REQUEST['wfm-page'];
+				
+				$params = array('extras'	=> 'license,owner_name',
+								'per_page'	=> $flickr_settings->getSetting('per_page'),
+								'page' 		=> $page,
+								'media'		=> 'photos',
+								'user_id' 	=> $settings['nsid'],
+								'auth_token'=> $settings['token'] );
+				
+				if($settings['privacy_filter'] == 'true') $params = array_merge($params, array('privacy_filter' => 1));
+				
+				if(!empty($_REQUEST['wfm-filter'])) $params = array_merge($params, array('text' => $_REQUEST['wfm-filter'], 'sort' => 'relevance'));
+				
+				if(empty($_REQUEST['wfm-photoset'])) $photos = $this->call('flickr.photos.search', $params, true);
+				else {
+					$params = array_merge( $params, array('photoset_id' => $_REQUEST['wfm-photoset']));
+					unset($params['user_id']);
+					$photos = $this->call('flickr.photosets.getPhotos', $params, true);
+					$photos['photos'] = $photos['photoset'];
+					unset($photos['photoset']);
+					$owner = $photos['photos']['owner'];
+				}
+				
+				if(is_array($photos['photos']['photo']) && count($photos['photos']['photo']) > 0) : 
+			
+					// Display Photos
+					foreach ($photos['photos']['photo'] as $photo) : 
+						if(!empty($_REQUEST['wfm-photoset'])) $photo['owner'] = $owner;
+					?>
+					
+						<div class="flickr-img personal" id="flickr-<?php echo $photo['id']; ?>">
+						
+							<img src="<?php echo $this->getPhotoUrl($photo, 'square'); ?>" alt="<?php echo htmlspecialchars($photo['title']); ?>" <?php 
+								if($flickr_settings->getSetting('is_pro') == '1') echo 'longdesc="' . $this->getPhotoUrl($photo, 'original') . '"';
+							?> />
+							
+							<input type="hidden" id="owner-<?php echo $photo['id']; ?>" value="<?php echo $photo['owner'] . "|". htmlspecialchars($photo['ownername']); ?>" />
+							
+						</div>
+					
+					<?php 
+					endforeach; 
+				
+				else : ?>
+				
+					<div class="error">
+						<h3><?php _e('No photos found', 'flickr-manager'); ?></h3>
+					</div>
+				
+				<?php 
+				endif; ?>
+			</div>
+			
+			<div id="wfm-dashboard">
+				
+				<div id="wfm-navigation" class="right">
+					<?php $this->paginate(floatval($page), $photos['photos']['pages']); ?>
+				</div>
+			
+				<input type="text" name="wfm-filter" id="wfm-filter" value="<?php echo $_REQUEST['wfm-filter']; ?>" />
+				<input type="submit" class="button" name="button" value="<?php _e('Search', 'flickr-manager'); ?>" id="wfm-filter-submit" />
+				
+				<div id="wfm-options">
+					<div id="wfm-set-block" class="right">
+						<label><?php _e('Photoset', 'flickr-manager'); ?>: 
+						<select name="wfm-photoset" id="wfm-photoset">
+							<option value="" <?php if(empty($_REQUEST['wfm-photoset'])) echo 'selected="selected"'; ?>></option>
+									
+							<?php	
+							$photosets = $this->call('flickr.photosets.getList', array('user_id' => $settings['nsid'], 'auth_token' => $settings['token']), true);
+							foreach ($photosets['photosets']['photoset'] as $photoset) :
+							?>
+							
+							<option value="<?php echo $photoset['id']; ?>" <?php if($_REQUEST['wfm-photoset'] == $photoset['id']) echo 'selected="selected"'; ?>><?php echo $photoset['title']['_content']; ?></option>
+						
+							<?php endforeach; ?>
+						
+						</select></label> 
+					
+						<a href="#" id="wfm-entire-set" title="<?php _e('Insert Set', 'flickr-manager'); ?>">+</a>
+						
+					</div>
+					
+					<?php $this->overlay_settings(); ?>
+					
+				</div>
+			
+		</form>
+		
+		<?php 
+    }
     
-    <?php }
+    function overlay_settings() {
+    	global $flickr_settings;
+    	?>
+    	<div id="wfm-overlay">
+						
+			<label><input type="checkbox" id="wfm-lightbox" name="wfm-lightbox" value="true" <?php if($flickr_settings->getSetting('lightbox_enable') == "true") echo 'checked="checked"'; ?>/>
+			<?php _e('Javascript Viewer', 'flickr-manager'); ?></label>
+			<div class="settings">
+				<div class="right">
+					<label><?php _e('Create Gallery', 'flickr-manager'); ?> <input type="checkbox" name="wfm-insert-set" id="wfm-insert-set" value="true" <?php if($_REQUEST['wfm-insert-set'] == "true") echo 'checked="checked"'; ?> /></label> 
+					<label id="wfm-set-name-label"><?php _e('Name', 'flickr-manager'); ?>: <input type="text" name="wfm-set-name" id="wfm-set-name" value="<?php echo $_REQUEST['wfm-set-name']; ?>" style="padding: 2px;" /></label>
+				</div>
+				<label> <?php _e('Size', 'flickr-manager'); ?>: <select name="wfm-lbsize" id="wfm-lbsize">
+				<?php
+				$lightbox_sizes = array(	"small" => __('Small', 'flickr-manager'), 
+											"medium" => __('Medium', 'flickr-manager'), 
+											"large" => __('Large', 'flickr-manager')
+										);
+				
+				if($flickr_settings->getSetting('is_pro') == '1') $lightbox_sizes = array_merge($lightbox_sizes, array('original' => __("Original", 'flickr-manager')));
+				
+				foreach ($lightbox_sizes as $k => $size) {
+					echo "<option value=\"$k\"";
+					if($flickr_settings->getSetting('lightbox_default') == $k) echo ' selected="selected" ';
+					echo ">" . ucfirst($size) . "</option>\n";
+				}
+				?>
+				</select></label>
+			</div>
+		
+		</div>
+		<?php 
+    }
+    
+    function upload_panel() {
+    	global $flickr_settings, $userdata;
+    	
+    	$pid = $this->save_info();
+    	$token = $flickr_settings->getSetting('token');
+    	
+		if(isset($_FILES['uploadPhoto'])) {
+		
+			/* Perform file upload */
+			$file = $_FILES['uploadPhoto'];
+			if($file['error'] == 0) {
+				
+				$params = array('auth_token' => $token, 'photo' => '@'.$file['tmp_name']);
+				if(isset($_POST['photoTitle']) && !empty($_POST['photoTitle'])) $params = array_merge($params,array('title' => $_POST['photoTitle']));
+				if(isset($_POST['photoTags']) && !empty($_POST['photoTags'])) $params = array_merge($params,array('tags' => $_POST['photoTags']));
+				if(isset($_POST['photoDesc']) && !empty($_POST['photoDesc'])) $params = array_merge($params,array('description' => $_POST['photoDesc']));
+				$rsp = $this->upload($params);
+				
+			}
+		}
+		?>
+		
+		<form id="file_upload_form" method="post" class="media-upload-form type-form validate" enctype="multipart/form-data" action="<?php echo $_SERVER['REQUEST_URI']; ?>" onsubmit="return insertUpload();">
+			<?php 
+   			if(!empty($rsp)) {
+   				try {
+					$xml = new SimpleXMLElement($rsp);
+					if(strval($xml['stat']) == 'ok') {
+						$pid = floatval($xml->photoid);
+						?>
+						
+						<div id="upload-success" class="updated fade">
+							<p><?php _e('Image successfully uploaded', 'flickr-manager'); ?>!</p>
+						</div>
+						
+						<?php 
+					} else {
+						$code = floatval($xml->err['code']);
+						$error = strval($xml->err['msg']);
+						echo '<div class="error" id="upload-error">';
+						_e('An error occurred while trying to upload your photo', 'flickr-manager');
+						echo ':<p>' . $code . ': ' . $error . '</p></div>';
+					}
+   				} catch (Exception $e) {
+   					echo '<div class="error" id="upload-error">';
+   					echo htmlspecialchars($rsp);
+   					echo '</div>';
+   				}
+			}
+			?>
+			
+			<h3 id="wfm-media-header"><?php _e('Upload Photo', 'flickr-manager'); ?></h3>
+	    	
+	    	<?php
+			if(!empty($token)) {
+				$params = array('auth_token' => $token);
+				$auth_status = $this->call('flickr.auth.checkToken',$params, true);
+				if($auth_status['stat'] != 'ok') {
+					echo '<h3>' . __('Error: Please authenticate through ', 'flickr-manager') . '<a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$this->plugin_directory/$this->plugin_filename\">Settings->Flickr</a></h3>";
+					return;
+				}
+			} else {
+				echo '<h3>' . __('Error: Please authenticate through ', 'flickr-manager') . '<a href="'.get_option('siteurl')."/wp-admin/options-general.php?page=$this->plugin_directory/$this->plugin_filename\">Settings->Flickr</a></h3>";
+				return;
+			}
+			
+			get_currentuserinfo();
+			$upload_level = $flickr_settings->getSetting('upload_level');
+			if(intval($userdata->user_level) < intval($upload_level)) {
+				_e('You do not have permission to upload photos to this stream, you may adjust this in the settings page!', 'flickr-manager');
+				return;
+			}
+			
+			if($_REQUEST['faction'] == 'info_page' && empty($pid)) $_REQUEST['faction'] = '';
+			
+			switch($_REQUEST['faction']) :
+				case 'info_page':
+					
+					$this->info_page($pid);
+					
+				break;
+				default:
+			?>
+			
+			<table id="wfm-upload-table">
+				<tbody>
+					<tr>
+						<th scope="row">
+							<label for="uploadPhoto"><?php _e('Photo', 'flickr-manager'); ?>:</label>
+						</th>
+						<td>
+							<div class="fileInputWidth">
+								<input type="file" name="uploadPhoto" class="input" id="uploadPhoto" size="37" />
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="photoTitle"><?php _e('Title', 'flickr-manager'); ?>:</label></th>
+						<td><input type="text" class="input" name="photoTitle" id="flickrTitle" /></td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="photoTags"><?php _e('Tags', 'flickr-manager'); ?>:</label></th>
+						<td><input type="text" class="input" name="photoTags" id="flickrTags" /> <sup>*<?php _e('Space separated list', 'flickr-manager'); ?></sup></td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="photoDesc"><?php _e('Description', 'flickr-manager'); ?>:</label></th>
+						<td><textarea name="photoDesc" class="input" id="flickrDesc" rows="4"></textarea></td>
+					</tr>
+				</tbody>
+			</table>
+			<p class="submit" style="text-align:right">
+				<input type="submit" name="Submit" class="button submit" value="<?php _e('Upload &raquo;', 'flickr-manager'); ?>" onclick="cancelAction = false;" />
+				<input type="hidden" name="faction" id="flickr-action" value="info_page" />
+			</p>
+			
+		</form>
+		
+		<?php 
+			break;
+		endswitch;
+    }
+    
+    function info_page($photo_id) {
+    	global $flickr_settings;
+    	$photo = $this->call('flickr.photos.getInfo', array('photo_id' => $photo_id), true);
+		$settings = $flickr_settings->getSettings();
+    	?>
+		
+		<input type="hidden" id="wfm-ajax-url" value="<?php echo $this->getAbsoluteUrl(); ?>" />
+    	<input type="hidden" name="wfm-auth_token" id="wfm-auth_token" value=<?php echo $settings['token']; ?> />
+		<input type="hidden" name="wfm-blank" id="wfm-blank" value="<?php echo $settings['new_window']; ?>" />
+		<input type="hidden" name="wfm-insert-before" id="wfm-insert-before" value="<?php 
+			$settings['before_wrap'] = str_replace("\n", "", $settings['before_wrap']);
+			echo rawurlencode($settings['before_wrap']);
+		?>" />
+		<input type="hidden" name="wfm-insert-after" id="wfm-insert-after" value="<?php 
+			$settings['after_wrap'] = str_replace("\n", "", $settings['after_wrap']);
+			echo rawurlencode($settings['after_wrap']);
+		?>" />
+		
+		<table class="describe">
+			<thead class="media-item-info">
+				<tr>
+					<td class="A1B1" rowspan="4">
+						<img src="<?php echo $this->getPhotoUrl($photo['photo'], 'thumbnail'); ?>" alt="<?php echo htmlspecialchars($photo['photo']['title']['_content']); ?>" />
+					</td>
+					<td>
+						<?php echo htmlspecialchars($photo['photo']['title']['_content'] . "." . $photo['photo']['originalformat']); ?>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<?php echo htmlspecialchars('image/' . $photo['photo']['originalformat']); ?>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<?php echo htmlspecialchars(date('Y-m-d H:i:s', intval($photo['photo']['dateuploaded']))); ?>
+					</td>
+				</tr>
+				<tr><td></td></tr>
+			</thead>
+			<tbody>
+				<tr class="post_title form-required">
+					<th class="label" valign="top" scope="row">
+						<label for="flickr-title">
+							<span class="alignleft"><?php _e('Title', 'flickr-manager'); ?></span>
+							<span class="alignright">
+								<abbr class="required" title="required">*</abbr>
+							</span>
+							<br class="clear"/>
+						</label>
+					</th>
+					<td class="field">
+						<input id="flickr-title" type="text" value="<?php echo htmlspecialchars($photo['photo']['title']['_content']); ?>" name="flickr-title" />
+					</td>
+				</tr>
+				<tr class="post_tags">
+					<th class="label" valign="top" scope="row">
+						<label for="flickr-tags">
+							<?php _e('Tags', 'flickr-manager'); ?>
+						</label>
+					</th>
+					<td class="field">
+						<input type="text" id="flickr-tags" name="flickr-tags" value="<?php 
+						foreach($photo['photo']['tags']['tag'] as $tag) {
+							echo "{$tag['raw']} ";
+						}
+						?>" />
+						<p class="help">*<?php _e('Space separated list', 'flickr-manager'); ?></p>
+					</td>
+				</tr>
+				<tr class="post_content">
+					<th class="label" valign="top" scope="row">
+						<label for="flickr-description">
+							<?php _e('Description', 'flickr-manager'); ?>
+						</label>
+					</th>
+					<td class="field">
+						<textarea id="flickr-description" name="flickr-description"><?php 
+							echo htmlspecialchars(trim($photo['photo']['description']['_content'])); 
+						?></textarea>
+					</td>
+				</tr>
+				<tr class="url">
+					<th class="label" valign="top" scope="row">
+						<label for="flickr-link">
+							<?php _e('Link URL', 'flickr-manager'); ?>
+						</label>
+					</th>
+					<td class="field">
+						<?php echo htmlspecialchars($photo['photo']['urls']['url'][0]['_content']); ?>
+						<input type="hidden" name="flickr-link" id="flickr-link" value="<?php 
+							echo htmlspecialchars($photo['photo']['urls']['url'][0]['_content']); 
+						?>" />
+					</td>
+				</tr>
+				<tr class="align">
+					<th class="label" valign="top" scope="row">
+						<label for="flickr-align">
+							<?php _e('Alignment', 'flickr-manager'); ?>
+						</label>
+					</th>
+					<td class="field">
+						<input id="flickr-align-none" type="radio" checked="checked" value="none" name="flickr-align" />
+						<label class="align image-align-none-label" for="flickr-align-none"><?php _e('None', 'flickr-manager'); ?></label>
+						<input id="flickr-align-left" type="radio" value="left" name="flickr-align" />
+						<label class="align image-align-left-label" for="flickr-align-left"><?php _e('Left', 'flickr-manager'); ?></label>
+						<input id="flickr-align-center" type="radio" value="center" name="flickr-align" />
+						<label class="align image-align-center-label" for="flickr-align-center"><?php _e('Center', 'flickr-manager'); ?></label>
+						<input id="flickr-align-right" type="radio" value="right" name="flickr-align" />
+						<label class="align image-align-right-label" for="flickr-align-right"><?php _e('Right', 'flickr-manager'); ?></label>
+					</td>
+				</tr>
+				<tr class="image-size">
+					<th class="label" valign="top" scope="row">
+						<label for="flickr-size" style="margin: 0;">
+							<?php _e('Size', 'flickr-manager'); ?>
+						</label>
+					</th>
+					<td class="field">
+						<?php 
+						$token = $flickr_settings->getSetting('token');
+						$params = array('auth_token' => $token, 'photo_id' => $photo_id);
+						$sizes = $this->call('flickr.photos.getSizes', $params, true);
+						
+						foreach($sizes['sizes']['size'] as $size) :
+						?>
+						
+						<div class="image-size-item">
+							<input id="image-size-<?php echo strtolower($size['label']); ?>" type="radio" value="<?php echo strtolower($size['label']); ?>" name="flickr-size" <?php if(strtolower($size['label']) == 'thumbnail') echo 'checked="checked"'; ?> />
+							<label for="image-size-<?php echo strtolower($size['label']); ?>"><?php echo $size['label']; ?></label>
+							<label class="help" for="image-size-<?php echo strtolower($size['label']); ?>">(<?php echo $size['width']; ?> &times; <?php echo $size['height']; ?>)</label>
+							<input type="hidden" id="<?php echo strtolower($size['label']); ?>-url" name="<?php echo strtolower($size['label']); ?>-url" value="<?php echo $this->getPhotoUrl($photo['photo'], $size['label']); ?>" />
+						</div>
+						
+						<?php endforeach; ?>
+					</td>
+				</tr>
+				<tr class="submit">
+					<td></td>
+					<td class="savesend">
+						<input type="hidden" value="<?php echo $photo_id; ?>" name="photo_id" />
+						<input class="button" type="submit" value="<?php _e('Insert into Post', 'flickr-manager'); ?>" name="send" id="flickr-insert" onclick="cancelAction = true;" />
+						<input class="button" type="submit" value="<?php _e('Save', 'flickr-manager'); ?>" name="save" id="flickr-save" onclick="cancelAction = false;" />
+						<input type="hidden" value="Save" name="faction" />
+						<a class="del-link" id="flickr-delete" onclick="return confirm('<?php _e('Are you sure you want to delete this?', 'flickr-manager'); ?>');" href="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>&amp;faction=delete&amp;photo_id=<?php echo $photo_id; ?>"><?php _e('Delete', 'flickr-manager'); ?></a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<div id="wfm-options">
+			<?php $this->overlay_settings(); ?>
+		</div>
+		<?php 	
+    }
+    
+	function save_info() {
+		if($_REQUEST['faction'] != 'Save' || empty($_REQUEST['photo_id'])) return 0;
+		
+		global $flickr_settings;
+		$token = $flickr_settings->getSetting('token');
+		
+		$params = array('photo_id' => $_REQUEST['photo_id'], 
+						'title' => $_REQUEST['flickr-title'],
+						'description' => $_REQUEST['flickr-description'],
+						'auth_token' => $token);
+		
+		$rsp = $this->post('flickr.photos.setMeta', $params, true);
+		
+		$params = array('photo_id' => $_REQUEST['photo_id'], 
+						'tags' => $_REQUEST['flickr-tags'],
+						'auth_token' => $token);
+		
+		$this->post('flickr.photos.setTags', $params, true);
+		
+		$_REQUEST['faction'] = 'info_page';
+		return $_REQUEST['photo_id'];
+	}
+    
+    function paginate($page, $pages) {
+    	if($page > 1) 
+			echo "<a href=\"#?wfm-page=". ($page - 1) ."\">" . __('&laquo; Previous', 'flickr-manager') . "</a> ";
+		
+ 		if($pages > 0) {
+			echo '<a href="#?wfm-page=1" class="page ';
+			if($page == 1) echo ' current';
+			echo '">1</a> ';
+		}
+			
+		if($page < 4 && $pages > 2) {
+			echo "<a href=\"#?wfm-page=2\" class=\"page ";
+			if($page == 2) echo 'current';
+			echo '">2</a> ';
+		}
+		if($page < 4 && $pages > 3) {
+			echo "<a href=\"#?wfm-page=3\" class=\"page ";
+			if($page == 3) echo 'current';
+			echo '">3</a> ';
+			if($page == 3 && $pages > 4) 
+				echo "<a href=\"#?wfm-page=4\" class=\"page\">4</a> ";
+		} elseif( $page >= 4 ) {
+			$linknum = $page - 5;
+			if($linknum < 2) $linknum = 2;
+			echo "<a href=\"#?wfm-page=$linknum\" class=\"page\">...</a> ";
+			$linknum = $page - 1;
+			echo "<a href=\"#?wfm-page=$linknum\" class=\"page\">$linknum</a> ";
+			if($page < $pages)
+				echo "<a href=\"#?wfm-page=$page\" class=\"page current\">$page</a> ";
+				
+			if($pages > $page + 1) {
+				$linknum = $page + 1;
+				echo "<a href=\"#?wfm-page=$linknum\" class=\"page\">$linknum</a> ";
+			}
+		}
+		
+		if($pages > $page + 2 || $page == 1 && $pages > 4) {
+			$linknum = $page + 5;
+			if($linknum >= $pages) $linknum = $page + 2;
+			echo "<a href=\"#?wfm-page=$linknum\" class=\"page\">...</a> ";
+		}
+
+		if($pages > 1) {
+			echo "<a href=\"#?wfm-page={$pages}\" class=\"page";
+			if($page == $pages) echo ' current';
+			echo "\">{$pages}</a>";
+		}
+		
+		if($pages > 1 && $page < $pages) {
+			$linknum = $page + 1;
+			echo " <a href=\"#?wfm-page=$linknum\">" . __('Next &raquo;', 'flickr-manager') . "</a> ";
+		}
+    }
+    
+    function widget_recent_flickr($args) {
+    	global $flickr_settings;
+    	$settings = $flickr_settings->getSetting('recent_widget');
+    	
+    	extract($args);
+    	echo $before_widget;
+    	if(!empty($settings['title'])) {
+	    	echo $before_title;
+	    	echo '<a href="http://www.flickr.com/photos/' . $flickr_settings->getSetting('nsid') . '/">';
+	    	echo '<img src="' . $this->getAbsoluteUrl() . '/images/flickr-media.gif" border="0" alt="Flickr" />';
+	    	echo '</a> '; 
+	    	echo $settings['title'];
+	    	echo $after_title;
+    	}
+    	
+    	$rel = $class = '';
+    	if(!empty($settings['viewer']) && $settings['viewer'] != 'disable') {
+    		$rel = ' rel="flickr-mgr[recent]" ';
+    		$class = " class=\"flickr-{$settings['viewer']}\" ";
+    	}
+    	
+    	$params = array('per_page'	=> $settings['photos'],
+    					'user_id'	=> $flickr_settings->getSetting('nsid'),
+    					'extras'	=> 'icon_server,original_format');
+    	
+    	$photos = $this->call('flickr.people.getPublicPhotos', $params);
+    	
+    	echo '<div style="text-align: center" id="wfm-recent-widget">';
+    	
+    	foreach ($photos['photos']['photo'] as $photo) {
+    		echo "<a href=\"http://www.flickr.com/photos/{$photo['owner']}/{$photo['id']}/\" $rel title=\"" . htmlspecialchars($photo['title']) . '" class="flickr-image">';
+    		if($settings['viewer'] == 'original') $class = ' class="flickr-original" longdesc="' . $this->getPhotoUrl($photo, 'original') . '" ';
+    		echo '<img src="' . $this->getPhotoUrl($photo, 'square') . '" alt="' . htmlspecialchars($photo['title']) . "\" $class />";
+    		echo '</a>';
+    	}
+    	
+    	echo '</div>';
+    	
+    	echo $after_widget;
+    }
+    
+    function widget_recent_flickr_control() {
+    	global $flickr_settings;
+    	
+    	$settings = $flickr_settings->getSetting('recent_widget');
+    	
+    	if(isset($_REQUEST['flickr-title'])) $settings['title'] = $_REQUEST['flickr-title'];
+    	elseif(!isset($settings['title'])) $settings['title'] = 'Recent Photos';
+    	
+    	if(isset($_REQUEST['flickr-photos'])) {
+    		$settings['photos'] = $_REQUEST['flickr-photos'];
+    		if(!is_numeric($settings['photos'])) $settings['photos'] = 10;
+    	} elseif(!isset($settings['photos'])) $settings['photos'] = 10;
+    	
+    	if(isset($_REQUEST['flickr-viewer'])) $settings['viewer'] = $_REQUEST['flickr-viewer'];
+    	elseif(!isset($settings['viewer'])) $settings['viewer'] = 'disable';
+    	
+    	$flickr_settings->saveSetting('recent_widget', $settings);
+    	?>
+    	<p>
+    		<label for="flickr-title">
+    			<?php _e('Title', 'flickr-manager'); ?>:
+    			<input id="flickr-title" class="widefat" type="text" value="<?php echo htmlspecialchars($settings['title']); ?>" name="flickr-title" />
+    		</label>
+    	</p>
+    	<p>
+    		<label for="flickr-photos">
+    			<?php _e('# Photos', 'flickr-manager'); ?>:
+    			<input id="flickr-photos" class="widefat" type="text" value="<?php echo htmlspecialchars($settings['photos']); ?>" name="flickr-photos" />
+    		</label>
+    	</p>
+    	<p>
+    		<label for="flickr-viewer">
+    			<?php _e('Image Viewer', 'flickr-manager'); ?>:
+    			<select name="flickr-viewer" class="widefat" id="flickr-viewer">
+    				<?php 
+    				$options = array( 'disable'	=> __('Disable', 'flickr-manager'),
+    								  'small'	=> __('Small', 'flickr-manager'), 
+									  'medium'	=> __('Medium', 'flickr-manager'), 
+									  'large'	=> __('Large', 'flickr-manager'));
+    				
+    				if($flickr_settings->getSetting('is_pro') == '1') 
+    					$options = array_merge($options, array('original' => __('Original', 'flickr-manager')));
+    					
+    				foreach ($options as $k => $v) {
+    					echo "<option value=\"$k\"";
+    					if($settings['viewer'] == $k) echo ' selected="selected"';
+    					echo '>' . htmlspecialchars($v) . '</option>';
+    				}
+    				?>
+    			</select>
+    			<small><?php _e('This option will determine the image loaded into the Javascript viewer.', 'flickr-manager');?></small>
+    		</label>
+    	</p>
+    	<?php 
+    }
     
 }
 
 global $flickr_manager, $flickr_settings;
-$flickr_manager = new FlickrManager();
 $flickr_settings = new FlickrSettings();
+$flickr_manager = new FlickrManager();
 ?>

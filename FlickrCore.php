@@ -17,7 +17,7 @@ class FlickrCore {
 		
 		if($sign) $params = array_merge($params, array('api_sig' => $this->getSignature($params)));
 		
-		$url = "http://api.flickr.com/services/rest/?" . $this->encodeParameters($params);
+		$url = "http://api.flickr.com/services/rest/?" . http_build_query($params);
 		
 	    return $this->getRequest($url);
 	}
@@ -54,7 +54,7 @@ class FlickrCore {
 		$params = array_merge($call_includes, $params);
 		$params = array_merge($params, array('photo' => $photo, 'api_sig' => $this->getSignature($params)));
 		
-		$url = "http://api.flickr.com/services/upload/";
+		$url = 'http://api.flickr.com/services/upload/';
 		
 		return $this->postRequest($url, $params);
 		
@@ -110,23 +110,58 @@ class FlickrCore {
 		    curl_close($ch);
 			return false;
 		} else {
-			// Perform fopen POST request
-			$request = array('http' => array(
-	                 'method' => 'POST',
-	                 'content' => $this->encodeParameters($params)
-	              ));
-	              
-		    $ctx = stream_context_create($request);
-		    $fp = @fopen($url, 'rb', false, $ctx);
-		    if (!$fp) {
-		       return false;
-		    }
-		    $response = @stream_get_contents($fp);
-		    if ($response === false) {
-		       return false;
-		    }
-		    return $response;
+			return $this->fUpload($url, $params);
 		}
+	}
+	
+	
+	function fUpload($url, $params, $useragent = 'PHPPost/1.0') {
+		$url_info = parse_url( $url );
+		
+		$mime_boundary = md5(date("r",time()));
+		
+		$out = "POST $url HTTP/1.0\r\n";
+		$out .= "Host: {$url_info['host']}\r\n";
+		$out .= "User-Agent: $useragent\r\n";
+		$out .= "Content-Type: multipart/form-data, boundary=$mime_boundary\r\n";
+		
+		ob_start();
+		
+		foreach ($params as $k => $v):
+			echo "\r\n--$mime_boundary";
+			echo "\r\nContent-Disposition: form-data; name=\"$k\"";
+		
+			if($k != 'photo') echo "\r\n\r\n$v";
+			else {
+				echo '; filename="' . basename($v) . "\"\r\n";
+				
+				$filename = substr($v, 1);
+				echo 'Content-Type: ' . mime_content_type($filename) . "\r\n";
+				echo 'Content-Transfer-Encoding: binary' . "\r\n";
+				echo "\r\n" . file_get_contents($filename);
+			}
+		endforeach; 
+		
+		echo "\r\n--$mime_boundary--\r\n";
+		$request = ob_get_clean();
+		
+		$request = $out . 'Content-Length: ' . (strlen( $request )) . "\r\n$request\r\n";
+		
+		$fp = fsockopen( $url_info['host'], 80);
+		if( !$fp ) return false;
+		
+		fwrite($fp, $request);
+		
+		$contents = '';
+		while (!feof($fp)) {
+            $contents .= fread($fp, 256);
+        }
+		
+		fclose($fp);
+		
+		/* seperate content and headers */
+	    $contents = explode( "\r\n\r\n", $contents, 2 );
+	    return $contents[1];
 	}
 	
 	
@@ -145,23 +180,11 @@ class FlickrCore {
 	
 	
 	
-	function encodeParameters($params) {
-		$encoded_params = array();
-	
-		foreach ($params as $k => $v){
-			$encoded_params[] = urlencode($k).'='.urlencode($v);
-		}
-		
-		return implode('&', $encoded_params);
-	}
-	
-	
-	
 	function getAuthUrl($frob, $perms) {
 		$params = array('api_key' => $this->api_key, 'perms' => $perms, 'frob' => $frob);
 		$params = array_merge($params, array('api_sig' => $this->getSignature($params)));
 		
-		$url = 'http://flickr.com/services/auth/?' . $this->encodeParameters($params);
+		$url = 'http://flickr.com/services/auth/?' . http_build_query($params);
 		return $url;
 	}
 	

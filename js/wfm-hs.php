@@ -21,9 +21,8 @@ hs.updateAnchors = function() {
 	wfmJS('a[@rel*=flickr-mgr]').each(function() {
 		all.push(this);
 		images.push(this);
-		var gID = wfmJS(this).attr('rel').match(/flickr\-mgr\[\d+\]/g);
-		
-		var g = (gID) ? 'g' + gID.toString().match(/\d+/) : 'none';
+		var gID = wfmJS(this).attr('rel').match(/flickr\-mgr\[\w*\]/g);
+		var g = (gID) ? 'g' + gID.toString().match(/\[\w*\]/) : 'none';
 		if (!groups[g]) groups[g] = [];
 		groups[g].push(this);
 	});
@@ -78,11 +77,10 @@ function expandImage(anchor) {
 		wfmJS(anchor).attr('href', image_link);
 	}
 	
-	var gID = wfmJS(anchor).attr('rel').match(/flickr\-mgr\[.*\]/g);
+	var gID = wfmJS(anchor).attr('rel').match(/flickr\-mgr\[\w*\]/g);
 	var save_return = false;
 	if(gID) {
-		gID = gID.toString().match(/\[.*\]/).toString();
-		gID = (gID != '[]') ? gID.substr(1, gID.length - 2) : 'flickr-mgr';
+		gID = gID.toString().match(/\[\w*\]/).toString();
 		save_return = hs.expand(anchor, { slideshowGroup: 'g' + gID });
 	} else save_return = hs.expand(anchor);
 	

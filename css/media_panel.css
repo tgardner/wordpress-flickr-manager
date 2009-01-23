@@ -55,6 +55,8 @@
 	line-height: 20px;
 	padding: 2px 5px;
 	text-decoration: none;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
 	}
 	
 #wfm-navigation a.page.current {

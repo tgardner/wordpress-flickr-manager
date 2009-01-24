@@ -1308,29 +1308,31 @@ class FlickrManager extends FlickrCore {
 		<form id="file_upload_form" method="post" class="media-upload-form type-form validate" enctype="multipart/form-data" action="<?php echo $_SERVER['REQUEST_URI']; ?>" onsubmit="return insertUpload();">
 			<?php 
    			if(!empty($rsp)) {
-				$xml = simplexml_load_string($rsp);
-				if($xml !== FALSE) {
-					if(strval($xml['stat']) == 'ok') {
-						$pid = floatval($xml->photoid);
-						?>
-						
-						<div id="upload-success" class="updated fade">
-							<p><?php _e('Image successfully uploaded', 'flickr-manager'); ?>!</p>
-						</div>
-						
-						<?php 
+				if(function_exists('simplexml_load_string')) {
+					$xml = simplexml_load_string($rsp);
+					if($xml !== FALSE) {
+						if(strval($xml['stat']) == 'ok') {
+							$pid = floatval($xml->photoid);
+							?>
+							
+							<div id="upload-success" class="updated fade">
+								<p><?php _e('Image successfully uploaded', 'flickr-manager'); ?>!</p>
+							</div>
+							
+							<?php 
+						} else {
+							$code = floatval($xml->err['code']);
+							$error = strval($xml->err['msg']);
+							echo '<div class="error" id="upload-error">';
+							_e('An error occurred while trying to upload your photo', 'flickr-manager');
+							echo ':<p>' . $code . ': ' . $error . '</p></div>';
+						}
 					} else {
-						$code = floatval($xml->err['code']);
-						$error = strval($xml->err['msg']);
 						echo '<div class="error" id="upload-error">';
-						_e('An error occurred while trying to upload your photo', 'flickr-manager');
-						echo ':<p>' . $code . ': ' . $error . '</p></div>';
+						echo htmlspecialchars($rsp);
+						echo '</div>';
 					}
-   				} else {
-   					echo '<div class="error" id="upload-error">';
-   					echo htmlspecialchars($rsp);
-   					echo '</div>';
-   				}
+				}
 			}
 			?>
 			

@@ -1045,7 +1045,7 @@ class FlickrManager extends FlickrCore {
 				$overlay = (empty($_REQUEST['wfm-lightbox'])) ? $settings['lightbox_enable'] : $_REQUEST['wfm-lightbox'];
 				$page = (empty($_REQUEST['wfm-page'])) ? '1' : $_REQUEST['wfm-page'];
 				
-				$params = array('extras'	=> 'license,owner_name',
+				$params = array('extras'	=> 'license,owner_name,original_format',
 								'per_page'	=> $flickr_settings->getSetting('per_page'),
 								'page' 		=> $page,
 								'media'		=> 'photos');
@@ -1159,7 +1159,7 @@ class FlickrManager extends FlickrCore {
 				$overlay = (empty($_REQUEST['wfm-lightbox'])) ? $settings['lightbox_enable'] : $_REQUEST['wfm-lightbox'];
 				$page = (empty($_REQUEST['wfm-page'])) ? '1' : $_REQUEST['wfm-page'];
 				
-				$params = array('extras'	=> 'license,owner_name',
+				$params = array('extras'	=> 'license,owner_name,original_format',
 								'per_page'	=> $flickr_settings->getSetting('per_page'),
 								'page' 		=> $page,
 								'media'		=> 'photos',

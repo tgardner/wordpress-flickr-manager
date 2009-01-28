@@ -769,6 +769,9 @@ class FlickrManager extends FlickrCore {
 		
 		$token = $flickr_settings->getSetting('token');
 		$params = array('photoset_id' => $attr['id'], 'auth_token' => $token, 'extras' => 'original_format');
+		
+		if($flickr_settings->getSetting('privacy_filter') == 'true') $params = array_merge($params, array('privacy_filter' => 1));
+		
 		$photoset = $this->call('flickr.photosets.getPhotos',$params, true);
 		
 		$html = '';

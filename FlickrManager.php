@@ -818,8 +818,9 @@ class FlickrManager extends FlickrCore {
 			wp_enqueue_script('jquery-md5', $this->getAbsoluteUrl() . '/js/jquery.md5.js', array('jquery'));
 			wp_enqueue_script('wfm-media-panel', $this->getAbsoluteUrl() . '/js/media-panel.php', array('jquery'));
 			return;
-		} elseif($filename != "post.php" && $filename != "page.php" && $filename != "post-new.php" && $filename != "page-new.php") {
-			
+		} elseif($filename == "post.php" || $filename == "page.php" || $filename == "post-new.php" || $filename == "page-new.php") {
+			if(version_compare($wp_version, '2.5') < 0)
+				wp_enqueue_script('wfm-legacy-js', $this->getAbsoluteUrl() . '/js/flickr-js.php', array('jquery'));
 		}
 		
 		// Register recent photo's widget
@@ -829,6 +830,7 @@ class FlickrManager extends FlickrCore {
 		if(function_exists('register_widget_control'))
 			register_widget_control ( 'Recent Flickr Photos', array($this, 'widget_recent_flickr_control'));
 		
+		if(is_admin()) return;
 		$image_viewer = $flickr_settings->getSetting('image_viewer');
 		$image_viewer = (!empty($image_viewer)) ? $image_viewer : 'lightbox';
 		
@@ -836,7 +838,7 @@ class FlickrManager extends FlickrCore {
 			case 'highslide':	
 				wp_enqueue_script('highslide',$this->getAbsoluteUrl(). '/js/highslide.packed.js', array('jquery'));
 				wp_enqueue_script('wfm-hs',$this->getAbsoluteUrl(). '/js/wfm-hs.php');			
-			break;			
+			break;
 			case 'lightbox':		
 				wp_enqueue_script('jquery-lightbox',$this->getAbsoluteUrl(). '/js/jquery.lightbox.js', array('jquery'));
 				wp_enqueue_script('wfm-lightbox',$this->getAbsoluteUrl(). '/js/wfm-lightbox.php');					
@@ -847,7 +849,7 @@ class FlickrManager extends FlickrCore {
 	
 	
 	
-	function add_headers() { 
+	function add_headers() {
 		switch($GLOBALS['image_viewer']){
 			case 'highslide':
 			?>
@@ -895,7 +897,6 @@ class FlickrManager extends FlickrCore {
 		?>
 		
 		<link rel="stylesheet" href="<?php echo $this->getAbsoluteUrl(); ?>/css/admin_style.css" type="text/css" />
-		<script type="text/javascript" src="<?php echo $this->getAbsoluteUrl(); ?>/js/flickr-js.php"></script>
 		
 	<?php
 	}

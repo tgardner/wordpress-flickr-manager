@@ -145,8 +145,8 @@ var prepareImages = function() {
 			longdesc = ' longdesc="' + jQuery(this).attr("longdesc") + '" ';
 		}
 		var license = jQuery("#license-" + id);
-		var wrapBefore = decodeURIComponent(jQuery("#wfm-insert-before").attr("value"));
-		var wrapAfter = decodeURIComponent(jQuery("#wfm-insert-after").attr("value"));
+		var wrapBefore = decodeURIComponent(jQuery("#wfm-insert-before").attr("value")).replace(/\\([\\'"])/g, '$1');
+		var wrapAfter = decodeURIComponent(jQuery("#wfm-insert-after").attr("value")).replace(/\\([\\'"])/g, '$1');
 		
 		var target = ' ';
 		if(jQuery("#wfm-blank").val() == "true") target = ' target="_blank" ';
@@ -293,8 +293,8 @@ function insertUpload() {
 	
 	var token = jQuery("#wfm-auth_token").val();
 	var id = jQuery("input[@name='photo_id']").val();
-	var wrapBefore = decodeURIComponent(jQuery("#wfm-insert-before").attr("value"));
-	var wrapAfter = decodeURIComponent(jQuery("#wfm-insert-after").attr("value"));
+	var wrapBefore = decodeURIComponent(jQuery("#wfm-insert-before").attr("value")).replace(/\\([\\'"])/g, '$1');
+	var wrapAfter = decodeURIComponent(jQuery("#wfm-insert-after").attr("value")).replace(/\\([\\'"])/g, '$1');
 	var target = ' ';
 	if(jQuery("#wfm-blank").val() == "true") target = ' target="_blank" ';
 	var longdesc = '';

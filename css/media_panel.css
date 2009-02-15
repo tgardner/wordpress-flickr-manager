@@ -18,10 +18,6 @@
 	margin: 0px auto;
 }
 
-#wfm-dashboard {
-	height: 130px;
-}
-
 #wfm-scope-block {
 	float: right;
 	vertical-align: middle;
@@ -66,7 +62,8 @@
 	}
 	
 #wfm-navigation a.page:hover {
-	background: #ff9;
+	background: #21759B;
+	color: #fff;
 	}
 	
 #wfm-options {
@@ -146,13 +143,23 @@ tr.image-size td {
 	-moz-border-radius: 4px;
 	width: 90%;
 	}
+	
+h3 a {
+	text-decoration: none;
+	}
 
 #wfm-uploader {
 	border: 0px;
 	width: 600px;
 	height: 330px;
 	overflow: hidden;
-}
+	}
+	
+#wfm-photoset, #wfm-filter {
+	border: 1px solid #dfdfdf;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	}
 
 .hide { display: none !important; }
 

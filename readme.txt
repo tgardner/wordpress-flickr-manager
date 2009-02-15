@@ -4,7 +4,7 @@ Donate link: http://tgardner.net/
 Tags: flickr, images, post, admin, ajax, plugin
 Requires at least: 2.3
 Tested up to: 2.7
-Stable tag: 2.2
+Stable tag: 2.3
 
 Handles uploading, modifying images on Flickr, and insertion into posts.
 

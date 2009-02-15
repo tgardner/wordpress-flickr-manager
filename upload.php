@@ -6,10 +6,15 @@ global $flickr_manager, $flickr_settings;
 
 get_currentuserinfo();
 $upload_level = $flickr_settings->getSetting("upload_level");
+$upload_level = (empty($upload_level)) ? 6 : $upload_level;
+
 if(intval($userdata->user_level) < intval($upload_level)) 
 	die(__('You do not have permission to upload photos to this stream, you may adjust this in the settings page!', 'flickr-manager'));
 
 if(isset($_FILES['uploadPhoto'])) {
+	if(function_exists('check_admin_referer'))
+		check_admin_referer('flickr-manager-upload_legacy');
+	
 	$token = $flickr_settings->getSetting('token');
 
 	/* Perform file upload */
@@ -55,8 +60,12 @@ if(isset($_FILES['uploadPhoto'])) {
 
 <body class="wp-admin">
 	<div id="uploadContainer">
-		<form id="file_upload_form" method="post" enctype="multipart/form-data" action="<?php echo $_SERVER['PHP_SELF']; ?>" style="padding: 0px 20px;">
-			<?php if($upload_success) : ?>
+		<form id="file_upload_form" method="post" enctype="multipart/form-data" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" style="padding: 0px 20px;">
+			<?php
+			if ( function_exists('wp_nonce_field') )
+				wp_nonce_field('flickr-manager-upload_legacy');
+			
+			if($upload_success) : ?>
 			
 				<div id="wfm-success">
 					<strong><?php _e('Image successfully uploaded', 'flickr-manager'); ?></strong>

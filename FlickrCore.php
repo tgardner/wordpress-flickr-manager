@@ -1,8 +1,8 @@
 <?php
 class FlickrCore {
 	
-	var $api_key = "0d3960999475788aee64408b64563028";
-	var $secret = "b1e94e2cb7e1ff41";
+	var $api_key = "488e399ca1004bacb075b3f1ae3c0fa9";
+	var $secret = "c5f620f9b355629e";
 	
 	
 	

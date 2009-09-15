@@ -70,7 +70,16 @@ class FlickrManager extends FlickrCore {
 		
 		$this->db_table = $wpdb->prefix . "flickr";
 		
-		$this->plugin_directory = dirname(plugin_basename(__FILE__));
+		// Workaround for PHP __FILE__ resolving symlinks
+		$plugin_dir = ABSPATH . '/wp-content/plugins';
+		if ($handle = opendir($plugin_dir)) {
+			while (false !== ($file = readdir($handle))) 
+				if ($file != "." && $file != "..") 
+					if(realpath("$plugin_dir/$file") == dirname(__FILE__)) 
+						$this->plugin_directory = $file;
+			closedir($handle);
+		}
+		
 		$this->plugin_filename = basename(__FILE__);
 		
 		register_activation_hook( __FILE__, array(&$this, 'install') );
@@ -925,7 +934,7 @@ class FlickrManager extends FlickrCore {
 	
 	
 	function getAbsoluteUrl() {
-		return get_option('siteurl') . "/wp-content/plugins/" . $this->plugin_directory;
+		return get_bloginfo('url') . "/wp-content/plugins/" . $this->plugin_directory;
 	}
 	
 	
@@ -999,7 +1008,7 @@ class FlickrManager extends FlickrCore {
 		$flickr_title = __('Add Flickr Photo', 'flickr-manager');
 
 		$link_markup = "<a href=\"{$flickr_upload_iframe_src}&amp;tab=flickr&amp;TB_iframe=true&amp;height=500&amp;width=640\" class=\"thickbox\" title=\"$flickr_title\"><img src=\"".$this->getAbsoluteUrl()."/images/flickr-media.gif\" alt=\"$flickr_title\" /></a>\n";
-
+		
 		echo $link_markup;
         
 	}

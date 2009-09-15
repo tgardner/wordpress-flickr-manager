@@ -2,9 +2,13 @@
 header('Content-Type: text/javascript');
 header('Cache-Control: no-cache');
 header('Pragma: no-cache');
-require_once("../../../../wp-config.php");
+
+$wp_dir = implode(DIRECTORY_SEPARATOR, array_slice(explode(DIRECTORY_SEPARATOR, dirname($_SERVER['DOCUMENT_ROOT'] . $_SERVER['PHP_SELF'])),0,-4));
+require_once("$wp_dir/wp-config.php");
+
+global $flickr_manager;
 ?>
-var wfm_plugin = '<?php global $flickr_manager; echo $flickr_manager->getAbsoluteUrl(); ?>';
+var wfm_plugin = '<?php echo $flickr_manager->getAbsoluteUrl(); ?>';
 var cancelAction = false;
  
 jQuery(document).ready(function() {
@@ -88,7 +92,7 @@ function insertUpload() {
 	if(!cancelAction) return true;
 	
 	var token = jQuery("#wfm-auth_token").val();
-	var id = jQuery("input[@name='photo_id']").val();
+	var id = jQuery('input[name="photo_id"]').val();
 	var wrapBefore = decodeURIComponent(jQuery("#wfm-insert-before").attr("value")).replace(/\\([\\'"])/g, '$1');
 	var wrapAfter = decodeURIComponent(jQuery("#wfm-insert-after").attr("value")).replace(/\\([\\'"])/g, '$1');
 	var target = ' ';
@@ -100,17 +104,17 @@ function insertUpload() {
 	}
 	var classStr = ' class="';
 	if(jQuery("#wfm-lightbox").is(":checked")) {
-		classStr = classStr + 'flickr-' + jQuery("select[@name='wfm-lbsize']").val();
+		classStr = classStr + 'flickr-' + jQuery("select[name='wfm-lbsize']").val();
 	} else {
 		rel = '';
 	}
 	classStr = classStr + '" ';
 	
-	var size = jQuery("input[@name='flickr-size']:checked").val();
-	if(jQuery("select[@name='wfm-lbsize']").val() == 'original')
+	var size = jQuery("input[name='flickr-size']:checked").val();
+	if(jQuery("select[name='wfm-lbsize']").val() == 'original')
 		longdesc = ' longdesc="' + jQuery('#original-url').val() + '" ';
 	
-	var imgHTML = '<a href="' + jQuery('#flickr-link').val() + '" title="' + jQuery('#flickr-title').val() + '"' + target + 'class="flickr-image align'+jQuery("input[@name='flickr-align']:checked").val()+'"' + rel + '>';
+	var imgHTML = '<a href="' + jQuery('#flickr-link').val() + '" title="' + jQuery('#flickr-title').val() + '"' + target + 'class="flickr-image align'+jQuery("input[name='flickr-align']:checked").val()+'"' + rel + '>';
 	imgHTML = imgHTML + '<img src="' + jQuery('#'+size+'-url').val() + '" alt="' + jQuery('#flickr-title').val() + '"' + classStr + longdesc + ' /></a>';
 	
 	if(jQuery('#licence').size() > 0) {
@@ -140,7 +144,7 @@ function insertSet() {
 	var wrapAfter = decodeURIComponent(jQuery("#wfm-insert-after").attr("value")).replace(/\\([\\'"])/g, '$1');
 	
 	var id = jQuery("#wfm-photoset").val();
-	var imgHTML = '[flickrset id="' + id + '" thumbnail="' + jQuery("input[@name='flickr-size']").val() + '"';
+	var imgHTML = '[flickrset id="' + id + '" thumbnail="' + jQuery("input[name='flickr-size']").val() + '"';
 	if(jQuery("#wfm-lightbox").is(':checked')) { 
 		imgHTML = imgHTML + ' overlay="true" size="' + jQuery('#wfm-lbsize').val() + '"';
 	}

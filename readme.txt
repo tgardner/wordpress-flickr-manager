@@ -28,25 +28,15 @@ Inserting images into posts could never have been easier. Simply click on an ima
 == Frequently Asked Questions ==
 
 1. How do I insert an image into my post?
-Just add [img:&lt;flickr-image-id&gt;,&lt;size&gt;] anywhere you want it in your post. 
-*CHANGE: From version 1.1 onwards you can add images directly to your posts by clicking 'Browse Photos' on the Flickr Manager panel (located beneath the tinyMCE editor) on the edit page.*
-Sizes Available:
-	* Square
-	* Small
-	* Medium
-	* Large
-	* Original
-	* Thumbnail
+Just click on the Flickr Icon above the edit post TinyMCE editor
 
 2. How do I authenticate with my account?
 Through the `Settings->Flickr` menu, click Authenticate, log into Flickr and then click finish.
 
 3. How do I upload / edit my pictures?
-Through the 'Manage->Flickr' menu, and follow the on screen instructions.
-*CHANGE: From version 1.1 onwards you can upload images directly to Flickr by clicking 'Upload Photo' on the Flickr Manager panel (located beneath the tinyMCE editor) on the edit page.*
+Just click on the Flickr Icon above the edit post TinyMCE editor
 
 == Screenshots ==
 
-1. The Flickr Manager Media Button browse dialog
-2. The upload panel available from within the media button
-3. The added media button
+1. The upload panel available from within the media button
+2. The added media button

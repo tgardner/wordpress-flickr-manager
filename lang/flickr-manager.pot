@@ -1,0 +1,343 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Wordpress Flickr Manager\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-04-28 13:58+0930\n"
+"PO-Revision-Date: 2011-04-28 13:59+0930\n"
+"Last-Translator: Trent Gardner <trent.gardner@gmail.com>\n"
+"Language-Team: Trent Gardner <trent.gardner@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: D:\\Web\\wordpress\\wp-content\\plugins\\wordpress-flickr-manager\n"
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:74
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:215
+msgid "Key"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:75
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:217
+msgid "Secret"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:122
+msgid "Options Saved!"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:159
+msgid "API key has been reset to default!"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:167
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrManager.php:410
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:321
+msgid "Small"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:168
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrManager.php:411
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:322
+msgid "Medium"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:169
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrManager.php:412
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:323
+msgid "Large"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:173
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrManager.php:415
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:326
+msgid "Original"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:177
+msgid "Disabled"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:187
+msgid "Flickr Manager Settings"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:206
+msgid "Global Settings"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:210
+msgid "API Information"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:219
+msgid "Override API Key. You will need to authenticate with Flickr again."
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:233
+msgid "Open Flickr pages in a new window"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:238
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrManager.php:430
+msgid "Image Viewer"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:244
+msgid "Include Flickr link in caption"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:249
+msgid "Before Image"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:254
+msgid "After Image"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:259
+msgid "Enable Photo Sharing"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:278
+msgid "Media Panel Settings"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:282
+msgid "Hide private photos"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:287
+msgid "Photos per page"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:298
+msgid "Enable image viewer by default"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:303
+msgid "Default image viewer size"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:319
+msgid "User Information"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:323
+msgid "Username"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:328
+msgid "User ID"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:333
+msgid "Real Name"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:338
+msgid "Photo URL"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:343
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrManager.php:425
+msgid "# Photos"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:348
+msgid "Logout &raquo;"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:351
+msgid "About"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:393
+msgid "Authenticate"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:396
+msgid "Step"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:399
+msgid "Finish &raquo;"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:400
+msgid "If you have modified your API Key and would like to reset it back to default, please click <a href=\"#\" id=\"resetapi\">here</a>."
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrAdmin.php:479
+msgid "Save Changes"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrManager.php:29
+#, php-format
+msgid "You are currently running %s and you must have at least PHP 4.4.x in order to use Flickr Manager!"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrManager.php:145
+msgid "Settings"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrManager.php:391
+msgid "Recent Photos"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrManager.php:409
+msgid "Disable"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrManager.php:420
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:282
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:334
+msgid "Title"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrManager.php:440
+msgid "This option will determine the image loaded into the Javascript viewer."
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:61
+msgid "Loading..."
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:62
+msgid "Are you sure you want to delete this?"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:93
+msgid "Add Flickr Photo"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:112
+msgid "Error: Please authenticate through "
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:132
+msgid "Photo stream"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:133
+msgid "Albums"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:134
+msgid "Everyone"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:135
+msgid "Upload"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:148
+msgid "Search"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:186
+msgid "An error occurred while trying to upload your photo"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:252
+msgid "Insert Set"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:283
+msgid "Tags"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:285
+msgid "Space separated list"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:286
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:335
+msgid "Description"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:288
+msgid "Link URL"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:290
+msgid "Alignment"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:291
+msgid "None"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:292
+msgid "Left"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:293
+msgid "Center"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:294
+msgid "Right"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:295
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:336
+msgid "Size"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:297
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:346
+msgid "Insert into Post"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:301
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:337
+msgid "Enable Viewer"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:302
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:338
+msgid "Viewer Size"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:304
+msgid "Image Group"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:319
+msgid "Square"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:320
+msgid "Thumbnail"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:339
+msgid "* Leave blank to display the entire album."
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:340
+msgid "Number of Photos"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:360
+msgid "Save"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:361
+msgid "Delete"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/FlickrPanel.php:442
+msgid "Invalid function call or reference!"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/OverlayLoader.php:90
+msgid "View on Flickr"
+msgstr ""
+
+#: D:\Web\wordpress\wp-content\plugins\wordpress-flickr-manager/templates/FlickrPage.php:9
+msgid "Wordpress Flickr Manager is not installed / activated!"
+msgstr ""
+

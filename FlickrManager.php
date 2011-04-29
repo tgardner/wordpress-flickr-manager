@@ -3,7 +3,7 @@
 Plugin Name: Flickr Manager
 Plugin URI: http://tgardner.net/wordpress-flickr-manager/
 Description: Handles uploading, modifying images on Flickr, and insertion into posts.
-Version: 3.0
+Version: 3.0.1
 Author: Trent Gardner
 Author URI: http://tgardner.net/
 
@@ -39,6 +39,8 @@ require_once(dirname(__FILE__) . '/BasePlugin.php');
 class FlickrManager extends BasePlugin
 {
 	var $flickr;
+	var $cache_table;
+	var $cache_dir;
 	
 	function FlickrManager() 
 	{
@@ -51,6 +53,12 @@ class FlickrManager extends BasePlugin
 		
 		//Additional links on the plugin page
 		add_filter('plugin_row_meta', array(&$this, 'RegisterPluginLinks'),10,2);
+		
+		// Clear previous version cache
+		register_activation_hook( __FILE__, array(&$this, 'ClearCache') );
+		
+		// Clean up after our self
+		register_deactivation_hook( __FILE__, array(&$this, 'ClearCache') );
 		
 		// Register the photo shortcodes
 		$this->CreateShortcodes();
@@ -66,6 +74,7 @@ class FlickrManager extends BasePlugin
 			'api_key' => '0d3960999475788aee64408b64563028'
 			,'secret' => 'b1e94e2cb7e1ff41'
 			,'per_page' => 5
+            ,'cache' => 'db'
 		);
 		
 		foreach($defaults as $k => $v) {
@@ -73,36 +82,92 @@ class FlickrManager extends BasePlugin
 				$this->settings[$k] = $v;
 			}
 		}
-	}
-	
-	function GetPhotos($page, $owner, $filter = null) 
-	{
-		$params = array(
-			'extras' => 'license,owner_name,original_format'
-			,'per_page' => $this->settings['per_page']
-			,'page' => $page
-			,'auth_token' => $this->settings['token']
-			,'text' => $filter
-			,'user_id' => $owner
-			,'media' => (!empty($owner)) ? 'all' : 'photos'
-		);
 		
-		if($owner != null && $this->settings['privacy_filter'] == 'true')
-			$params['privacy_filter'] = 1;
-		
-		return $this->flickr->photos_search($params);
+		global $wpdb;
+		$this->cache_table = $wpdb->prefix . "flickr";
+		$this->cache_dir = dirname(__FILE__) . '/cache/';
 	}
 	
 	function CreateFlickrHandler($api_key, $secret) 
 	{
 		global $wpdb;
 		
-		$cache_connection = 'mysql://' . DB_USER . ':' . DB_PASSWORD . '@' . DB_HOST . '/' . DB_NAME;
-		$cache_table = $wpdb->prefix . "flickr";
-	
 		$this->flickr = new phpFlickr($api_key, $secret);
-		$this->flickr->enableCache('db', $cache_connection, 600, $cache_table);
+        
+        if($this->settings['cache'] == 'fs') {
+        	// Enable file system caching
+            $this->flickr->enableCache('fs', $this->cache_dir);
+        } else {
+        	// Enable database caching
+            if ( isset($wpdb->charset) && !empty($wpdb->charset) ) {
+				$charset = ' DEFAULT CHARSET=' . $wpdb->charset;
+			} elseif ( defined(DB_CHARSET) && DB_CHARSET != '' ) {
+				$charset = ' DEFAULT CHARSET=' . DB_CHARSET;
+			} else {
+				$charset = '';
+			}
+			
+            $query = " CREATE TABLE IF NOT EXISTS `$this->cache_table` (
+							`request` CHAR( 35 ) NOT NULL ,
+							`response` MEDIUMTEXT NOT NULL ,
+							`expiration` DATETIME NOT NULL ,
+							INDEX ( `request` )
+						) " . $charset;
+            
+            $wpdb->query($query);
+            
+            $this->flickr->enableCache('custom', array(array(&$this, 'CacheGet'), array(&$this, 'CacheSet')));
+            
+        }
+        
 		$this->flickr->setToken($this->GetSetting('token'));
+	}
+	
+	function ClearCache() {
+		global $wpdb;
+		
+		$wpdb->query("DROP TABLE `$this->cache_table`");
+		
+		if ($dir = opendir($this->cache_dir)) {
+			while ($file = readdir($dir)) {
+				if (substr($file, -6) == '.cache') {
+					unlink($this->cache_dir . '/' . $file);
+				}
+			}
+		}
+	}
+	
+	function CacheGet($key) {
+		global $wpdb;
+		$result = $wpdb->get_row(sprintf('SELECT * FROM `%s` WHERE request = "%s" AND expiration >= NOW()'
+											, $this->cache_table
+											, $wpdb->escape($key)));
+		
+		if ( is_null($result) ) return false;
+		return $result->response;
+	}
+	
+	function CacheSet($key, $value, $expire) {
+		global $wpdb;
+		$query = '
+			INSERT INTO `' . $this->cache_table . '`
+				(
+					request, 
+					response, 
+					expiration
+				)
+			VALUES
+				(
+					"' . $wpdb->escape($key) . '", 
+					"' . $wpdb->escape($value) . '", 
+					FROM_UNIXTIME(' . (time() + (int) $expire) . ')
+				)
+			ON DUPLICATE KEY UPDATE 
+				response = VALUES(response),
+				expiration = VALUES(expiration)
+			
+		';
+		$wpdb->query($query);
 	}
 	
 	function CreateShortcodes()
@@ -156,6 +221,26 @@ class FlickrManager extends BasePlugin
 		echo "<script type='text/javascript'>\n//<![CDATA[\n";
 		echo sprintf("var WFM_ShareServices = %s;\n", $services);
 		echo "//]]>\n</script>";
+	}
+	
+	function GetPhotos($page, $owner, $filter = null) 
+	{
+		$params = array(
+			'extras' => 'license,owner_name,original_format'
+			,'per_page' => $this->settings['per_page']
+			,'page' => $page
+			,'auth_token' => $this->settings['token']
+			,'text' => $filter
+			,'user_id' => $owner
+			,'media' => (!empty($owner)) ? 'all' : 'photos'
+		);
+		
+		if($owner != null && $this->settings['privacy_filter'] == 'true')
+			$params['privacy_filter'] = 1;
+		
+		// Disable caching incase of new photos
+		$this->flickr->request("flickr.photos.search", $params, true);
+		return $this->flickr->parsed_response ? $this->flickr->parsed_response['photos'] : false;
 	}
 	
 	function SavePhoto($photoid, $title, $description, $tags) 

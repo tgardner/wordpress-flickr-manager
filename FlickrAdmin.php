@@ -229,6 +229,15 @@ class FlickrAdmin
 																	<label for="apikey_override">[OverrideText]</label>')
 											,'extras' => array('secret')
 										),
+                                        array(
+                                            'label' => __('Cache Type', 'flickr-manager')
+                                            ,'name' => 'cache'
+                                            ,'type' => 'select'
+                                            ,'param' => array(
+                                                            'db' => __('Database', 'flickr-manager')
+                                                            ,'fs' => __('File System', 'flickr-manager')
+                                                        )
+                                        ),
 										array(
 											'label' => __('Open Flickr pages in a new window', 'flickr-manager')
 											,'name' => 'new_window'

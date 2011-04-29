@@ -110,7 +110,7 @@ class FlickrPanel
 			echo $error->render(array(
 				'Error' => sprintf('%s <a href="%s">Settings->Flickr</a>'
 									,__('Error: Please authenticate through ', 'flickr-manager')
-									,$flickr_manager->GetOptionsUrl())
+									,admin_url("/options-general.php?page=" . $flickr_manager->GetBaseName()))
 			));
 			return;
 		}
@@ -262,7 +262,11 @@ class FlickrPanel
 		if(!empty($pid)) {
 			
 			$page = new Page('templates/InsertPhoto.tpl');
-			$photo = $flickr_manager->flickr->photos_getInfo($pid);
+			
+			// Get photo info and bypass caching in case the image has been changed
+			$flickr_manager->flickr->request('flickr.photos.getInfo',  array('photo_id' => $pid), true);
+			$photo = $flickr_manager->flickr->parsed_response ? $flickr_manager->flickr->parsed_response : false;
+			
 			$sizes = $flickr_manager->flickr->photos_getSizes($pid);
 			$photo = $photo['photo'];
 			
@@ -411,6 +415,9 @@ if(strtoupper($_SERVER['REQUEST_METHOD']) == "POST" && basename($_SERVER['REQUES
 {
 	// AJAX Handler
 	error_reporting(E_ERROR);
+	
+	header("Cache-Control: no-cache");
+  	header("Pragma: no-cache");
 
 	// Load Wordpress Core
 	require_once( dirname(__FILE__) . '/../../../wp-load.php');

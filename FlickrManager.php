@@ -75,6 +75,11 @@ class FlickrManager extends BasePlugin
 			,'secret' => 'b1e94e2cb7e1ff41'
 			,'per_page' => 5
             ,'cache' => 'db'
+            ,'recent_widget' => array(
+									'title' => __('Recent Photos', 'flickr-manager')
+									,'photos' => 10
+									,'viewer' => (!empty($this->settings['lightbox_default'])) ? $this->settings['lightbox_default'] : ''
+								)
 		);
 		
 		foreach($defaults as $k => $v) {
@@ -471,17 +476,6 @@ class FlickrManager extends BasePlugin
 	function RenderRecentPhotoWidgetControl() 
 	{
 		$settings = $this->settings['recent_widget'];
-		
-		$defaults = array(
-			'title' => __('Recent Photos', 'flickr-manager')
-			,'photos' => 10
-			,'viewer' => (!empty($this->settings['lightbox_default'])) ? $this->settings['lightbox_default'] : ''
-		);
-		
-		if(empty($settings)) {
-			$this->SaveSetting('recent_widget', $defaults);
-			$settings = $this->settings['recent_widget'];
-		}
 		
 		if(isset($_REQUEST['flickr-title'])) {
 			$settings['title'] = $_REQUEST['flickr-title'];

@@ -36,8 +36,8 @@ class OverlayLoader {
 		if($handle = opendir($this->overlayDir)) {
 			
 			while(($file = readdir($handle)) !== false) {
-				if(!is_dir(realpath($this->overlayDir . '/' . $file)) && substr($file,0,1) != ".") {
-					$this->plugins[strtolower($this->GetName($file))] = $file;
+				if(!is_dir(realpath($this->overlayDir . '/' . $file)) && substr($file,0,1) != "." && $name = $this->GetName($file)) {
+					$this->plugins[strtolower($name)] = $file;
 				}
 			}
 			
@@ -47,12 +47,16 @@ class OverlayLoader {
 	function GetName($plugin) 
 	{
 		$includePath = $this->overlayDir . '/' . $plugin;
-		if(!file_exists($includePath)) 
+		if(!file_exists($includePath) || substr($includePath, -4) != '.php') 
 			return;
 		
 		include_once($includePath);
 		
 		$class = substr($plugin,0,strpos($plugin,".",0));
+		
+		if(!class_exists($class))
+			return;
+		
 		$instance = new $class(true);
 		return $instance->GetName();
 	}

@@ -36,7 +36,7 @@ class OverlayLoader {
 		if($handle = opendir($this->overlayDir)) {
 			
 			while(($file = readdir($handle)) !== false) {
-				if(!is_dir($file) && substr($file,0,1) != ".") {
+				if(!is_dir(realpath($this->overlayDir . '/' . $file)) && substr($file,0,1) != ".") {
 					$this->plugins[strtolower($this->GetName($file))] = $file;
 				}
 			}

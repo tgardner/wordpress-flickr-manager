@@ -4,17 +4,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  \n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/wordpress-flickr-manager\n"
-"POT-Creation-Date: 2011-04-28 05:28:29+00:00\n"
+"POT-Creation-Date: 2011-04-29 01:25:12+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "PO-Revision-Date: 2010-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-
-#: templates/FlickrPage.php:9
-msgid "Wordpress Flickr Manager is not installed / activated!"
-msgstr ""
 
 #: OverlayLoader.php:90
 msgid "View on Flickr"
@@ -26,47 +22,47 @@ msgid ""
 "to use Flickr Manager!"
 msgstr ""
 
-#: FlickrManager.php:145
+#: FlickrManager.php:210
 msgid "Settings"
 msgstr ""
 
-#: FlickrManager.php:391
+#: FlickrManager.php:476
 msgid "Recent Photos"
 msgstr ""
 
-#: FlickrManager.php:409
+#: FlickrManager.php:494
 msgid "Disable"
 msgstr ""
 
-#: FlickrManager.php:410 FlickrAdmin.php:167 FlickrPanel.php:321
+#: FlickrManager.php:495 FlickrAdmin.php:167 FlickrPanel.php:325
 msgid "Small"
 msgstr ""
 
-#: FlickrManager.php:411 FlickrAdmin.php:168 FlickrPanel.php:322
+#: FlickrManager.php:496 FlickrAdmin.php:168 FlickrPanel.php:326
 msgid "Medium"
 msgstr ""
 
-#: FlickrManager.php:412 FlickrAdmin.php:169 FlickrPanel.php:323
+#: FlickrManager.php:497 FlickrAdmin.php:169 FlickrPanel.php:327
 msgid "Large"
 msgstr ""
 
-#: FlickrManager.php:415 FlickrAdmin.php:173 FlickrPanel.php:326
+#: FlickrManager.php:500 FlickrAdmin.php:173 FlickrPanel.php:330
 msgid "Original"
 msgstr ""
 
-#: FlickrManager.php:420 FlickrPanel.php:282 FlickrPanel.php:334
+#: FlickrManager.php:505 FlickrPanel.php:286 FlickrPanel.php:338
 msgid "Title"
 msgstr ""
 
-#: FlickrManager.php:425 FlickrAdmin.php:343
+#: FlickrManager.php:510 FlickrAdmin.php:352
 msgid "# Photos"
 msgstr ""
 
-#: FlickrManager.php:430 FlickrAdmin.php:238
+#: FlickrManager.php:515 FlickrAdmin.php:247
 msgid "Image Viewer"
 msgstr ""
 
-#: FlickrManager.php:440
+#: FlickrManager.php:525
 msgid "This option will determine the image loaded into the Javascript viewer."
 msgstr ""
 
@@ -107,93 +103,109 @@ msgid "Override API Key. You will need to authenticate with Flickr again."
 msgstr ""
 
 #: FlickrAdmin.php:233
+msgid "Cache Type"
+msgstr ""
+
+#: FlickrAdmin.php:237
+msgid "Database"
+msgstr ""
+
+#: FlickrAdmin.php:238
+msgid "File System"
+msgstr ""
+
+#: FlickrAdmin.php:242
 msgid "Open Flickr pages in a new window"
 msgstr ""
 
-#: FlickrAdmin.php:244
+#: FlickrAdmin.php:253
 msgid "Include Flickr link in caption"
 msgstr ""
 
-#: FlickrAdmin.php:249
+#: FlickrAdmin.php:258
 msgid "Before Image"
 msgstr ""
 
-#: FlickrAdmin.php:254
+#: FlickrAdmin.php:263
 msgid "After Image"
 msgstr ""
 
-#: FlickrAdmin.php:259
+#: FlickrAdmin.php:268
 msgid "Enable Photo Sharing"
 msgstr ""
 
-#: FlickrAdmin.php:278
+#: FlickrAdmin.php:287
 msgid "Media Panel Settings"
 msgstr ""
 
-#: FlickrAdmin.php:282
+#: FlickrAdmin.php:291
 msgid "Hide private photos"
 msgstr ""
 
-#: FlickrAdmin.php:287
+#: FlickrAdmin.php:296
 msgid "Photos per page"
 msgstr ""
 
-#: FlickrAdmin.php:298
+#: FlickrAdmin.php:307
 msgid "Enable image viewer by default"
 msgstr ""
 
-#: FlickrAdmin.php:303
+#: FlickrAdmin.php:312
 msgid "Default image viewer size"
 msgstr ""
 
-#: FlickrAdmin.php:319
+#: FlickrAdmin.php:328
 msgid "User Information"
 msgstr ""
 
-#: FlickrAdmin.php:323
+#: FlickrAdmin.php:332
 msgid "Username"
 msgstr ""
 
-#: FlickrAdmin.php:328
+#: FlickrAdmin.php:337
 msgid "User ID"
 msgstr ""
 
-#: FlickrAdmin.php:333
+#: FlickrAdmin.php:342
 msgid "Real Name"
 msgstr ""
 
-#: FlickrAdmin.php:338
+#: FlickrAdmin.php:347
 msgid "Photo URL"
 msgstr ""
 
-#: FlickrAdmin.php:348
+#: FlickrAdmin.php:357
 msgid "Logout &raquo;"
 msgstr ""
 
-#: FlickrAdmin.php:351
+#: FlickrAdmin.php:360
 msgid "About"
 msgstr ""
 
-#: FlickrAdmin.php:393
+#: FlickrAdmin.php:402
 msgid "Authenticate"
 msgstr ""
 
-#: FlickrAdmin.php:396
+#: FlickrAdmin.php:405
 msgid "Step"
 msgstr ""
 
-#: FlickrAdmin.php:399
+#: FlickrAdmin.php:408
 msgid "Finish &raquo;"
 msgstr ""
 
-#: FlickrAdmin.php:400
+#: FlickrAdmin.php:409
 msgid ""
 "If you have modified your API Key and would like to reset it back to "
 "default, please click <a href=\"#\" id=\"resetapi\">here</a>."
 msgstr ""
 
-#: FlickrAdmin.php:479
+#: FlickrAdmin.php:488
 msgid "Save Changes"
+msgstr ""
+
+#: templates/FlickrPage.php:9
+msgid "Wordpress Flickr Manager is not installed / activated!"
 msgstr ""
 
 #: FlickrPanel.php:61
@@ -240,86 +252,86 @@ msgstr ""
 msgid "Insert Set"
 msgstr ""
 
-#: FlickrPanel.php:283
+#: FlickrPanel.php:287
 msgid "Tags"
 msgstr ""
 
-#: FlickrPanel.php:285
+#: FlickrPanel.php:289
 msgid "Space separated list"
 msgstr ""
 
-#: FlickrPanel.php:286 FlickrPanel.php:335
+#: FlickrPanel.php:290 FlickrPanel.php:339
 msgid "Description"
 msgstr ""
 
-#: FlickrPanel.php:288
+#: FlickrPanel.php:292
 msgid "Link URL"
 msgstr ""
 
-#: FlickrPanel.php:290
+#: FlickrPanel.php:294
 msgid "Alignment"
 msgstr ""
 
-#: FlickrPanel.php:291
+#: FlickrPanel.php:295
 msgid "None"
 msgstr ""
 
-#: FlickrPanel.php:292
+#: FlickrPanel.php:296
 msgid "Left"
 msgstr ""
 
-#: FlickrPanel.php:293
+#: FlickrPanel.php:297
 msgid "Center"
 msgstr ""
 
-#: FlickrPanel.php:294
+#: FlickrPanel.php:298
 msgid "Right"
 msgstr ""
 
-#: FlickrPanel.php:295 FlickrPanel.php:336
+#: FlickrPanel.php:299 FlickrPanel.php:340
 msgid "Size"
 msgstr ""
 
-#: FlickrPanel.php:297 FlickrPanel.php:346
+#: FlickrPanel.php:301 FlickrPanel.php:350
 msgid "Insert into Post"
 msgstr ""
 
-#: FlickrPanel.php:301 FlickrPanel.php:337
+#: FlickrPanel.php:305 FlickrPanel.php:341
 msgid "Enable Viewer"
 msgstr ""
 
-#: FlickrPanel.php:302 FlickrPanel.php:338
+#: FlickrPanel.php:306 FlickrPanel.php:342
 msgid "Viewer Size"
 msgstr ""
 
-#: FlickrPanel.php:304
+#: FlickrPanel.php:308
 msgid "Image Group"
 msgstr ""
 
-#: FlickrPanel.php:319
+#: FlickrPanel.php:323
 msgid "Square"
 msgstr ""
 
-#: FlickrPanel.php:320
+#: FlickrPanel.php:324
 msgid "Thumbnail"
 msgstr ""
 
-#: FlickrPanel.php:339
+#: FlickrPanel.php:343
 msgid "* Leave blank to display the entire album."
 msgstr ""
 
-#: FlickrPanel.php:340
+#: FlickrPanel.php:344
 msgid "Number of Photos"
 msgstr ""
 
-#: FlickrPanel.php:360
+#: FlickrPanel.php:364
 msgid "Save"
 msgstr ""
 
-#: FlickrPanel.php:361
+#: FlickrPanel.php:365
 msgid "Delete"
 msgstr ""
 
-#: FlickrPanel.php:442
+#: FlickrPanel.php:449
 msgid "Invalid function call or reference!"
 msgstr ""

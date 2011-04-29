@@ -2,9 +2,11 @@ var wfmJS = jQuery.noConflict();
 
 String.prototype.format = function() {
     var formatted = this;
-    for(arg in arguments) {
-        formatted = formatted.replace("{" + arg + "}", arguments[arg]);
-    }
+    
+    wfmJS.each(arguments, function(k, v) {
+    	formatted = formatted.replace("{" + k + "}", v);
+    });
+    
     return formatted;
 };
 

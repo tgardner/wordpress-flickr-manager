@@ -36,10 +36,10 @@ jQuery(function( $ ) {
 				wfmAJAX.displayPhotos(data);
 				
 				var setSelect = $('<select id="photoset"></select>');
-				for(var i in data.photosets) {
-					var option = data.photosets[i];
-					setSelect.append('<option value="{0}">{1}</option>'.format(option.id, option.title));
-				}
+				
+				$.each(data.photosets, function(k, v) {
+					setSelect.append('<option value="{0}">{1}</option>'.format(v.id, v.title));
+				});
 				
 				setSelect.change(function() {
 					wfmAJAX.loadPhotoset($(this).val());

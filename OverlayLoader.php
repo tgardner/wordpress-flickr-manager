@@ -79,7 +79,7 @@ class OverlayLoader {
 	}
 	
 	function LoadCommonJavascript() {
-		wp_enqueue_script('wfm-common',plugins_url('/js/wfm-common.js', __FILE__), array('jquery'));
+		wp_enqueue_script('wfm-common',plugins_url('/js/wfm-common.js', __FILE__), array('jquery'),'20110429');
 	}
 	
 	function LoadWFMVariables() {

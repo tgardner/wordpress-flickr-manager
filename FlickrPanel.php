@@ -49,8 +49,8 @@ class FlickrPanel
 		
 		if($type == 'flickr') {
 		
-			wp_enqueue_script('wfm-common', plugins_url('/js/wfm-common.js', __FILE__), array('jquery'), '20110428');
-			wp_enqueue_script('wfm-media-panel', plugins_url('/js/MediaPanel.js', __FILE__), array('jquery'), '20110428');
+			wp_enqueue_script('wfm-common', plugins_url('/js/wfm-common.js', __FILE__), array('jquery'), '20110429');
+			wp_enqueue_script('wfm-media-panel', plugins_url('/js/MediaPanel.js', __FILE__), array('jquery'), '20110429');
 			
 			$params = array(
 				'WFMPath' => $flickr_manager->absoluteURL
